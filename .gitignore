@@ -37,3 +37,5 @@ build/
 /target/
 /.mvn/
 /.idea/
+/artline_parts.csv
+/artline_parts.xlsx

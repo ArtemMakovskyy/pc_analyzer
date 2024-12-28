@@ -29,7 +29,7 @@ public class TotalArtLineParser {
     @PostConstruct
     public void init() {
 //        parse();
-        parseMultiThreaded();
+//        parseMultiThreaded();
     }
 
     public void parse() {
@@ -223,17 +223,16 @@ public class TotalArtLineParser {
     private void saveCsvFileFromList(List<ArtLinePart> parts) {
         File csvFile = new File("artline_parts.csv");
 
-        // Используем try-with-resources для автоматического закрытия PrintWriter
         try (PrintWriter printWriter = new PrintWriter(csvFile)) {
             // Записываем заголовки
-            List<String> header = new ArrayList<>();
-            header.add("\"part\"");
-            header.add("\"productId\"");
-            header.add("\"productUrl\"");
-            header.add("\"productTitle\"");
-            header.add("\"price\"");
-            header.add("\"availability\"");
-            printWriter.println(String.join(",", header));
+            List<String> headers = new ArrayList<>();
+            headers.add("\"part\"");
+            headers.add("\"productId\"");
+            headers.add("\"productUrl\"");
+            headers.add("\"productTitle\"");
+            headers.add("\"price\"");
+            headers.add("\"availability\"");
+            printWriter.println(String.join(",", headers));
 
             // Записываем данные
             for (ArtLinePart part : parts) {
@@ -254,11 +253,10 @@ public class TotalArtLineParser {
     }
 
     private void saveXlsFileFromList(List<ArtLinePart> parts) {
-        // Создаем Excel файл
+
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("ArtLineParts");
 
-        // Создаем заголовок
         Row headerRow = sheet.createRow(0);
         String[] headers = {"Part", "Product ID", "Product URL", "Product Title", "Price", "Availability"};
         for (int i = 0; i < headers.length; i++) {

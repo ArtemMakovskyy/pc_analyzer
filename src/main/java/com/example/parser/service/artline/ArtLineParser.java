@@ -1,12 +1,9 @@
 package com.example.parser.service.artline;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import com.example.parser.service.HtmlDocumentFetcher;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -17,7 +14,6 @@ import org.springframework.stereotype.Service;
 public class ArtLineParser {
     private static final int START_PAGE = 0;
 
-    @SneakyThrows
     public List<ArtLinePart> parse(
             boolean isPrint,
             String partName,
@@ -46,8 +42,15 @@ public class ArtLineParser {
          */
         while (isPageWithInformation) {
             currentPage++;
-            log.info("Connect to the page: " + startPageLink + currentPage);
-            Document document = Jsoup.connect(startPageLink + currentPage).get();
+
+
+//            Document document = HtmlDocumentFetcher.getInstance()
+//                    .getHtmlDocumentAgent(false, startPageLink + currentPage);
+
+            Document document = HtmlDocumentFetcher.getInstance()
+                    .getHtmlDocumentAgent(startPageLink + currentPage,false,false,false);
+
+
             Element linkElement = document.selectFirst("div.pagin a.pagin__indicator");
             if (linkElement != null) {
                 parts.addAll(parseCurrentPage(document, partName));

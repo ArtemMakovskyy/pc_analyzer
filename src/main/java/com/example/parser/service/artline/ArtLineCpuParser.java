@@ -1,5 +1,6 @@
 package com.example.parser.service.artline;
 
+import com.example.parser.service.HtmlDocumentFetcher;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +51,15 @@ public class ArtLineCpuParser {
         while (isPageWithInformation) {
             currentPage++;
             log.info("Connect to the page: " + PARSING_PAGE_URL + currentPage);
-            Document document = Jsoup.connect(PARSING_PAGE_URL + currentPage).get();
+
+//            Document document = Jsoup.connect(PARSING_PAGE_URL + currentPage).get();
+//            Document document =  HtmlDocumentFetcher.getInstance().getHtmlDocumentAgent(false,PARSING_PAGE_URL + currentPage);
+            Document document =  HtmlDocumentFetcher.getInstance().getHtmlDocumentAgent(
+                    PARSING_PAGE_URL + currentPage,
+                    false,
+                    false,
+                    false);
+
             Element linkElement = document.selectFirst("div.pagin a.pagin__indicator");
             if (linkElement != null) {
                 processors.addAll(parseCurrentPage(document));

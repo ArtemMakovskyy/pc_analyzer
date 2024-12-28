@@ -1,7 +1,7 @@
 package com.example.parser.service.pda;
 
 import com.example.parser.model.pda.Post;
-import java.io.IOException;
+import com.example.parser.service.HtmlDocumentFetcher;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.SneakyThrows;
@@ -20,7 +20,7 @@ public class PdaParser {
     private static final String KEY = "itemprop";
     private static final String VALUE = "url";
 
-    public void parse() throws IOException {
+    public void parse(){
         log.info(LESSON_URI);
         openUriAndUseElementsByAttributeValue(true);
     }
@@ -32,7 +32,8 @@ public class PdaParser {
          */
         List<Post> postsOfPda = new ArrayList<>();
         log.info("Подключение к главной странице " + PARSING_PAGE_URL);
-        Document document = Jsoup.connect(PARSING_PAGE_URL).get();
+
+        Document document = HtmlDocumentFetcher.getInstance().getHtmlDocumentAgent(false,PARSING_PAGE_URL);
 
         Elements postTitleElement = document.getElementsByAttributeValue(KEY, VALUE);
 

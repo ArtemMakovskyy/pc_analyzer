@@ -2,6 +2,7 @@ package com.example.parser.service.user.benchmark;
 
 import com.example.parser.model.user.benchmark.CpuUserBenchmark;
 import com.example.parser.service.HtmlDocumentFetcher;
+import com.example.parser.utils.ParseUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CpuUserBenchmarkParser {
     private final CpuUserBenchmarkParserByPosition cpuUserBenchmarkParserByPosition;
+    private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final String BASE_URL = "https://cpu.userbenchmark.com/";
 
     public List<Object> purseAllPages() {
@@ -29,16 +31,12 @@ public class CpuUserBenchmarkParser {
     }
 
     public List<CpuUserBenchmark> pursePage(String url) {
+        Document htmlDocument;
+        List<CpuUserBenchmark> cpuUserBenchmarks = new ArrayList<>();
 
         boolean readFromWebPage = false;
-
-        Document htmlDocument = null;
-
-        List<CpuUserBenchmark>cpuUserBenchmarks = new ArrayList<>();
-
         if (readFromWebPage) {
-
-            HtmlDocumentFetcher.getInstance().getHtmlDocumentAgent
+            htmlDocument = htmlDocumentFetcher.getHtmlDocumentAgent
                     (
                             url,
                             true
@@ -90,30 +88,30 @@ public class CpuUserBenchmarkParser {
             String column10Price = row.select("td:nth-child(10) div.mh-tc")
                     .text().replaceAll("[^0-9]", "");
 
-            if (false) {
-                System.out.println("Column 1: " + column1NumberPosition);
-                System.out.println("Column 201: " + column2_1Manufacturer);
-                System.out.println("Column 202: " + column2_2Model);
-                System.out.println("Column 3: " + column3UserRating);
-                System.out.println("Column 4: " + column4Value);
-                System.out.println("Column 5: " + column5_1Avg);
-                System.out.println("Column 5: " + column5_2AvgFromTo);
-                System.out.println("Column 6: " + column6Memory);
-                System.out.println("Column 7: " + column7Core);
-                System.out.println("Column 8: " + column8Mkt);
-                System.out.println("Column 9: " + column9Age);
-                System.out.println("Column 10: " + column10Price);
-                System.out.println("------------------------");
-            }
+//            if (false) {
+//                System.out.println("Column 1: " + column1NumberPosition);
+//                System.out.println("Column 201: " + column2_1Manufacturer);
+//                System.out.println("Column 202: " + column2_2Model);
+//                System.out.println("Column 3: " + column3UserRating);
+//                System.out.println("Column 4: " + column4Value);
+//                System.out.println("Column 5: " + column5_1Avg);
+//                System.out.println("Column 5: " + column5_2AvgFromTo);
+//                System.out.println("Column 6: " + column6Memory);
+//                System.out.println("Column 7: " + column7Core);
+//                System.out.println("Column 8: " + column8Mkt);
+//                System.out.println("Column 9: " + column9Age);
+//                System.out.println("Column 10: " + column10Price);
+//                System.out.println("------------------------");
+//            }
 
             cpu = new CpuUserBenchmark();
             cpu.setModel(column2_2Model);
             cpu.setManufacturer(column2_1Manufacturer);
-            cpu.setUserRating(toDouble(column3UserRating));
-            cpu.setValuePercents(toDouble(column4Value));
-            cpu.setAvgBench(toDouble(column5_1Avg));
-            cpu.setMemoryPercents(toDouble(column6Memory));
-            cpu.setPrice(toDouble(column10Price));
+            cpu.setUserRating(ParseUtil.stringToDouble(column3UserRating));
+            cpu.setValuePercents(ParseUtil.stringToDouble(column4Value));
+            cpu.setAvgBench(ParseUtil.stringToDouble(column5_1Avg));
+            cpu.setMemoryPercents(ParseUtil.stringToDouble(column6Memory));
+            cpu.setPrice(ParseUtil.stringToDouble(column10Price));
             cpu.setUrlOfCpu(row.select("td a.nodec").attr("href"));
 
             cpuUserBenchmarkParserByPosition.purseInnerPage(cpu);
@@ -123,16 +121,45 @@ public class CpuUserBenchmarkParser {
         return cpuUserBenchmarks;
     }
 
-    private Double toDouble(String priceText) {
-        double price = 0.0;
-        try {
-            // Check if line not empty and consists from digits
-            if (!priceText.isEmpty() && priceText.matches("\\d+")) {
-                price = Double.parseDouble(priceText);
+}
+
+@Service
+@Log4j2
+class CpuUserBenchmarkParserByPosition {
+    private static final String BASE_URL = "https://cpu.userbenchmark.com/Intel-Core-i5-13600K/Rating/4134";
+
+    //    public void purseInnerPage(String url, CpuUserBenchmark cpu) {
+    public void purseInnerPage(CpuUserBenchmark cpu) {
+        boolean readFromWebPage = false;
+
+        Document htmlDocument = null;
+        if (readFromWebPage) {
+//            HtmlDocumentFetcher.getInstance().getHtmlDocument(
+//                    false, url);
+        } else {
+            // Read from local file
+            File file = new File("C:\\Users\\Artem\\Documents\\Java\\UltimateJetBrains\\tutorials\\ms1\\parser\\parser\\src\\main\\resources\\static\\other\\Core i5-13600K.html");
+            try {
+                htmlDocument = Jsoup.parse(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        } catch (NumberFormatException e) {
-            price = 0.0;
         }
-        return price;
+
+        cpu.setPartNumber(htmlDocument.getElementsByClass("pg-head-toption-post").text());
+        cpu.setCpuSpecification(htmlDocument.getElementsByClass("cmp-cpt tallp cmp-cpt-l").text());
+        final Elements selects = htmlDocument.select("div.bsc-w.text-left.semi-strong > div");
+        for (Element select : selects) {
+            String text = select.text();
+            if (text.contains("Desktop")) {
+                cpu.setDesktopScore(ParseUtil.stringToDouble(text.replaceAll("[^0-9]", "")));
+            } else if (text.contains("Gaming")) {
+                cpu.setGamingScore(ParseUtil.stringToDouble(text.replaceAll("[^0-9]", "")));
+            } else if (text.contains("Workstation")) {
+                cpu.setWorkstationScore(ParseUtil.stringToDouble(text.replaceAll("[^0-9]", "")));
+                break;
+            }
+        }
+        System.out.println(cpu);
     }
 }

@@ -3,6 +3,7 @@ package com.example.parser.service.artline;
 import com.example.parser.service.HtmlDocumentFetcher;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Log4j2
+@RequiredArgsConstructor
 public class ArtLineParser {
+    private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final int START_PAGE = 0;
 
     public List<ArtLinePart> parse(
@@ -47,8 +50,12 @@ public class ArtLineParser {
 //            Document document = HtmlDocumentFetcher.getInstance()
 //                    .getHtmlDocumentAgent(false, startPageLink + currentPage);
 
-            Document document = HtmlDocumentFetcher.getInstance()
-                    .getHtmlDocumentAgent(startPageLink + currentPage,false,false,false);
+            Document document = htmlDocumentFetcher
+                    .getHtmlDocumentAgent(
+                            startPageLink + currentPage,
+                            false,
+                            false,
+                            false);
 
 
             Element linkElement = document.selectFirst("div.pagin a.pagin__indicator");

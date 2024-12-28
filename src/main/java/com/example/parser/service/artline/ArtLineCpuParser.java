@@ -4,6 +4,7 @@ import com.example.parser.service.HtmlDocumentFetcher;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.Jsoup;
@@ -14,19 +15,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Log4j2
+@RequiredArgsConstructor
 public class ArtLineCpuParser {
+    private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final String PARSING_PAGE_URL
             = "https://artline.ua/catalog/protsessory/page=";
     private static final int START_PAGE = 0;
 
-
-    @PostConstruct
-    public void init() {
-//        log.info("ArtLineParser");
-//        parseAllPagesWithProcessors(true);
-    }
-
-    @SneakyThrows
     public void parseAllPagesWithProcessors(boolean isPrint) {
         int currentPage = START_PAGE;
         boolean isPageWithInformation = true;
@@ -52,11 +47,9 @@ public class ArtLineCpuParser {
             currentPage++;
             log.info("Connect to the page: " + PARSING_PAGE_URL + currentPage);
 
-//            Document document = Jsoup.connect(PARSING_PAGE_URL + currentPage).get();
-//            Document document =  HtmlDocumentFetcher.getInstance().getHtmlDocumentAgent(false,PARSING_PAGE_URL + currentPage);
-            Document document =  HtmlDocumentFetcher.getInstance().getHtmlDocumentAgent(
+            Document document = htmlDocumentFetcher.getHtmlDocumentAgent(
                     PARSING_PAGE_URL + currentPage,
-                    false,
+                    true,
                     false,
                     false);
 

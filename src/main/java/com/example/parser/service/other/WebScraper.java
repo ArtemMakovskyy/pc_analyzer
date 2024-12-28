@@ -1,4 +1,4 @@
-package com.example.parser.service;
+package com.example.parser.service.other;
 
 import java.util.ArrayList;
 import java.util.List;

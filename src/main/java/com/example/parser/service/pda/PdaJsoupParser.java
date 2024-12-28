@@ -4,6 +4,7 @@ import com.example.parser.model.pda.Post;
 import com.example.parser.service.HtmlDocumentFetcher;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.Jsoup;
@@ -14,26 +15,29 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Log4j2
-public class PdaParser {
+@RequiredArgsConstructor
+public class PdaJsoupParser {
+    private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final String LESSON_URI = "https://www.youtube.com/watch?v=Bw26a9tW7G8";
     private static final String PARSING_PAGE_URL = "https://4pda.to/";
     private static final String KEY = "itemprop";
     private static final String VALUE = "url";
 
-    public void parse(){
+    public void parse() {
         log.info(LESSON_URI);
         openUriAndUseElementsByAttributeValue(true);
     }
 
-    @SneakyThrows
-    private void openUriAndUseElementsByAttributeValue(boolean prnDocument)  {
+    private void openUriAndUseElementsByAttributeValue(boolean prnDocument) {
         /**
          *
          */
         List<Post> postsOfPda = new ArrayList<>();
         log.info("Подключение к главной странице " + PARSING_PAGE_URL);
 
-        Document document = HtmlDocumentFetcher.getInstance().getHtmlDocumentAgent(false,PARSING_PAGE_URL);
+        Document document = htmlDocumentFetcher
+                .getHtmlDocumentAgent(
+                        false, PARSING_PAGE_URL);
 
         Elements postTitleElement = document.getElementsByAttributeValue(KEY, VALUE);
 
@@ -47,7 +51,9 @@ public class PdaParser {
             final String detLink = element.attr("href");
             post.setDetailsLink(element.attr("href"));
             post.setTitle(element.attr("title"));
-            Document detailsDoc = Jsoup.connect(post.getDetailsLink()).get();
+            Document detailsDoc
+                    = htmlDocumentFetcher.getHtmlDocumentAgent(
+                            false, post.getDetailsLink());
             log.info("Подключение к странице деталей поста " + detLink);
             try {
                 Element authorNameElement = detailsDoc.getElementsByClass("name").first().child(0);

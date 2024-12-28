@@ -6,6 +6,7 @@ import com.example.parser.service.HtmlDocumentFetcher;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -14,18 +15,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Log4j2
+@RequiredArgsConstructor
 public class HotlineCpuPageParser {
+    private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final String DOMAIN_LINK = "https://hotline.ua";
     private static final String ABOUT_PRODUCT = "?tab=about";
     private static final String BASE_URL = "https://hotline.ua/ua/computer/processory/?p=";
-
-    @PostConstruct
-    public void init() {
-//        System.out.println(purseAllPages().size());
-//        final List<Cpu> cpus = purseAllPages();
-//        cpus.forEach(System.out::println);
-//        System.out.println(cpus.size());
-    }
 
     public List<Cpu> purseAllPages() {
         int startPage = 1;
@@ -35,16 +30,17 @@ public class HotlineCpuPageParser {
         for (int i = startPage; i <= maxPage; i++) {
             final List<Cpu> purse = pursePage(BASE_URL + i);
             parts.addAll(purse);
-            log.info("Connected to the page: " + BASE_URL + i + ", and parsed it.");
+            log.info("... parsed page: " + i);
         }
         return parts;
     }
 
     public List<Cpu> pursePage(String url) {
-        final Document htmlDocument =
-                HtmlDocumentFetcher.getInstance().getHtmlDocumentAgent(
-                        false,
-                        url);
+        Document htmlDocument = htmlDocumentFetcher.getHtmlDocumentAgent(
+                url,
+                true,
+                true,
+                false);
 
         Elements elements = htmlDocument.select(".list-item");
         List<Cpu> cpus = new ArrayList<>();
@@ -80,10 +76,13 @@ public class HotlineCpuPageParser {
     }
 
     private int findMaxPage() {
-        Document document = HtmlDocumentFetcher.getInstance()
-                .getHtmlDocumentAgent(false, BASE_URL + 1);
+        Document htmlDocument = htmlDocumentFetcher.getHtmlDocumentAgent(
+                BASE_URL + 1,
+                true,
+                true,
+                false);
 
-        Elements pages = document.select("a.page");
+        Elements pages = htmlDocument.select("a.page");
         int maxPage = 0;
 
         for (Element page : pages) {
@@ -122,10 +121,14 @@ public class HotlineCpuPageParser {
     }
 
     private Cpu parseInnerCpuCharacteristics(String url) {
-        final Document documentProductSpecification
-                = HtmlDocumentFetcher.getInstance().getHtmlDocumentAgent(false, url);
 
-        Elements rows = documentProductSpecification.select(
+        Document htmlDocument = htmlDocumentFetcher.getHtmlDocumentAgent(
+                url,
+                true,
+                true,
+                false);
+
+        Elements rows = htmlDocument.select(
                 "table.specifications__table tr");
 
         Cpu cpu = new Cpu();

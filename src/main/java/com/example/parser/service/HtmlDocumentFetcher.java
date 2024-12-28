@@ -1,32 +1,18 @@
 package com.example.parser.service;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import lombok.extern.log4j.Log4j2;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
-
-public final class HtmlDocumentFetcher {
-
-    private static final Logger log = LoggerFactory.getLogger(HtmlDocumentFetcher.class);
-    private static HtmlDocumentFetcher instance;
-
-
-    private HtmlDocumentFetcher() {
-    }
-
-    public static synchronized HtmlDocumentFetcher getInstance() {
-        if (instance == null) {
-            instance = new HtmlDocumentFetcher();
-        }
-        return instance;
-    }
+@Log4j2
+@Service
+public class HtmlDocumentFetcher {
 
     public Document getHtmlDocumentAgent(boolean isPrintDocumentToConsole, String url) {
         final Connection connect = Jsoup.connect(url);
@@ -45,33 +31,62 @@ public final class HtmlDocumentFetcher {
         return document;
     }
 
+
     public Document getHtmlDocumentAgent(
             String url,
             boolean useUserAgent,
             boolean useDelay,
+            boolean isPrintDocumentToConsole){
+                return getHtmlDocumentAgent(
+                        url,
+                        useUserAgent,
+                        useDelay,
+                        2,
+                        5,
+                        false
+                );
+    }
+    public Document getHtmlDocumentAgent(
+            String url,
+            boolean useUserAgent,
+            boolean useDelay,
+            int delayFrom,
+            int delayTo,
             boolean isPrintDocumentToConsole) {
 
-        Document document = null;
         Connection connect = null;
 
+        Document document;
         try {
-            addRandomDelayInSeconds(1, 7, useDelay);
-            connect = Jsoup.connect(url);
+            addRandomDelayInSeconds(delayFrom, delayTo, useDelay);
 
             if (useUserAgent) {
-                connect.userAgent(getUserAgents().get("Chrome_Windows"));
+                connect = Jsoup.connect(url)
+                        .maxBodySize(0)
+                        .timeout(60 * 1000)
+                        .userAgent(getUserAgents().get("Chrome_Windows"))
+                        .ignoreContentType(true)
+                        .ignoreHttpErrors(true);
+//                        .cookie()
+//                        .execute();
 
+            } else {
+                connect = Jsoup.connect(url);
             }
 
-            if (true){
+            if (false) {
+                //  header don't work
                 connect.header("Accept-Language", "en-US,en;q=0.9")
                         .header("Accept-Encoding", "gzip, deflate, br")
                         .header("Connection", "keep-alive")
                         .header("Upgrade-Insecure-Requests", "1");
             }
-
             document = connect.get();
-
+//        } catch (InterruptedException e) {
+//            // Обработка InterruptedException
+//            log.error("Поток был прерван во время выполнения", e);
+//            Thread.currentThread().interrupt(); // Важно восстановить статус прерывания
+//            throw new RuntimeException("Операция была прервана", e);
         } catch (IOException e) {
             log.error("Can't get page: " + url, e);
             throw new RuntimeException(e);
@@ -80,7 +95,7 @@ public final class HtmlDocumentFetcher {
         if (isPrintDocumentToConsole) {
             log.info(document.toString());
         }
-
+        log.info("Connected to the page: " + url);
         return document;
     }
 
@@ -132,5 +147,4 @@ public final class HtmlDocumentFetcher {
         headers.put("Upgrade-Insecure-Requests", "1");
         return headers;
     }
-
 }

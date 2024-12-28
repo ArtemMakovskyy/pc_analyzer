@@ -1,4 +1,4 @@
-package com.example.parser.service;
+package com.example.parser.service.other;
 
 import java.io.IOException;
 import java.util.HashMap;

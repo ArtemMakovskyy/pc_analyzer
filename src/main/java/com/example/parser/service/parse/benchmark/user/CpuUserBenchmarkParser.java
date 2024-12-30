@@ -1,16 +1,13 @@
-package com.example.parser.service.user.benchmark;
+package com.example.parser.service.parse.benchmark.user;
 
 import com.example.parser.model.user.benchmark.CpuUserBenchmark;
-import com.example.parser.service.HtmlDocumentFetcher;
+
+import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.utils.ParseUtil;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -29,7 +26,7 @@ public class CpuUserBenchmarkParser {
 
     public List<CpuUserBenchmark> purseAllPages() {
         List<CpuUserBenchmark> cpuUserBenchmarks = new ArrayList<>();
-        for (int i = 1; i <= 8; i++) {
+        for (int i = 8; i <= 8; i++) {
             cpuUserBenchmarks.addAll(pursePageFromFile(BASE_LINK + "ub_cpu_0" + i + ".html"));
         }
         return cpuUserBenchmarks;

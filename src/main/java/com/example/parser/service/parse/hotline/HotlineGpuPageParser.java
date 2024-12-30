@@ -1,7 +1,7 @@
-package com.example.parser.service.hotline;
+package com.example.parser.service.parse.hotline;
 
-import com.example.parser.model.hotline.Gpu;
-import com.example.parser.service.HtmlDocumentFetcher;
+import com.example.parser.model.hotline.GpuHotLine;
+import com.example.parser.service.parse.HtmlDocumentFetcher;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,20 +20,20 @@ public class HotlineGpuPageParser {
     private static final String ABOUT_PRODUCT = "?tab=about";
     private static final String BASE_URL = "https://hotline.ua/ua/computer/videokarty/?p=";
 
-    public List<Gpu> purseAllPages() {
+    public List<GpuHotLine> purseAllPages() {
         int startPage = 1;
         int maxPage = findMaxPage();
-        List<Gpu> parts = new ArrayList<>();
+        List<GpuHotLine> parts = new ArrayList<>();
 
         for (int i = startPage; i <= maxPage; i++) {
-            final List<Gpu> purse = pursePage(BASE_URL + i);
+            final List<GpuHotLine> purse = pursePage(BASE_URL + i);
             parts.addAll(purse);
             log.info("Connected to the page: " + BASE_URL + i + ", and parsed it.");
         }
         return parts;
     }
 
-    public List<Gpu> pursePage(String url) {
+    public List<GpuHotLine> pursePage(String url) {
         final Document htmlDocument =
                 htmlDocumentFetcher.getHtmlDocumentFromWeb(
                         url,
@@ -43,10 +43,10 @@ public class HotlineGpuPageParser {
 
 
         Elements elements = htmlDocument.select(".list-item");
-        List<Gpu> products = new ArrayList<>();
+        List<GpuHotLine> products = new ArrayList<>();
 
         for (Element item : elements) {
-            Gpu product = new Gpu();
+            GpuHotLine product = new GpuHotLine();
             Element titleElement = item.selectFirst(".list-item__title-container a.item-title");
             product.setTotalName(titleElement != null ? titleElement.text() : "No data");
 

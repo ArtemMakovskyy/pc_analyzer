@@ -1,6 +1,6 @@
-package com.example.parser.service.artline;
+package com.example.parser.service.parse.artline;
 
-import com.example.parser.service.HtmlDocumentFetcher;
+import com.example.parser.service.parse.HtmlDocumentFetcher;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -13,19 +13,16 @@ import org.springframework.stereotype.Service;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class ArtLineParser {
+public class ArtLineCpuParser {
     private final HtmlDocumentFetcher htmlDocumentFetcher;
+    private static final String PARSING_PAGE_URL
+            = "https://artline.ua/catalog/protsessory/page=";
     private static final int START_PAGE = 0;
 
-    public List<ArtLinePart> parse(
-            boolean isPrint,
-            String partName,
-            String startPageLink
-    )
-    {
+    public void parseAllPagesWithProcessors(boolean isPrint) {
         int currentPage = START_PAGE;
         boolean isPageWithInformation = true;
-        List<ArtLinePart> parts = new ArrayList<>();
+        List<ArtLineCpu> processors = new ArrayList<>();
 
         /**
          * Find not empty pages and process it. If page is empty stop parsing, else
@@ -45,38 +42,32 @@ public class ArtLineParser {
          */
         while (isPageWithInformation) {
             currentPage++;
+            log.info("Connect to the page: " + PARSING_PAGE_URL + currentPage);
 
-
-//            Document document = HtmlDocumentFetcher.getInstance()
-//                    .getHtmlDocumentAgent(false, startPageLink + currentPage);
-
-            Document document = htmlDocumentFetcher
-                    .getHtmlDocumentFromWeb(
-                            startPageLink + currentPage,
-                            false,
-                            false,
-                            false);
-
+            Document document = htmlDocumentFetcher.getHtmlDocumentFromWeb(
+                    PARSING_PAGE_URL + currentPage,
+                    true,
+                    false,
+                    false);
 
             Element linkElement = document.selectFirst("div.pagin a.pagin__indicator");
             if (linkElement != null) {
-                parts.addAll(parseCurrentPage(document, partName));
+                processors.addAll(parseCurrentPage(document));
                 log.info("Page " + currentPage + ". Parsing finished");
             } else {
                 isPageWithInformation = false;
-                log.info("Page: " + startPageLink + currentPage + " is empty. Parsing GPU finished");
+                log.info("Page: " + PARSING_PAGE_URL + currentPage + " is empty. Parsing processors finished");
             }
         }
 
         if (isPrint) {
-            for (ArtLinePart processor : parts) {
+            for (ArtLineCpu processor : processors) {
                 System.out.println(processor);
             }
         }
-        return parts;
     }
 
-    private List<ArtLinePart> parseCurrentPage(Document document, String partName ) {
+    private List<ArtLineCpu> parseCurrentPage(Document document) {
         /**
          * <div
          *     class="product-cart product-cart-js  "
@@ -92,7 +83,7 @@ public class ArtLineParser {
          * которые имеют оба класса: product-cart и product-cart-js.
          */
         Elements productCarts = document.select("div.product-cart.product-cart-js");
-        List<ArtLinePart> processors = new ArrayList<>();
+        List<ArtLineCpu> processors = new ArrayList<>();
 
         for (Element productCart : productCarts) {
             String productId = productCart.attr("data-product-id");
@@ -124,17 +115,16 @@ public class ArtLineParser {
             String productTitleA = titleElement != null ? titleElement.text() : "Название не указано";
 
 
-            ArtLinePart artLine = new ArtLinePart();
-            artLine.setProductId(productId);
-            artLine.setProductUrl(productUrl);
-            artLine.setProductTitle(productTitle);
-            artLine.setPrice(convertToDoubleAndCheckByNull(price));
-            artLine.setAvailability(availability.equals("В наличии"));
-            artLine.setPart(partName);
+            ArtLineCpu artlineCpu = new ArtLineCpu();
+            artlineCpu.setProductId(productId);
+            artlineCpu.setProductUrl(productUrl);
+            artlineCpu.setProductTitle(productTitle);
+            artlineCpu.setPrice(convertToDoubleAndCheckByNull(price));
+            artlineCpu.setAvailability(availability.equals("В наличии"));
 //            artlineProcessor.setProductUrlA(productUrlA);
 //            artlineProcessor.setProductTitleA(productTitleA);
 
-            processors.add(artLine);
+            processors.add(artlineCpu);
         }
         return processors;
     }

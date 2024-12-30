@@ -1,13 +1,11 @@
-package com.example.parser.service.user.benchmark;
+package com.example.parser.service.parse.benchmark.user;
 
-import com.example.parser.model.user.benchmark.CpuUserBenchmark;
 import com.example.parser.model.user.benchmark.GpuUserBenchmark;
-import com.example.parser.service.HtmlDocumentFetcher;
+import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.utils.ParseUtil;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;

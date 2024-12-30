@@ -1,4 +1,4 @@
-package com.example.parser.service.other;
+package com.example.parser.service.parse.other;
 
 import jakarta.annotation.PostConstruct;
 import java.io.File;

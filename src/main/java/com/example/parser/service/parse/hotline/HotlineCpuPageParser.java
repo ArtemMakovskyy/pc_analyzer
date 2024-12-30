@@ -1,8 +1,8 @@
-package com.example.parser.service.hotline;
+package com.example.parser.service.parse.hotline;
 
-import com.example.parser.model.hotline.Cpu;
+import com.example.parser.model.hotline.CpuHotLine;
 import com.example.parser.model.hotline.ShortCpuInfoDto;
-import com.example.parser.service.HtmlDocumentFetcher;
+import com.example.parser.service.parse.HtmlDocumentFetcher;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,20 +21,20 @@ public class HotlineCpuPageParser {
     private static final String ABOUT_PRODUCT = "?tab=about";
     private static final String BASE_URL = "https://hotline.ua/ua/computer/processory/?p=";
 
-    public List<Cpu> purseAllPages() {
+    public List<CpuHotLine> purseAllPages() {
         int startPage = 1;
         int maxPage = findMaxPage();
-        List<Cpu> parts = new ArrayList<>();
+        List<CpuHotLine> parts = new ArrayList<>();
 
         for (int i = startPage; i <= maxPage; i++) {
-            final List<Cpu> purse = pursePage(BASE_URL + i);
+            final List<CpuHotLine> purse = pursePage(BASE_URL + i);
             parts.addAll(purse);
             log.info("... parsed page: " + i);
         }
         return parts;
     }
 
-    public List<Cpu> pursePage(String url) {
+    public List<CpuHotLine> pursePage(String url) {
         Document htmlDocument = htmlDocumentFetcher.getHtmlDocumentFromWeb(
                 url,
                 true,
@@ -42,10 +42,10 @@ public class HotlineCpuPageParser {
                 false);
 
         Elements elements = htmlDocument.select(".list-item");
-        List<Cpu> cpus = new ArrayList<>();
+        List<CpuHotLine> cpus = new ArrayList<>();
 
         for (Element item : elements) {
-            Cpu cpu = new Cpu();
+            CpuHotLine cpu = new CpuHotLine();
 
             Element titleElement = item.selectFirst(".list-item__title-container a.item-title");
             cpu.setName(titleElement != null ? titleElement.text() : "No data");
@@ -119,7 +119,7 @@ public class HotlineCpuPageParser {
         return cpuInfo;
     }
 
-    private Cpu parseInnerCpuCharacteristics(String url) {
+    private CpuHotLine parseInnerCpuCharacteristics(String url) {
 
         Document htmlDocument = htmlDocumentFetcher.getHtmlDocumentFromWeb(
                 url,
@@ -130,7 +130,7 @@ public class HotlineCpuPageParser {
         Elements rows = htmlDocument.select(
                 "table.specifications__table tr");
 
-        Cpu cpu = new Cpu();
+        CpuHotLine cpu = new CpuHotLine();
 
         for (Element row : rows) {
             Elements columns = row.select("td");

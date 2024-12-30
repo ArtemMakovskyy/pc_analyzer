@@ -1,4 +1,4 @@
-package com.example.parser.service.pda;
+package com.example.parser.service.parse.pda;
 
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.WebDriver;

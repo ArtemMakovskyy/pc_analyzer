@@ -1,6 +1,6 @@
 package com.example.parser.controller;
 
-import com.example.parser.service.pda.PdaJsoupParser;
+import com.example.parser.service.parse.pda.PdaJsoupParser;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.web.bind.annotation.GetMapping;

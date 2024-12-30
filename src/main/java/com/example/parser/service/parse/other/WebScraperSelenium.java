@@ -1,4 +1,4 @@
-package com.example.parser.service.other;
+package com.example.parser.service.parse.other;
 
 import java.util.List;
 import org.openqa.selenium.By;

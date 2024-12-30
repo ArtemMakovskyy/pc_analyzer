@@ -1,6 +1,5 @@
-package com.example.parser.service.artline;
+package com.example.parser.service.parse.artline;
 
-import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;

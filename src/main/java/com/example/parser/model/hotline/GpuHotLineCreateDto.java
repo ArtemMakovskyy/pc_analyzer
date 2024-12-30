@@ -3,7 +3,7 @@ package com.example.parser.model.hotline;
 import lombok.Data;
 
 @Data
-public class Gpu {
+public class GpuHotLineCreateDto {
     private String totalName;
     private String name;
     private String memoryType;
@@ -12,4 +12,5 @@ public class Gpu {
     private String port;
     private String year;
     private String price;
+    private Double avgBenchUserBenchmark;
 }

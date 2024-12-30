@@ -1,4 +1,4 @@
-package com.example.parser.service.artline;
+package com.example.parser.service.parse.artline;
 
 import lombok.Data;
 

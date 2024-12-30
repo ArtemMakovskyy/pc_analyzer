@@ -1,4 +1,4 @@
-package com.example.parser.service.user.benchmark;
+package com.example.parser.service.parse.benchmark.user;
 
 import com.example.parser.model.user.benchmark.CpuUserBenchmark;
 import com.example.parser.utils.ParseUtil;

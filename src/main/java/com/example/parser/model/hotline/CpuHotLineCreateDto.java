@@ -3,7 +3,7 @@ package com.example.parser.model.hotline;
 import lombok.Data;
 
 @Data
-public class Cpu {
+public class CpuHotLineCreateDto {
     private String name;
     private String url;
     private String prices;
@@ -25,5 +25,5 @@ public class Cpu {
     private int coreCount;
     private int threadCount;
 
-
+    private Double avgBenchUserBenchmark;
 }

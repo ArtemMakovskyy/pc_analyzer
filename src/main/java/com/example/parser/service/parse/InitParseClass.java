@@ -1,14 +1,17 @@
-package com.example.parser.service;
+package com.example.parser.service.parse;
 
 import com.example.parser.model.user.benchmark.CpuUserBenchmark;
-import com.example.parser.service.artline.ArtLineCpuParser;
-import com.example.parser.service.artline.TotalArtLineParser;
-import com.example.parser.service.hotline.HotlineCpuPageParser;
-import com.example.parser.service.hotline.HotlineGpuPageParser;
-import com.example.parser.service.pda.PdaJsoupParser;
-import com.example.parser.service.pda.PdaSeleniumParser;
-import com.example.parser.service.user.benchmark.CpuUserBenchmarkParser;
-import com.example.parser.service.user.benchmark.GpuUserBenchmarkParser;
+
+import com.example.parser.service.CpuHotlineService;
+import com.example.parser.service.GpuHotlineService;
+import com.example.parser.service.parse.artline.ArtLineCpuParser;
+import com.example.parser.service.parse.artline.TotalArtLineParser;
+import com.example.parser.service.parse.benchmark.user.CpuUserBenchmarkParser;
+import com.example.parser.service.parse.benchmark.user.GpuUserBenchmarkParser;
+import com.example.parser.service.parse.hotline.HotlineCpuPageParser;
+import com.example.parser.service.parse.hotline.HotlineGpuPageParser;
+import com.example.parser.service.parse.pda.PdaJsoupParser;
+import com.example.parser.service.parse.pda.PdaSeleniumParser;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -29,18 +32,21 @@ public class InitParseClass {
     private final GpuUserBenchmarkParser gpuUserBenchmarkParser;
     private final PdaJsoupParser pdaJsoupParser;
     private final PdaSeleniumParser pdaSeleniumParser;
+    private final CpuHotlineService cpuHotlineService;
+    private final GpuHotlineService gpuHotlineService;
 
     @PostConstruct
     public void init() {
         ExecutorService executor = Executors.newFixedThreadPool(6);
 //        executor.submit(this::userBenchmark);
-//        executor.submit(this::hotline);
+        executor.submit(this::hotline);
 //        executor.submit(this::artLine);
 //        executor.submit(this::pda);
 //
         executor.shutdown();
 
 //        userBenchmark();
+
     }
 
     private void userBenchmark() {
@@ -50,8 +56,11 @@ public class InitParseClass {
     }
 
     private void hotline() {
-        hotlineCpuPageParser.purseAllPages();
-        hotlineGpuPageParser.purseAllPages();
+//        hotlineCpuPageParser.purseAllPages();
+//        hotlineGpuPageParser.purseAllPages();
+
+        cpuHotlineService.saveAll(hotlineCpuPageParser.purseAllPages());
+//        gpuHotlineService.saveAll(hotlineGpuPageParser.purseAllPages());
     }
 
     private void artLine() {

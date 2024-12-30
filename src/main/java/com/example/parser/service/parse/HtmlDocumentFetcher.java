@@ -1,4 +1,4 @@
-package com.example.parser.service;
+package com.example.parser.service.parse;
 
 import java.io.File;
 import java.io.IOException;

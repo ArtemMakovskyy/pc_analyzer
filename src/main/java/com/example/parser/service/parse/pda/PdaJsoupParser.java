@@ -1,7 +1,7 @@
-package com.example.parser.service.pda;
+package com.example.parser.service.parse.pda;
 
 import com.example.parser.model.pda.Post;
-import com.example.parser.service.HtmlDocumentFetcher;
+import com.example.parser.service.parse.HtmlDocumentFetcher;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

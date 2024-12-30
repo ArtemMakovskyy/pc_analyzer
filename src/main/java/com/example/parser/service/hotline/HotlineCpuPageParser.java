@@ -3,7 +3,6 @@ package com.example.parser.service.hotline;
 import com.example.parser.model.hotline.Cpu;
 import com.example.parser.model.hotline.ShortCpuInfoDto;
 import com.example.parser.service.HtmlDocumentFetcher;
-import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,7 @@ public class HotlineCpuPageParser {
     }
 
     public List<Cpu> pursePage(String url) {
-        Document htmlDocument = htmlDocumentFetcher.getHtmlDocumentAgent(
+        Document htmlDocument = htmlDocumentFetcher.getHtmlDocumentFromWeb(
                 url,
                 true,
                 true,
@@ -76,7 +75,7 @@ public class HotlineCpuPageParser {
     }
 
     private int findMaxPage() {
-        Document htmlDocument = htmlDocumentFetcher.getHtmlDocumentAgent(
+        Document htmlDocument = htmlDocumentFetcher.getHtmlDocumentFromWeb(
                 BASE_URL + 1,
                 true,
                 true,
@@ -122,7 +121,7 @@ public class HotlineCpuPageParser {
 
     private Cpu parseInnerCpuCharacteristics(String url) {
 
-        Document htmlDocument = htmlDocumentFetcher.getHtmlDocumentAgent(
+        Document htmlDocument = htmlDocumentFetcher.getHtmlDocumentFromWeb(
                 url,
                 true,
                 true,

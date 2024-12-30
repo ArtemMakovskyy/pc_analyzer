@@ -14,11 +14,6 @@ import org.springframework.stereotype.Service;
 @Log4j2
 public class DocumentExample {
 
-    @PostConstruct
-    public void init() throws IOException {
-//        parse();
-    }
-
     public void parse() throws IOException {
         log.info("DocumentExample");
         byTag();

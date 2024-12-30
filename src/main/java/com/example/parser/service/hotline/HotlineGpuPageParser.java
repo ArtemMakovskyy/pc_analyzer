@@ -2,7 +2,6 @@ package com.example.parser.service.hotline;
 
 import com.example.parser.model.hotline.Gpu;
 import com.example.parser.service.HtmlDocumentFetcher;
-import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +35,7 @@ public class HotlineGpuPageParser {
 
     public List<Gpu> pursePage(String url) {
         final Document htmlDocument =
-                htmlDocumentFetcher.getHtmlDocumentAgent(
+                htmlDocumentFetcher.getHtmlDocumentFromWeb(
                         url,
                         true,
                         true,
@@ -94,7 +93,7 @@ public class HotlineGpuPageParser {
 
     private int findMaxPage() {
         Document document = htmlDocumentFetcher
-                .getHtmlDocumentAgent(false, BASE_URL + 1);
+                .getHtmlDocumentFromWeb( BASE_URL + 1,false,false,false);
 
         Elements pages = document.select("a.page");
         int maxPage = 0;

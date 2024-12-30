@@ -51,7 +51,7 @@ public class ArtLineParser {
 //                    .getHtmlDocumentAgent(false, startPageLink + currentPage);
 
             Document document = htmlDocumentFetcher
-                    .getHtmlDocumentAgent(
+                    .getHtmlDocumentFromWeb(
                             startPageLink + currentPage,
                             false,
                             false,

@@ -1,9 +1,11 @@
 package com.example.parser.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -14,39 +16,47 @@ import org.springframework.stereotype.Service;
 @Service
 public class HtmlDocumentFetcher {
 
-    public Document getHtmlDocumentAgent(boolean isPrintDocumentToConsole, String url) {
-        final Connection connect = Jsoup.connect(url);
-        Document document = null;
-        try {
-            document = connect.get();
+    public Document getHtmlDocumentFromFile(String link, boolean isPrintDocumentToConsole) {
+        log.info("Reading from file: {}", link);
+        File file = new File(link);
 
-            if (isPrintDocumentToConsole) {
-                log.info(document.toString());
-            }
-            log.info("Connected to the page: " + url);
-        } catch (IOException e) {
-            log.error("Can't get page: " + url, e);
-            throw new RuntimeException(e);
+        if (!file.exists()) {
+            log.error("File not found: {}", link);
+            throw new IllegalArgumentException("File not found: " + link);
         }
-        return document;
+
+        Document htmlDocument;
+        try {
+            htmlDocument = Jsoup.parse(file, "UTF-8");
+        } catch (IOException e) {
+            log.error("Error while parsing the file: {}", link, e);
+            throw new RuntimeException("Error reading HTML document from file", e);
+        }
+
+        if (isPrintDocumentToConsole) {
+            log.info(htmlDocument);
+        }
+
+        log.info("Document successfully parsed.");
+        return htmlDocument;
     }
 
-
-    public Document getHtmlDocumentAgent(
+    public Document getHtmlDocumentFromWeb(
             String url,
             boolean useUserAgent,
             boolean useDelay,
-            boolean isPrintDocumentToConsole){
-                return getHtmlDocumentAgent(
-                        url,
-                        useUserAgent,
-                        useDelay,
-                        2,
-                        5,
-                        false
-                );
+            boolean isPrintDocumentToConsole) {
+        return getHtmlDocumentFromWeb(
+                url,
+                useUserAgent,
+                useDelay,
+                2,
+                5,
+                isPrintDocumentToConsole
+        );
     }
-    public Document getHtmlDocumentAgent(
+
+    public Document getHtmlDocumentFromWeb(
             String url,
             boolean useUserAgent,
             boolean useDelay,

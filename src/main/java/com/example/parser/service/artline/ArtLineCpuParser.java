@@ -1,13 +1,10 @@
 package com.example.parser.service.artline;
 
 import com.example.parser.service.HtmlDocumentFetcher;
-import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -47,7 +44,7 @@ public class ArtLineCpuParser {
             currentPage++;
             log.info("Connect to the page: " + PARSING_PAGE_URL + currentPage);
 
-            Document document = htmlDocumentFetcher.getHtmlDocumentAgent(
+            Document document = htmlDocumentFetcher.getHtmlDocumentFromWeb(
                     PARSING_PAGE_URL + currentPage,
                     true,
                     false,

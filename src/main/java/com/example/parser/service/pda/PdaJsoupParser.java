@@ -5,9 +5,7 @@ import com.example.parser.service.HtmlDocumentFetcher;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
-import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -36,8 +34,7 @@ public class PdaJsoupParser {
         log.info("Подключение к главной странице " + PARSING_PAGE_URL);
 
         Document document = htmlDocumentFetcher
-                .getHtmlDocumentAgent(
-                        false, PARSING_PAGE_URL);
+                .getHtmlDocumentFromWeb(PARSING_PAGE_URL,false,false,false);
 
         Elements postTitleElement = document.getElementsByAttributeValue(KEY, VALUE);
 
@@ -52,8 +49,8 @@ public class PdaJsoupParser {
             post.setDetailsLink(element.attr("href"));
             post.setTitle(element.attr("title"));
             Document detailsDoc
-                    = htmlDocumentFetcher.getHtmlDocumentAgent(
-                            false, post.getDetailsLink());
+                    = htmlDocumentFetcher.getHtmlDocumentFromWeb(
+                             post.getDetailsLink(),false,false,false);
             log.info("Подключение к странице деталей поста " + detLink);
             try {
                 Element authorNameElement = detailsDoc.getElementsByClass("name").first().child(0);

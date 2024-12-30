@@ -6,7 +6,7 @@ public class ParseUtil {
             return 0.0;
         }
         try {
-            if (priceText.matches("\\d+")) {
+            if (priceText.matches("\\d+(\\.\\d+)?")) {
                 return Double.parseDouble(priceText);
             }
         } catch (NumberFormatException e) {

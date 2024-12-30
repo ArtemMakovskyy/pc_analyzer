@@ -23,70 +23,82 @@ public class CpuUserBenchmarkParser {
     private final CpuUserBenchmarkParserByPosition cpuUserBenchmarkParserByPosition;
     private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final String BASE_URL = "https://cpu.userbenchmark.com/";
+    private static final String BASE_LINK = "C:\\Users\\Artem\\Documents\\Java"
+            + "\\UltimateJetBrains\\tutorials\\ms1\\parser\\parser\\src\\main\\resources\\static"
+            + "\\other\\userbenchmark\\cpu\\";
 
-    public List<Object> purseAllPages() {
-        pursePage(BASE_URL);
-
-        return Collections.emptyList();
+    public List<CpuUserBenchmark> purseAllPages() {
+        List<CpuUserBenchmark> cpuUserBenchmarks = new ArrayList<>();
+        for (int i = 1; i <= 8; i++) {
+            cpuUserBenchmarks.addAll(pursePageFromFile(BASE_LINK + "ub_cpu_0" + i + ".html"));
+        }
+        return cpuUserBenchmarks;
     }
 
-    public List<CpuUserBenchmark> pursePage(String url) {
-        Document htmlDocument;
+    private List<CpuUserBenchmark> pursePageFromFile(String link) {
+        Document htmlDocument
+                = htmlDocumentFetcher.getHtmlDocumentFromFile(
+                link, false);
+        return processDocument(htmlDocument);
+    }
+
+    private List<CpuUserBenchmark> pursePageFromUrl(String link) {
+        Document htmlDocument = htmlDocumentFetcher.getHtmlDocumentFromWeb
+                (
+                        link,
+                        true
+                        , true
+                        , false
+                );
+
+        List<CpuUserBenchmark> cpuUserBenchmarks = processDocument(htmlDocument);
+        return cpuUserBenchmarks;
+    }
+
+    private List<CpuUserBenchmark> processDocument(Document htmlDocument) {
+
         List<CpuUserBenchmark> cpuUserBenchmarks = new ArrayList<>();
-
-        boolean readFromWebPage = false;
-        if (readFromWebPage) {
-            htmlDocument = htmlDocumentFetcher.getHtmlDocumentAgent
-                    (
-                            url,
-                            true
-                            , true
-                            , false
-                    );
-
-        } else {
-            log.info("Read from file");
-            // Read from local file
-            File file = new File("C:\\Users\\Artem\\Documents\\Java\\UltimateJetBrains\\tutorials\\ms1\\parser\\parser\\src\\main\\resources\\static\\other\\UserBenchmark2.html");
-            htmlDocument = null;
-            try {
-                htmlDocument = Jsoup.parse(file);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
 
         /**
          * <tr class="hovertarget " data-id="1943305">
          */
         Elements rows = htmlDocument.select("tr.hovertarget");
-        CpuUserBenchmark cpu = null;
-
+        CpuUserBenchmark cpu;
         for (Element row : rows) {
-            String column1NumberPosition = row.select("td:nth-child(1) div")
-                    .text();
-            String column2_1Manufacturer = row.select("td:nth-child(2) span.semi-strongs")
-                    .first().ownText().trim();
-            String column2_2Model = row.select("td:nth-child(2) span.semi-strongs a.nodec")
-                    .text().trim();
-            String column3UserRating = row.select("td:nth-child(3) div.mh-tc")
-                    .first().text().replaceAll("[^0-9]", "");
-            String column4Value = row.select("td:nth-child(4) div.mh-tc")
-                    .text();
-            String column5_1Avg = row.select("td:nth-child(5) div.mh-tc")
-                    .text().split(" ")[0];
-            String column5_2AvgFromTo = row.select("td:nth-child(5) div.mh-tc-cap")
-                    .text();
-            String column6Memory = row.select("td:nth-child(6) div.mh-tc")
-                    .text();
-            String column7Core = row.select("td:nth-child(7) div.mh-tc")
-                    .text();
-            String column8Mkt = row.select("td:nth-child(8) div.mh-tc")
-                    .text();
-            String column9Age = row.select("td:nth-child(9) div.mh-tc")
-                    .text();
-            String column10Price = row.select("td:nth-child(10) div.mh-tc")
-                    .text().replaceAll("[^0-9]", "");
+            cpu = rowToCpu(row);
+//            cpuUserBenchmarkParserByPosition.purseInnerPage(cpu);
+            cpuUserBenchmarks.add(cpu);
+        }
+        return cpuUserBenchmarks;
+    }
+
+
+    private CpuUserBenchmark rowToCpu(Element row) {
+
+        //            String column1NumberPosition = row.select("td:nth-child(1) div")
+//                    .text();
+        String column2_1Manufacturer = row.select("td:nth-child(2) span.semi-strongs")
+                .first().ownText().trim();
+        String column2_2Model = row.select("td:nth-child(2) span.semi-strongs a.nodec")
+                .text().trim();
+        String column3UserRating = row.select("td:nth-child(3) div.mh-tc")
+                .first().text().replaceAll("[^0-9]", "");
+        String column4Value = row.select("td:nth-child(4) div.mh-tc")
+                .text();
+        String column5_1Avg = row.select("td:nth-child(5) div.mh-tc")
+                .text().split(" ")[0];
+//            String column5_2AvgFromTo = row.select("td:nth-child(5) div.mh-tc-cap")
+//                    .text();
+        String column6Memory = row.select("td:nth-child(6) div.mh-tc")
+                .text();
+//            String column7Core = row.select("td:nth-child(7) div.mh-tc")
+//                    .text();
+//            String column8Mkt = row.select("td:nth-child(8) div.mh-tc")
+//                    .text();
+//            String column9Age = row.select("td:nth-child(9) div.mh-tc")
+//                    .text();
+        String column10Price = row.select("td:nth-child(10) div.mh-tc")
+                .text().replaceAll("[^0-9]", "");
 
 //            if (false) {
 //                System.out.println("Column 1: " + column1NumberPosition);
@@ -103,63 +115,15 @@ public class CpuUserBenchmarkParser {
 //                System.out.println("Column 10: " + column10Price);
 //                System.out.println("------------------------");
 //            }
-
-            cpu = new CpuUserBenchmark();
-            cpu.setModel(column2_2Model);
-            cpu.setManufacturer(column2_1Manufacturer);
-            cpu.setUserRating(ParseUtil.stringToDouble(column3UserRating));
-            cpu.setValuePercents(ParseUtil.stringToDouble(column4Value));
-            cpu.setAvgBench(ParseUtil.stringToDouble(column5_1Avg));
-            cpu.setMemoryPercents(ParseUtil.stringToDouble(column6Memory));
-            cpu.setPrice(ParseUtil.stringToDouble(column10Price));
-            cpu.setUrlOfCpu(row.select("td a.nodec").attr("href"));
-
-            cpuUserBenchmarkParserByPosition.purseInnerPage(cpu);
-            cpuUserBenchmarks.add(cpu);
-        }
-
-        return cpuUserBenchmarks;
-    }
-
-}
-
-@Service
-@Log4j2
-class CpuUserBenchmarkParserByPosition {
-    private static final String BASE_URL = "https://cpu.userbenchmark.com/Intel-Core-i5-13600K/Rating/4134";
-
-    //    public void purseInnerPage(String url, CpuUserBenchmark cpu) {
-    public void purseInnerPage(CpuUserBenchmark cpu) {
-        boolean readFromWebPage = false;
-
-        Document htmlDocument = null;
-        if (readFromWebPage) {
-//            HtmlDocumentFetcher.getInstance().getHtmlDocument(
-//                    false, url);
-        } else {
-            // Read from local file
-            File file = new File("C:\\Users\\Artem\\Documents\\Java\\UltimateJetBrains\\tutorials\\ms1\\parser\\parser\\src\\main\\resources\\static\\other\\Core i5-13600K.html");
-            try {
-                htmlDocument = Jsoup.parse(file);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        cpu.setPartNumber(htmlDocument.getElementsByClass("pg-head-toption-post").text());
-        cpu.setCpuSpecification(htmlDocument.getElementsByClass("cmp-cpt tallp cmp-cpt-l").text());
-        final Elements selects = htmlDocument.select("div.bsc-w.text-left.semi-strong > div");
-        for (Element select : selects) {
-            String text = select.text();
-            if (text.contains("Desktop")) {
-                cpu.setDesktopScore(ParseUtil.stringToDouble(text.replaceAll("[^0-9]", "")));
-            } else if (text.contains("Gaming")) {
-                cpu.setGamingScore(ParseUtil.stringToDouble(text.replaceAll("[^0-9]", "")));
-            } else if (text.contains("Workstation")) {
-                cpu.setWorkstationScore(ParseUtil.stringToDouble(text.replaceAll("[^0-9]", "")));
-                break;
-            }
-        }
-        System.out.println(cpu);
+        CpuUserBenchmark cpu = new CpuUserBenchmark();
+        cpu.setModel(column2_2Model);
+        cpu.setManufacturer(column2_1Manufacturer);
+        cpu.setUserRating(ParseUtil.stringToDouble(column3UserRating));
+        cpu.setValuePercents(ParseUtil.stringToDouble(column4Value));
+        cpu.setAvgBench(ParseUtil.stringToDouble(column5_1Avg));
+        cpu.setMemoryPercents(ParseUtil.stringToDouble(column6Memory));
+        cpu.setPrice(ParseUtil.stringToDouble(column10Price));
+        cpu.setUrlOfCpu(row.select("td a.nodec").attr("href"));
+        return cpu;
     }
 }

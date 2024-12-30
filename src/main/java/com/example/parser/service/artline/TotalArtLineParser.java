@@ -26,12 +26,6 @@ public class TotalArtLineParser {
     private static final String MAIN_LINK_FIRST_PART = "https://artline.ua/catalog/";
     private static final String MAIN_LINK_FINAL_PART = "/page=";
 
-    @PostConstruct
-    public void init() {
-//        parse();
-//        parseMultiThreaded();
-    }
-
     public void parse() {
         long startTime = System.nanoTime();
         final List<ArtLinePart> cpus = artLineParser.parse(

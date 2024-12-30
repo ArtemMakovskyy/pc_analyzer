@@ -2,8 +2,11 @@ package com.example.parser.service.parse;
 
 import com.example.parser.model.user.benchmark.CpuUserBenchmark;
 
+import com.example.parser.repository.GpuUserBenchmarkRepository;
 import com.example.parser.service.CpuHotlineService;
+import com.example.parser.service.CpuUserBenchmarkService;
 import com.example.parser.service.GpuHotlineService;
+import com.example.parser.service.GpuUserBenchmarkService;
 import com.example.parser.service.parse.artline.ArtLineCpuParser;
 import com.example.parser.service.parse.artline.TotalArtLineParser;
 import com.example.parser.service.parse.benchmark.user.CpuUserBenchmarkParser;
@@ -32,14 +35,19 @@ public class InitParseClass {
     private final GpuUserBenchmarkParser gpuUserBenchmarkParser;
     private final PdaJsoupParser pdaJsoupParser;
     private final PdaSeleniumParser pdaSeleniumParser;
+
     private final CpuHotlineService cpuHotlineService;
     private final GpuHotlineService gpuHotlineService;
+
+    private final CpuUserBenchmarkService cpuUserBenchmarkService;
+    private final GpuUserBenchmarkService gpuUserBenchmarkService;
+
 
     @PostConstruct
     public void init() {
         ExecutorService executor = Executors.newFixedThreadPool(6);
-//        executor.submit(this::userBenchmark);
-        executor.submit(this::hotline);
+        executor.submit(this::userBenchmark);
+//        executor.submit(this::hotline);
 //        executor.submit(this::artLine);
 //        executor.submit(this::pda);
 //
@@ -51,8 +59,10 @@ public class InitParseClass {
 
     private void userBenchmark() {
         final List<CpuUserBenchmark> cpuUserBenchmarks = cpuUserBenchmarkParser.purseAllPages();
-        cpuUserBenchmarkParser.purseAllPages().forEach(System.out::println);
-        gpuUserBenchmarkParser.purseAllPages().forEach(System.out::println);
+//        cpuUserBenchmarkParser.purseAllPages().forEach(System.out::println);
+//        gpuUserBenchmarkParser.purseAllPages().forEach(System.out::println);
+//        cpuUserBenchmarkService.saveAll(cpuUserBenchmarkParser.purseAllPages());
+//        gpuUserBenchmarkService.saveAll(gpuUserBenchmarkParser.purseAllPages());
     }
 
     private void hotline() {

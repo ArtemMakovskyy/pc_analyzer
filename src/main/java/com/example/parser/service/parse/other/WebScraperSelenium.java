@@ -9,7 +9,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 public class WebScraperSelenium {
     public static void main(String[] args) {
         // Укажите путь к драйверу
-        System.setProperty("webdriver.chrome.driver", "C:\\path\\to\\chromedriver.exe");
+//        System.setProperty("webdriver.chrome.driver", "C:\\path\\to\\chromedriver.exe");
 
         // Создаём экземпляр WebDriver
         WebDriver driver = new ChromeDriver();

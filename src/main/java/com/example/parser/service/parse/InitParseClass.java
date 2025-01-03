@@ -2,7 +2,6 @@ package com.example.parser.service.parse;
 
 import com.example.parser.model.user.benchmark.CpuUserBenchmark;
 
-import com.example.parser.repository.GpuUserBenchmarkRepository;
 import com.example.parser.service.CpuHotlineService;
 import com.example.parser.service.CpuUserBenchmarkService;
 import com.example.parser.service.GpuHotlineService;
@@ -10,7 +9,7 @@ import com.example.parser.service.GpuUserBenchmarkService;
 import com.example.parser.service.parse.artline.ArtLineCpuParser;
 import com.example.parser.service.parse.artline.TotalArtLineParser;
 import com.example.parser.service.parse.benchmark.user.CpuUserBenchmarkParser;
-import com.example.parser.service.parse.benchmark.user.GpuUserBenchmarkParser;
+import com.example.parser.service.parse.benchmark.user.GpuUserBenchmarkParserWithGsoup;
 import com.example.parser.service.parse.hotline.HotlineCpuPageParser;
 import com.example.parser.service.parse.hotline.HotlineGpuPageParser;
 import com.example.parser.service.parse.pda.PdaJsoupParser;
@@ -32,7 +31,7 @@ public class InitParseClass {
     private final ArtLineCpuParser artLineCpuParser;
     private final TotalArtLineParser totalArtLineParser;
     private final CpuUserBenchmarkParser cpuUserBenchmarkParser;
-    private final GpuUserBenchmarkParser gpuUserBenchmarkParser;
+    private final GpuUserBenchmarkParserWithGsoup gpuUserBenchmarkParserWithGsoup;
     private final PdaJsoupParser pdaJsoupParser;
     private final PdaSeleniumParser pdaSeleniumParser;
 
@@ -46,7 +45,7 @@ public class InitParseClass {
     @PostConstruct
     public void init() {
         ExecutorService executor = Executors.newFixedThreadPool(6);
-        executor.submit(this::userBenchmark);
+//        executor.submit(this::userBenchmark);
 //        executor.submit(this::hotline);
 //        executor.submit(this::artLine);
 //        executor.submit(this::pda);

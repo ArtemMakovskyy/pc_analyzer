@@ -48,4 +48,6 @@ public class CpuHotLine {
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
+
+    //todo add try
 }

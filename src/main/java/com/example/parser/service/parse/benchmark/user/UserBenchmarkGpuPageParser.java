@@ -1,12 +1,9 @@
 package com.example.parser.service.parse.benchmark.user;
 
 import com.example.parser.model.user.benchmark.GpuUserBenchmark;
-import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.utils.ParseUtil;
-import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +17,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Service;
@@ -28,12 +24,13 @@ import org.springframework.stereotype.Service;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class GpuUserBenchmarkParser {
-    private final HtmlDocumentFetcher htmlDocumentFetcher;
+public class UserBenchmarkGpuPageParser {
+    private final UserBenchmarkTestPage userBenchmarkTestPage;
+    private static final ParseUtil.DelayInSeconds SMALL_PAUSE
+            = new ParseUtil.DelayInSeconds(2, 4);
+    private static final ParseUtil.DelayInSeconds BIG_PAUSE
+            = new ParseUtil.DelayInSeconds(4, 10);
     private static final String BASE_URL = "https://gpu.userbenchmark.com/";
-    private static final String CODE_TEST_IF_NOT_ROBOT = "fa fa-4x fa-male";
-    private static final String CSS_LOCATOR_TEST_IF_NOT_ROBOT
-            = "div > a > i.fa.fa-4x.fa-male";
     private static final String XPATH_BUTTON_PRICE_SORT
             = "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th[@data-mhth='MC_PRICE'][1]";
     private static final String XPATH_LOCATOR_PAGE_QUANTITY
@@ -41,19 +38,19 @@ public class GpuUserBenchmarkParser {
     private static final String XPATH_NEXT_PAGE_BUTTON
             = "//*[@id=\"tableDataForm:j_idt260\"]";
 
-//    @PostConstruct
+    private static final String CSS_QUERY_TABLE_ROW = "tr.hovertarget";
+
+    private static final String PAGE_QUANTITY_PATTERN = "Page \\d+ of (\\d+)";
+
     public void init() {
-        purseAllPages().forEach(System.out::println);
+        purse().forEach(System.out::println);
     }
 
-    public List<GpuUserBenchmark> purseAllPages() {
-
+    public List<GpuUserBenchmark> purse() {
         WebDriver driver = new ChromeDriver();
-//        WebDriver driver = new FirefoxDriver();
-
         try {
             driver.get(BASE_URL);
-            checkIfTestPageOpened(driver);
+            userBenchmarkTestPage.checkAndPassTestIfItNeed(driver);
             int pages = findPageQuantity(driver);
             sortByPriceButton(driver);
             return parsePages(driver, pages);
@@ -69,11 +66,11 @@ public class GpuUserBenchmarkParser {
         int currentPage = 1;
         do {
             log.info("Current page is " + currentPage + " from " + pages + ".");
-            final List<GpuUserBenchmark> gpuUserBenchmarksOnPage
+            final List<GpuUserBenchmark> gpusUserBenchmarksOnPage
                     = parsePage(driver);
-            gpuUserBenchmarks.addAll(gpuUserBenchmarksOnPage);
+            gpuUserBenchmarks.addAll(gpusUserBenchmarksOnPage);
             log.info("Pause 3 in parsePages() before click on next page");
-            ParseUtil.addRandomDelayInSeconds(5, 15, true);
+            ParseUtil.addRandomDelayInSeconds(BIG_PAUSE);
             currentPage++;
             if (currentPage < pages) {
                 clickNextPage(driver);
@@ -94,20 +91,19 @@ public class GpuUserBenchmarkParser {
             System.out.println(gpuUserBenchmarksOnPage.size());
         }
         log.info("Pause 2 in parsePage()");
-        ParseUtil.addRandomDelayInSeconds(5, 15, true);
+        ParseUtil.addRandomDelayInSeconds(BIG_PAUSE);
 
         return gpuUserBenchmarksOnPage;
     }
 
     private List<GpuUserBenchmark> pursePageSource(String pageSource) {
-        Document htmlDocument;
-        htmlDocument = Jsoup.parse(pageSource);
+        Document htmlDocument = Jsoup.parse(pageSource);
 
         /**
          * <tr class="hovertarget " data-id="1943305">
          */
 
-        Elements rows = htmlDocument.select("tr.hovertarget");
+        Elements rows = htmlDocument.select(CSS_QUERY_TABLE_ROW);
         GpuUserBenchmark item;
         List<GpuUserBenchmark> items = new ArrayList<>();
         for (Element row : rows) {
@@ -181,7 +177,7 @@ public class GpuUserBenchmarkParser {
 
         String pageInfoText = pageInfoElement.getText();
 
-        Pattern pattern = Pattern.compile("Page \\d+ of (\\d+)");
+        Pattern pattern = Pattern.compile(PAGE_QUANTITY_PATTERN);
         Matcher matcher = pattern.matcher(pageInfoText);
 
         if (matcher.find()) {
@@ -189,7 +185,7 @@ public class GpuUserBenchmarkParser {
         } else {
             throw new RuntimeException(
                     "Unable to extract the maximum number of pages from text: "
-                    + pageInfoText);
+                            + pageInfoText);
         }
 
         return pages;
@@ -202,7 +198,7 @@ public class GpuUserBenchmarkParser {
             throw new RuntimeException("Price sort button is not visible.");
         }
         log.info("Pause 1, before click on price button");
-        ParseUtil.addRandomDelayInSeconds(2, 4, true);
+        ParseUtil.addRandomDelayInSeconds(SMALL_PAUSE);
         elementPriceButton.click();
     }
 
@@ -210,31 +206,10 @@ public class GpuUserBenchmarkParser {
         By xpathNextButton = By.xpath(XPATH_NEXT_PAGE_BUTTON);
         WebElement elementNextButton = driver.findElement(xpathNextButton);
         log.info("Pause 4 in clickNextPage click before click on next page");
-        ParseUtil.addRandomDelayInSeconds(3, 6, true);
+        ParseUtil.addRandomDelayInSeconds(SMALL_PAUSE);
         elementNextButton.click();
 
-        checkIfTestPageOpened(driver);
-    }
-
-    private void checkIfTestPageOpened(WebDriver driver) {
-
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-
-        if (driver.getPageSource().contains(CODE_TEST_IF_NOT_ROBOT)) {
-            log.info("Page contain robot test.");
-            By iconLocator = By.cssSelector(CSS_LOCATOR_TEST_IF_NOT_ROBOT);
-
-            WebElement testButtonElement = wait.until(ExpectedConditions.elementToBeClickable(iconLocator));
-
-            if (!testButtonElement.isDisplayed()) {
-                throw new RuntimeException("testButtonElement is not visible.");
-            }
-            log.info("Pause in method checkIfTestPageOpened(), before click on test page");
-            ParseUtil.addRandomDelayInSeconds(3, 6, true);
-            testButtonElement.click();
-            log.info("Test on page passed");
-        }
-        log.info("Not found test page.");
+        userBenchmarkTestPage.checkAndPassTestIfItNeed(driver);
     }
 
 }

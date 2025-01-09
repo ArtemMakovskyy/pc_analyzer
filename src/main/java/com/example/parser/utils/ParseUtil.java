@@ -1,6 +1,9 @@
 package com.example.parser.utils;
 
 import java.util.Random;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
@@ -18,6 +21,11 @@ public class ParseUtil {
         }
         return 0.0;
     }
+
+    public static void addRandomDelayInSeconds(DelayInSeconds delayInSeconds) {
+        addRandomDelayInSeconds(delayInSeconds.getFromSec(), delayInSeconds.getToSec(), true);
+    }
+
 
     public static void addRandomDelayInSeconds(int fromSec, int toSec, boolean isDelay) {
         if (isDelay) {
@@ -42,6 +50,13 @@ public class ParseUtil {
                 log.error("Thread was interrupted during sleep", e);
             }
         }
+    }
+
+    @AllArgsConstructor
+    @Getter
+    public static class DelayInSeconds {
+        private int fromSec;
+        private int toSec;
     }
 
 }

@@ -8,7 +8,7 @@ import com.example.parser.service.GpuHotlineService;
 import com.example.parser.service.GpuUserBenchmarkService;
 import com.example.parser.service.parse.artline.ArtLineCpuParser;
 import com.example.parser.service.parse.artline.TotalArtLineParser;
-import com.example.parser.service.parse.benchmark.user.CpuUserBenchmarkParser;
+import com.example.parser.service.parse.benchmark.user.UserBenchmarkCpuParserFromFile;
 import com.example.parser.service.parse.benchmark.user.GpuUserBenchmarkParserWithGsoup;
 import com.example.parser.service.parse.hotline.HotlineCpuPageParser;
 import com.example.parser.service.parse.hotline.HotlineGpuPageParser;
@@ -30,7 +30,7 @@ public class InitParseClass {
     private final HotlineGpuPageParser hotlineGpuPageParser;
     private final ArtLineCpuParser artLineCpuParser;
     private final TotalArtLineParser totalArtLineParser;
-    private final CpuUserBenchmarkParser cpuUserBenchmarkParser;
+    private final UserBenchmarkCpuParserFromFile userBenchmarkCpuParserFromFile;
     private final GpuUserBenchmarkParserWithGsoup gpuUserBenchmarkParserWithGsoup;
     private final PdaJsoupParser pdaJsoupParser;
     private final PdaSeleniumParser pdaSeleniumParser;
@@ -57,7 +57,7 @@ public class InitParseClass {
     }
 
     private void userBenchmark() {
-        final List<CpuUserBenchmark> cpuUserBenchmarks = cpuUserBenchmarkParser.purseAllPages();
+        final List<CpuUserBenchmark> cpuUserBenchmarks = userBenchmarkCpuParserFromFile.purseAllPages();
 //        cpuUserBenchmarkParser.purseAllPages().forEach(System.out::println);
 //        gpuUserBenchmarkParser.purseAllPages().forEach(System.out::println);
 //        cpuUserBenchmarkService.saveAll(cpuUserBenchmarkParser.purseAllPages());

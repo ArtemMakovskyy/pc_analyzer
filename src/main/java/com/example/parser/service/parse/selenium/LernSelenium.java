@@ -214,7 +214,7 @@ public class LernSelenium {
 //        driver.quit();
     }
 
-    public void start9() {
+    public void start9actions() {
 //        https://www.youtube.com/watch?v=gA4BTgbCODU&list=PL3U4JD8S3lin3seHzfHlInqMCgzC_1gFW&index=27
         WebDriver driver = new ChromeDriver();
         driver.get("https://ebay.com/");
@@ -334,7 +334,7 @@ public class LernSelenium {
     }
 
 
-    public void start5() {
+    public void start5sendKeys() {
         WebDriver driver = new FirefoxDriver();
         driver.get("https://en.wikipedia.org/");
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
@@ -358,7 +358,7 @@ public class LernSelenium {
 
 
     //    @PostConstruct
-    public void start4() {
+    public void start4click_submit() {
         WebDriver driver = new FirefoxDriver();
         driver.get("https://en.wikipedia.org/");
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
@@ -372,7 +372,7 @@ public class LernSelenium {
         driver.quit();
     }
 
-    public void start3() {
+    public void start3CssSelector() {
         WebDriver driver = new FirefoxDriver();
         driver.get("https://en.wikipedia.org/");
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
@@ -393,9 +393,8 @@ public class LernSelenium {
         driver.quit();
     }
 
-    public void start2() {
+    public void implicitlyWait() {
         WebDriver driver = new FirefoxDriver();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 //        driver.manage().window().maximize();
         driver.manage().window().setSize(new Dimension(900, 500));
         driver.get("https://www.google.com/");
@@ -408,7 +407,7 @@ public class LernSelenium {
 
     }
 
-    public void start() {
+    public void startFindLast() {
         WebDriver driver = new ChromeDriver();
         driver.get("https://cpu.userbenchmark.com/");
         String a1 = "//table[@id='customers']//tr[last()]";
@@ -420,9 +419,10 @@ public class LernSelenium {
     private void functionXPath() {
         WebDriver driver = new ChromeDriver();
         String w3schools_html_tables1 = "https://www.w3schools.com/html/html_tables.asp";
-//span[@class='mw-page-title-main' and text()='Список учебных заведений Таравы']
 
         driver.get(w3schools_html_tables1);
+        driver.findElement(By.xpath(
+                "span[@class='mw-page-title-main' and text()='Список учебных заведений Таравы']"));
 
         driver.quit();
     }
@@ -436,7 +436,6 @@ public class LernSelenium {
         String pathShort2 = "//input[@id='searchInput']";
         String pathShort3 = "//*[@id=\"searchInput\"]";
         String pathShort4 = "//a[@class='mw-wiki-logo']";
-        String pathShort5 = "//a[@class='mw-wiki-logo']";
         String pathShort6 = "//div[@class='main-block main-box' and @id='main-tfl']//link[1]";
         String pathShort7 = "//*[@id='main-tfl']";
 

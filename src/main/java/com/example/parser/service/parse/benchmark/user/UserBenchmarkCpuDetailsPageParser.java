@@ -1,6 +1,7 @@
 package com.example.parser.service.parse.benchmark.user;
 
-import com.example.parser.model.user.benchmark.CpuUserBenchmark;
+import com.example.parser.dto.userbenchmark.CpuUserBenchmarkCreateDto;
+import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.utils.ParseUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,13 +19,16 @@ public class UserBenchmarkCpuDetailsPageParser {
     private static final int THIRD_INDEX = 3;
     private static final int FIFTH_INDEX = 5;
     private static final String REGEX_REMOVE_NON_DIGITS = "\\D";
-    private static final String SCORE_TABLE_CSS_SELECTOR = "iv.v-center:nth-child(1) > table";
-    private static final String SCORE_TABLE_ELEMENT = "div.bsc-w.text-left.semi-strong>div:first-of-type";
-    private static final ParseUtil.DelayInSeconds DELAY_IN_SECONDS = new ParseUtil.DelayInSeconds(5, 10);
+    private static final String SCORE_TABLE_CSS_SELECTOR
+            = "iv.v-center:nth-child(1) > table";
+    private static final String SCORE_TABLE_ELEMENT
+            = "div.bsc-w.text-left.semi-strong>div:first-of-type";
+    private static final ParseUtil.DelayInSeconds DELAY_IN_SECONDS
+            = new ParseUtil.DelayInSeconds(5, 10);
     private final UserBenchmarkTestPage userBenchmarkTestPage;
 
     public void purseAndAddDetails(
-            CpuUserBenchmark cpu,
+            CpuUserBenchmarkCreateDto cpu,
             WebDriver driver) {
 
         userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);

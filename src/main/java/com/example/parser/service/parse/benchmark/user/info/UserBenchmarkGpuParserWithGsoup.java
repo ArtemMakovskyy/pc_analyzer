@@ -1,4 +1,4 @@
-package com.example.parser.service.parse.benchmark.user;
+package com.example.parser.service.parse.benchmark.user.info;
 
 import com.example.parser.model.user.benchmark.GpuUserBenchmark;
 import com.example.parser.service.parse.HtmlDocumentFetcher;

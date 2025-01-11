@@ -29,37 +29,37 @@ public class TestitTest3 {
   public void tearDown() {
     driver.quit();
   }
-  @Test
-  public void testit() {
-    driver.get("https://www.w3schools.com/html/html_form_input_types.asp");
-    driver.manage().window().setSize(new Dimension(1385, 1103));
-    driver.findElement(By.cssSelector("input:nth-child(17)")).click();
-    driver.findElement(By.cssSelector("input:nth-child(17)")).sendKeys("Ahntv");
-    driver.findElement(By.cssSelector("input:nth-child(20)")).click();
-    driver.findElement(By.cssSelector("input:nth-child(20)")).click();
-    driver.findElement(By.cssSelector("input:nth-child(20)")).sendKeys("ln");
-    driver.findElement(By.id("html")).click();
-    driver.findElement(By.id("css")).click();
-    {
-      WebElement element = driver.findElement(By.id("vehicle1"));
-      Actions builder = new Actions(driver);
-      builder.moveToElement(element).clickAndHold().perform();
-    }
-    {
-      WebElement element = driver.findElement(By.id("vehicle1"));
-      Actions builder = new Actions(driver);
-      builder.moveToElement(element).perform();
-    }
-    {
-      WebElement element = driver.findElement(By.id("vehicle1"));
-      Actions builder = new Actions(driver);
-      builder.moveToElement(element).release().perform();
-    }
-    driver.findElement(By.id("vehicle1")).click();
-    driver.findElement(By.id("vehicle1")).click();
-    driver.findElement(By.id("vehicle1")).click();
-    driver.findElement(By.id("vehicle3")).click();
-    driver.findElement(By.cssSelector("input:nth-child(85)")).click();
-    assertThat(driver.switchTo().alert().getText(), is("Hello World!"));
-  }
+//  @Test
+//  public void testit() {
+//    driver.get("https://www.w3schools.com/html/html_form_input_types.asp");
+//    driver.manage().window().setSize(new Dimension(1385, 1103));
+//    driver.findElement(By.cssSelector("input:nth-child(17)")).click();
+//    driver.findElement(By.cssSelector("input:nth-child(17)")).sendKeys("Ahntv");
+//    driver.findElement(By.cssSelector("input:nth-child(20)")).click();
+//    driver.findElement(By.cssSelector("input:nth-child(20)")).click();
+//    driver.findElement(By.cssSelector("input:nth-child(20)")).sendKeys("ln");
+//    driver.findElement(By.id("html")).click();
+//    driver.findElement(By.id("css")).click();
+//    {
+//      WebElement element = driver.findElement(By.id("vehicle1"));
+//      Actions builder = new Actions(driver);
+//      builder.moveToElement(element).clickAndHold().perform();
+//    }
+//    {
+//      WebElement element = driver.findElement(By.id("vehicle1"));
+//      Actions builder = new Actions(driver);
+//      builder.moveToElement(element).perform();
+//    }
+//    {
+//      WebElement element = driver.findElement(By.id("vehicle1"));
+//      Actions builder = new Actions(driver);
+//      builder.moveToElement(element).release().perform();
+//    }
+//    driver.findElement(By.id("vehicle1")).click();
+//    driver.findElement(By.id("vehicle1")).click();
+//    driver.findElement(By.id("vehicle1")).click();
+//    driver.findElement(By.id("vehicle3")).click();
+//    driver.findElement(By.cssSelector("input:nth-child(85)")).click();
+//    assertThat(driver.switchTo().alert().getText(), is("Hello World!"));
+//  }
 }

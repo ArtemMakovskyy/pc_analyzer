@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -20,7 +19,7 @@ import org.hibernate.annotations.Where;
 @ToString
 @SQLDelete(sql = "UPDATE wines SET is_deleted = true WHERE id=?")
 @Where(clause = "is_deleted=false")
-public class CpuUserBenchmark {
+public class UserBenchmarkCpu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

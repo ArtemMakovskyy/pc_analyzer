@@ -1,7 +1,7 @@
 package com.example.parser.service.parse.hotline;
 
 import com.example.parser.model.hotline.CpuHotLine;
-import com.example.parser.model.hotline.ShortCpuInfoDto;
+import com.example.parser.dto.hotline.UserBenchmarkShortCpuInfoDto;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,16 +59,16 @@ public class HotlineCpuPageParser {
             cpu.setPrices(priceElement != null ? priceElement.text()
                     .replace(" ", "").trim() : "Не указана");
 
-            final ShortCpuInfoDto shortCpuInfoDto
+            final UserBenchmarkShortCpuInfoDto userBenchmarkShortCpuInfoDto
                     = parseBaseCpuCharacteristics(elements);
 
-            cpu.setSocketType(shortCpuInfoDto.getSocketType());
-            cpu.setFrequency(shortCpuInfoDto.getFrequency());
-            cpu.setL3Cache(shortCpuInfoDto.getL3Cache());
-            cpu.setCores(shortCpuInfoDto.getCores());
-            cpu.setThreads(shortCpuInfoDto.getThreads());
-            cpu.setPackageType(shortCpuInfoDto.getPackageType());
-            cpu.setReleaseDate(shortCpuInfoDto.getReleaseDate());
+            cpu.setSocketType(userBenchmarkShortCpuInfoDto.getSocketType());
+            cpu.setFrequency(userBenchmarkShortCpuInfoDto.getFrequency());
+            cpu.setL3Cache(userBenchmarkShortCpuInfoDto.getL3Cache());
+            cpu.setCores(userBenchmarkShortCpuInfoDto.getCores());
+            cpu.setThreads(userBenchmarkShortCpuInfoDto.getThreads());
+            cpu.setPackageType(userBenchmarkShortCpuInfoDto.getPackageType());
+            cpu.setReleaseDate(userBenchmarkShortCpuInfoDto.getReleaseDate());
             cpus.add(cpu);
         }
         return cpus;
@@ -97,10 +97,10 @@ public class HotlineCpuPageParser {
         return maxPage;
     }
 
-    private ShortCpuInfoDto parseBaseCpuCharacteristics(Elements elements) {
+    private UserBenchmarkShortCpuInfoDto parseBaseCpuCharacteristics(Elements elements) {
         Elements specItems = elements.select(".spec-item");
 
-        ShortCpuInfoDto cpuInfo = new ShortCpuInfoDto();
+        UserBenchmarkShortCpuInfoDto cpuInfo = new UserBenchmarkShortCpuInfoDto();
 
         for (Element data : specItems) {
             String key = data.select(".text-gray").text();

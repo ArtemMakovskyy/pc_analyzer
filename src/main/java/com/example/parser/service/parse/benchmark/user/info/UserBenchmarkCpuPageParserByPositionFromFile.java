@@ -1,6 +1,6 @@
-package com.example.parser.service.parse.benchmark.user;
+package com.example.parser.service.parse.benchmark.user.info;
 
-import com.example.parser.model.user.benchmark.CpuUserBenchmark;
+import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.utils.ParseUtil;
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +17,7 @@ class UserBenchmarkCpuPageParserByPositionFromFile {
     private static final String BASE_URL = "https://cpu.userbenchmark.com/Intel-Core-i5-13600K/Rating/4134";
 
     //    public void purseInnerPage(String url, CpuUserBenchmark cpu) {
-    public void purseInnerPage(CpuUserBenchmark cpu) {
+    public void purseInnerPage(UserBenchmarkCpu cpu) {
         boolean readFromWebPage = false;
 
         Document htmlDocument = null;

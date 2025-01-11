@@ -1,9 +1,7 @@
 package com.example.parser.service;
 
 import com.example.parser.model.hotline.CpuHotLine;
-import com.example.parser.model.hotline.CpuHotLineCreateDto;
 import com.example.parser.repository.CpuHotLineRepository;
-import com.example.parser.repository.GpuHotLineRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

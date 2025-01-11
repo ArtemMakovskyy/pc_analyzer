@@ -1,4 +1,4 @@
-package com.example.parser.model.user.benchmark;
+package com.example.parser.dto.userbenchmark;
 
 import lombok.Data;
 

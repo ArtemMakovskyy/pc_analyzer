@@ -1,6 +1,6 @@
-package com.example.parser.service.parse.benchmark.user;
+package com.example.parser.service.parse.benchmark.user.info;
 
-import com.example.parser.model.user.benchmark.CpuUserBenchmark;
+import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.utils.ParseUtil;
@@ -24,22 +24,22 @@ public class UserBenchmarkCpuParserFromFile {
             + "\\UltimateJetBrains\\tutorials\\ms1\\parser\\parser\\src\\main\\resources\\static"
             + "\\other\\userbenchmark\\cpu\\";
 
-    public List<CpuUserBenchmark> purseAllPages() {
-        List<CpuUserBenchmark> cpuUserBenchmarks = new ArrayList<>();
+    public List<UserBenchmarkCpu> purseAllPages() {
+        List<UserBenchmarkCpu> cpuUserBenchmarks = new ArrayList<>();
         for (int i = 8; i <= 8; i++) {
             cpuUserBenchmarks.addAll(pursePageFromFile(BASE_LINK + "ub_cpu_0" + i + ".html"));
         }
         return cpuUserBenchmarks;
     }
 
-    private List<CpuUserBenchmark> pursePageFromFile(String link) {
+    private List<UserBenchmarkCpu> pursePageFromFile(String link) {
         Document htmlDocument
                 = htmlDocumentFetcher.getHtmlDocumentFromFile(
                 link, false);
         return processDocument(htmlDocument);
     }
 
-    private List<CpuUserBenchmark> pursePageFromUrl(String link) {
+    private List<UserBenchmarkCpu> pursePageFromUrl(String link) {
         Document htmlDocument = htmlDocumentFetcher.getHtmlDocumentFromWeb
                 (
                         link,
@@ -48,19 +48,19 @@ public class UserBenchmarkCpuParserFromFile {
                         , false
                 );
 
-        List<CpuUserBenchmark> cpuUserBenchmarks = processDocument(htmlDocument);
+        List<UserBenchmarkCpu> cpuUserBenchmarks = processDocument(htmlDocument);
         return cpuUserBenchmarks;
     }
 
-    private List<CpuUserBenchmark> processDocument(Document htmlDocument) {
+    private List<UserBenchmarkCpu> processDocument(Document htmlDocument) {
 
-        List<CpuUserBenchmark> cpuUserBenchmarks = new ArrayList<>();
+        List<UserBenchmarkCpu> cpuUserBenchmarks = new ArrayList<>();
 
         /**
          * <tr class="hovertarget " data-id="1943305">
          */
         Elements rows = htmlDocument.select("tr.hovertarget");
-        CpuUserBenchmark cpu;
+        UserBenchmarkCpu cpu;
         for (Element row : rows) {
             cpu = rowToCpu(row);
 //            cpuUserBenchmarkParserByPosition.purseInnerPage(cpu);
@@ -70,7 +70,7 @@ public class UserBenchmarkCpuParserFromFile {
     }
 
 
-    private CpuUserBenchmark rowToCpu(Element row) {
+    private UserBenchmarkCpu rowToCpu(Element row) {
 
         //            String column1NumberPosition = row.select("td:nth-child(1) div")
 //                    .text();
@@ -112,7 +112,7 @@ public class UserBenchmarkCpuParserFromFile {
 //                System.out.println("Column 10: " + column10Price);
 //                System.out.println("------------------------");
 //            }
-        CpuUserBenchmark cpu = new CpuUserBenchmark();
+        UserBenchmarkCpu cpu = new UserBenchmarkCpu();
         cpu.setModel(column2_2Model);
         cpu.setManufacturer(column2_1Manufacturer);
         cpu.setUserRating(ParseUtil.stringToDouble(column3UserRating));

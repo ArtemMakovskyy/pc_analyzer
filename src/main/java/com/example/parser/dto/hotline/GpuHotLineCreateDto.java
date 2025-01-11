@@ -1,4 +1,4 @@
-package com.example.parser.model.hotline;
+package com.example.parser.dto.hotline;
 
 import lombok.Data;
 

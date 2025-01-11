@@ -1,4 +1,4 @@
-package com.example.parser.service.parse.benchmark.user;
+package com.example.parser.service.parse.benchmark.user.info;
 
 import jakarta.annotation.PostConstruct;
 import lombok.SneakyThrows;

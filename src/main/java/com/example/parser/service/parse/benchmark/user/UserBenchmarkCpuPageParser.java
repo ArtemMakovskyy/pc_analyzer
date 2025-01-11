@@ -1,6 +1,6 @@
 package com.example.parser.service.parse.benchmark.user;
 
-import com.example.parser.model.user.benchmark.CpuUserBenchmark;
+import com.example.parser.dto.userbenchmark.CpuUserBenchmarkCreateDto;
 import com.example.parser.utils.ParseUtil;
 import jakarta.annotation.PostConstruct;
 import java.time.Duration;
@@ -39,40 +39,23 @@ public class UserBenchmarkCpuPageParser {
     private final UserBenchmarkCpuDetailsPageParser userBenchmarkCpuDetailsPageParser;
 
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
-
-                final List<CpuUserBenchmark> purse = purse();
-        WebDriver driver = null;
-
-        List<CpuUserBenchmark> purse2 = new ArrayList<>();
-        purse2.add(purse.get(0));
-        purse2.add(purse.get(1));
-        purse2.add(purse.get(2));
+//
+//        final List<CpuUserBenchmark> purse = purse();
+//        purse.forEach(System.out::println);
 
 
-        try {
-            driver = setUpWebDriver(
-                    BASE_URL,
-                    true,
-                    10);
 
+//        List<CpuUserBenchmark> purse2 = new ArrayList<>();
+//        purse2.add(purse.get(0));
+//        purse2.add(purse.get(1));
+//        purse2.add(purse.get(2));
 
-            for (CpuUserBenchmark cpu : purse2) {
-                //addres ulr
-                driver.get(cpu.getUrlOfCpu());
-                //retern cpu
-                userBenchmarkCpuDetailsPageParser.purseAndAddDetails(cpu, driver);
-            }
-
-        } finally {
-            driver.quit();
-        }
-        purse2.forEach(System.out::println);
+//        updateDetails(purse2);
     }
 
-
-    public List<CpuUserBenchmark> purse() {
+    public List<CpuUserBenchmarkCreateDto> purse() {
         WebDriver driver = null;
         try {
             driver = setUpWebDriver(
@@ -80,10 +63,13 @@ public class UserBenchmarkCpuPageParser {
                     true,
                     10);
 
-            driver.get(BASE_URL);
             userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);
             int pages = findPageQuantity(driver);
             sortByPriceButton(driver);
+
+
+            //todo check it
+
 //            return parsePages(driver, pages);
             return parsePages(driver, 2);
         } finally {
@@ -91,50 +77,73 @@ public class UserBenchmarkCpuPageParser {
         }
     }
 
+    public List<CpuUserBenchmarkCreateDto> updateDetails(List<CpuUserBenchmarkCreateDto> cpus) {
+        WebDriver driver = null;
+        try {
+            driver = setUpWebDriver(
+                    BASE_URL,
+                    true,
+                    10);
 
-    private List<CpuUserBenchmark> parsePages(WebDriver driver, int pages) {
+            for (CpuUserBenchmarkCreateDto cpu : cpus) {
+                driver.get(cpu.getUrlOfCpu());
+                userBenchmarkCpuDetailsPageParser.purseAndAddDetails(cpu, driver);
+            }
 
-        log.info("Start open pages. Total quality is: " + pages);
-        List<CpuUserBenchmark> cpuUserBenchmarks = new ArrayList<>();
+        } finally {
+            driver.quit();
+        }
+
+        return cpus;
+    }
+
+
+    private List<CpuUserBenchmarkCreateDto> parsePages(WebDriver driver, int pages) {
+
+        List<CpuUserBenchmarkCreateDto> cpuUserBenchmarks = new ArrayList<>();
         int currentPage = 1;
         do {
             log.info("Current page is " + currentPage + " from " + pages + ".");
-            final List<CpuUserBenchmark> cpusUserBenchmarksOnPage = parsePage(driver);
+            final List<CpuUserBenchmarkCreateDto> cpusUserBenchmarksOnPage = parsePage(driver);
             cpuUserBenchmarks.addAll(cpusUserBenchmarksOnPage);
 
-            log.info("Pause 3 in parsePages() before click on next page");
-            ParseUtil.applyRandomDelay(BIG_PAUSE);
-            //todo chek it
-            currentPage++;
-            if (currentPage < pages) {
+
+            if (currentPage != pages) {
+                log.info("Pause 3 in parsePages() before click on next page");
+                ParseUtil.applyRandomDelay(BIG_PAUSE);
                 clickNextPage(driver);
             }
+            currentPage++;
+
         } while (currentPage < pages);
         log.info("Parse pages successfully stopped");
         return cpuUserBenchmarks;
     }
 
-    private List<CpuUserBenchmark> parsePage(WebDriver driver) {
+
+    private List<CpuUserBenchmarkCreateDto> parsePage(WebDriver driver) {
         String currentHtmlPageSource = driver.getPageSource();
-        List<CpuUserBenchmark> gpuUserBenchmarksOnPage = pursePageSource(currentHtmlPageSource);
+        List<CpuUserBenchmarkCreateDto> gpuUserBenchmarksOnPage = pursePageSource(currentHtmlPageSource);
 
         if (false) {
-
+            //todo delete it
             gpuUserBenchmarksOnPage.forEach(System.out::println);
             System.out.println(gpuUserBenchmarksOnPage.size());
         }
+
+
         log.info("Pause 2 in parsePage()");
         ParseUtil.applyRandomDelay(BIG_PAUSE);
 
         return gpuUserBenchmarksOnPage;
     }
 
-    private List<CpuUserBenchmark> pursePageSource(String pageSource) {
+    private List<CpuUserBenchmarkCreateDto> pursePageSource(String pageSource) {
         Document htmlDocument = Jsoup.parse(pageSource);
 
         Elements rows = htmlDocument.select(CSS_QUERY_TABLE_ROW);
-        CpuUserBenchmark item;
-        List<CpuUserBenchmark> items = new ArrayList<>();
+        CpuUserBenchmarkCreateDto item;
+        List<CpuUserBenchmarkCreateDto> items = new ArrayList<>();
         for (Element row : rows) {
             item = rowToCpu(row);
             items.add(item);
@@ -144,43 +153,20 @@ public class UserBenchmarkCpuPageParser {
         //            cpuUserBenchmarkParserByPosition.purseInnerPage(cpu);
     }
 
-    private CpuUserBenchmark rowToCpu(Element row) {
+    private CpuUserBenchmarkCreateDto rowToCpu(Element row) {
 
-
-        //            String column1NumberPosition = row.select("td:nth-child(1) div")
-//                    .text();
         String column2_1Manufacturer = row.select("td:nth-child(2) span.semi-strongs").first().ownText().trim();
         String column2_2Model = row.select("td:nth-child(2) span.semi-strongs a.nodec").text().trim();
         String column3UserRating = row.select("td:nth-child(3) div.mh-tc").first().text().replaceAll("[^0-9]", "");
         String column4Value = row.select("td:nth-child(4) div.mh-tc").text();
         String column5_1Avg = row.select("td:nth-child(5) div.mh-tc").text().split(" ")[0];
-//            String column5_2AvgFromTo = row.select("td:nth-child(5) div.mh-tc-cap")
-//                    .text();
+
         String column6Memory = row.select("td:nth-child(6) div.mh-tc").text();
-//            String column7Core = row.select("td:nth-child(7) div.mh-tc")
-//                    .text();
-//            String column8Mkt = row.select("td:nth-child(8) div.mh-tc")
-//                    .text();
-//            String column9Age = row.select("td:nth-child(9) div.mh-tc")
-//                    .text();
+
         String column10Price = row.select("td:nth-child(10) div.mh-tc").text().replaceAll("[^0-9]", "");
 
-//            if (false) {
-//                System.out.println("Column 1: " + column1NumberPosition);
-//                System.out.println("Column 201: " + column2_1Manufacturer);
-//                System.out.println("Column 202: " + column2_2Model);
-//                System.out.println("Column 3: " + column3UserRating);
-//                System.out.println("Column 4: " + column4Value);
-//                System.out.println("Column 5: " + column5_1Avg);
-//                System.out.println("Column 5: " + column5_2AvgFromTo);
-//                System.out.println("Column 6: " + column6Memory);
-//                System.out.println("Column 7: " + column7Core);
-//                System.out.println("Column 8: " + column8Mkt);
-//                System.out.println("Column 9: " + column9Age);
-//                System.out.println("Column 10: " + column10Price);
-//                System.out.println("------------------------");
-//            }
-        CpuUserBenchmark cpu = new CpuUserBenchmark();
+
+        CpuUserBenchmarkCreateDto cpu = new CpuUserBenchmarkCreateDto();
         cpu.setModel(column2_2Model);
         cpu.setManufacturer(column2_1Manufacturer);
         cpu.setUserRating(ParseUtil.stringToDouble(column3UserRating));
@@ -189,36 +175,6 @@ public class UserBenchmarkCpuPageParser {
         cpu.setMemoryPercents(ParseUtil.stringToDouble(column6Memory));
         cpu.setPrice(ParseUtil.stringToDouble(column10Price));
         cpu.setUrlOfCpu(row.select("td a.nodec").attr("href"));
-        return cpu;
-    }
-
-    private CpuUserBenchmark getCpuFromHtmlRow(List<WebElement> cellsInRow, WebDriver driver) {
-        CpuUserBenchmark cpu = new CpuUserBenchmark();
-
-//        cpu.setModel(cellsInRow.get(1).findElement(
-//                        By.xpath("//div/div[2]/span/a"))
-//                .getText().trim());
-
-//        cpu.setManufacturer(cellsInRow.get(1).findElement(
-//                By.xpath("//div[2]/span")).getText().split(" ")[0]
-//                .replaceAll("Compare\n", ""));
-
-//        final WebElement htmlElement = cellsInRow.get(1).findElement(
-//                By.xpath("//td/div/div/a"));
-//        cpu.setUrlOfCpu(htmlElement.getAttribute("href"));
-
-//        cpu.setUserRating(ParseUtil.stringToDouble(cellsInRow.get(2).findElement(
-//                        By.xpath("//div[@class='mh-tc pgbg spgbr']"))
-//                .getText().replaceAll("[^0-9]", "")));
-
-        //todo addPrice
-//        cpu.setValuePercents(
-//                ParseUtil.stringToDouble(
-//                        Jsoup.parse(cellsInRow.get(3).getAttribute("outerHTML"))
-//                                .select("div.mh-tc").first().text()
-//                                .replaceAll("[^0-9]", "")));
-//        userBenchmarkCpuDetailsPageParser.purseAndAddDetails(cpu, driver, htmlElement);
-        System.out.println(cpu);
         return cpu;
     }
 
@@ -290,7 +246,6 @@ public class UserBenchmarkCpuPageParser {
         }
 
         driver.get(url);
-
         return driver;
     }
 

@@ -1,6 +1,6 @@
 package com.example.parser.service.parse;
 
-import com.example.parser.model.user.benchmark.CpuUserBenchmark;
+import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 
 import com.example.parser.service.CpuHotlineService;
 import com.example.parser.service.CpuUserBenchmarkService;
@@ -8,8 +8,8 @@ import com.example.parser.service.GpuHotlineService;
 import com.example.parser.service.GpuUserBenchmarkService;
 import com.example.parser.service.parse.artline.ArtLineCpuParser;
 import com.example.parser.service.parse.artline.TotalArtLineParser;
-import com.example.parser.service.parse.benchmark.user.UserBenchmarkCpuParserFromFile;
-import com.example.parser.service.parse.benchmark.user.UserBenchmarkGpuParserWithGsoup;
+import com.example.parser.service.parse.benchmark.user.info.UserBenchmarkCpuParserFromFile;
+import com.example.parser.service.parse.benchmark.user.info.UserBenchmarkGpuParserWithGsoup;
 import com.example.parser.service.parse.hotline.HotlineCpuPageParser;
 import com.example.parser.service.parse.hotline.HotlineGpuPageParser;
 import com.example.parser.service.parse.pda.PdaJsoupParser;
@@ -57,7 +57,7 @@ public class InitParseClass {
     }
 
     private void userBenchmark() {
-        final List<CpuUserBenchmark> cpuUserBenchmarks = userBenchmarkCpuParserFromFile.purseAllPages();
+        final List<UserBenchmarkCpu> cpuUserBenchmarks = userBenchmarkCpuParserFromFile.purseAllPages();
 //        cpuUserBenchmarkParser.purseAllPages().forEach(System.out::println);
 //        gpuUserBenchmarkParser.purseAllPages().forEach(System.out::println);
 //        cpuUserBenchmarkService.saveAll(cpuUserBenchmarkParser.purseAllPages());

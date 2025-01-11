@@ -1,9 +1,9 @@
-package com.example.parser.model.hotline;
+package com.example.parser.dto.hotline;
 
 import lombok.Data;
 
 @Data
-public class ShortCpuInfoDto {
+public class UserBenchmarkShortCpuInfoDto {
     private String socketType;
     private String frequency;
     private String l3Cache;

@@ -19,7 +19,7 @@ public class UserBenchmarkTestPage {
             = "div > a > i.fa.fa-4x.fa-male";
     private static final int PAUSE_FROM_SEC = 2;
     private static final int PAUSE_TO_SEC = 4;
-    public void checkAndPassTestIfItNeed(WebDriver driver) {
+    public void checkAndPassTestIfNecessary(WebDriver driver) {
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
@@ -33,7 +33,7 @@ public class UserBenchmarkTestPage {
                 throw new RuntimeException("testButtonElement is not visible.");
             }
             log.info("Pause in method checkIfTestPageOpened(), before click on test page");
-            ParseUtil.addRandomDelayInSeconds(PAUSE_FROM_SEC, PAUSE_TO_SEC, true);
+            ParseUtil.applyRandomDelay(PAUSE_FROM_SEC, PAUSE_TO_SEC, true);
             testButtonElement.click();
             log.info("Test on page passed");
         }

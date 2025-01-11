@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Log4j2
 @RequiredArgsConstructor
 public class UserBenchmarkCpuParserFromFile {
-    private final CpuUserBenchmarkParserByPosition cpuUserBenchmarkParserByPosition;
+    private final UserBenchmarkCpuPageParserByPositionFromFile cpuUserBenchmarCpuPagekParserByPositionFromFile;
     private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final String BASE_URL = "https://cpu.userbenchmark.com/";
     private static final String BASE_LINK = "C:\\Users\\Artem\\Documents\\Java"

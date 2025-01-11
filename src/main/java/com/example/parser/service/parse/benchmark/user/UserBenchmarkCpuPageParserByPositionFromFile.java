@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Log4j2
-class CpuUserBenchmarkParserByPosition {
+class UserBenchmarkCpuPageParserByPositionFromFile {
     private static final String BASE_URL = "https://cpu.userbenchmark.com/Intel-Core-i5-13600K/Rating/4134";
 
     //    public void purseInnerPage(String url, CpuUserBenchmark cpu) {

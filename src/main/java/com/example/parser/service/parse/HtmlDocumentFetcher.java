@@ -5,8 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -69,7 +67,7 @@ public class HtmlDocumentFetcher {
 
         Document document;
         try {
-            ParseUtil.addRandomDelayInSeconds(delayFrom, delayTo, useDelay);
+            ParseUtil.applyRandomDelay(delayFrom, delayTo, useDelay);
 
             if (useUserAgent) {
                 connect = Jsoup.connect(url)

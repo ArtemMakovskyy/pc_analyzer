@@ -6,7 +6,6 @@ import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +42,7 @@ public class UserBenchmarkCpuPageParser {
     @PostConstruct
     public void init() {
 
-        final List<CpuUserBenchmark> purse = purse();
+                final List<CpuUserBenchmark> purse = purse();
         WebDriver driver = null;
 
         List<CpuUserBenchmark> purse2 = new ArrayList<>();
@@ -82,7 +81,7 @@ public class UserBenchmarkCpuPageParser {
                     10);
 
             driver.get(BASE_URL);
-            userBenchmarkTestPage.checkAndPassTestIfItNeed(driver);
+            userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);
             int pages = findPageQuantity(driver);
             sortByPriceButton(driver);
 //            return parsePages(driver, pages);
@@ -104,7 +103,7 @@ public class UserBenchmarkCpuPageParser {
             cpuUserBenchmarks.addAll(cpusUserBenchmarksOnPage);
 
             log.info("Pause 3 in parsePages() before click on next page");
-            ParseUtil.addRandomDelayInSeconds(BIG_PAUSE);
+            ParseUtil.applyRandomDelay(BIG_PAUSE);
             //todo chek it
             currentPage++;
             if (currentPage < pages) {
@@ -125,7 +124,7 @@ public class UserBenchmarkCpuPageParser {
             System.out.println(gpuUserBenchmarksOnPage.size());
         }
         log.info("Pause 2 in parsePage()");
-        ParseUtil.addRandomDelayInSeconds(BIG_PAUSE);
+        ParseUtil.applyRandomDelay(BIG_PAUSE);
 
         return gpuUserBenchmarksOnPage;
     }
@@ -146,6 +145,7 @@ public class UserBenchmarkCpuPageParser {
     }
 
     private CpuUserBenchmark rowToCpu(Element row) {
+
 
         //            String column1NumberPosition = row.select("td:nth-child(1) div")
 //                    .text();
@@ -252,7 +252,7 @@ public class UserBenchmarkCpuPageParser {
             throw new RuntimeException("Price sort button is not visible.");
         }
         log.info("Pause 1, before click on price button");
-        ParseUtil.addRandomDelayInSeconds(SMALL_PAUSE);
+        ParseUtil.applyRandomDelay(SMALL_PAUSE);
         elementPriceButton.click();
     }
 
@@ -260,10 +260,10 @@ public class UserBenchmarkCpuPageParser {
         By xpathNextButton = By.xpath(XPATH_NEXT_PAGE_BUTTON);
         WebElement elementNextButton = driver.findElement(xpathNextButton);
         log.info("Pause 4 in clickNextPage click before click on next page");
-        ParseUtil.addRandomDelayInSeconds(SMALL_PAUSE);
+        ParseUtil.applyRandomDelay(SMALL_PAUSE);
         elementNextButton.click();
 
-        userBenchmarkTestPage.checkAndPassTestIfItNeed(driver);
+        userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);
     }
 
     private WebDriver setUpWebDriver(String url,

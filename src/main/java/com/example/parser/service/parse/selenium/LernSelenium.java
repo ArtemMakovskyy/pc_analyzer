@@ -1,7 +1,6 @@
 package com.example.parser.service.parse.selenium;
 
 import com.example.parser.utils.ParseUtil;
-import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
@@ -276,7 +275,7 @@ public class LernSelenium {
 
         final By checkbuttonApple = By.xpath(
                 "//*[@id=\"second_solution\"]");
-        ParseUtil.addRandomDelayInSeconds(10, 15, true);
+        ParseUtil.applyRandomDelay(10, 15, true);
         driver.findElement(checkbuttonApple).click();
 
 //        System.out.println(checkbox.getText());
@@ -313,11 +312,11 @@ public class LernSelenium {
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
         driver.findElement(By.id("searchInput")).sendKeys("java");
-        ParseUtil.addRandomDelayInSeconds(1, 2, true);
+        ParseUtil.applyRandomDelay(1, 2, true);
         driver.findElement(By.cssSelector("button.cdx-button.cdx-search-input__end-button")).click();
-        ParseUtil.addRandomDelayInSeconds(1, 2, true);
+        ParseUtil.applyRandomDelay(1, 2, true);
         driver.navigate().back();
-        ParseUtil.addRandomDelayInSeconds(1, 2, true);
+        ParseUtil.applyRandomDelay(1, 2, true);
         driver.findElement(By.id("searchInput")).clear();
 
         String text1 = driver.findElement(By.cssSelector("#mp-itn > ul:nth-child(3) > li:nth-child(2)")).getText();

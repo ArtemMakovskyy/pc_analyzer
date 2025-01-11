@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class GpuUserBenchmarkParserWithGsoup {
+public class UserBenchmarkGpuParserWithGsoup {
     private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final String BASE_URL = "https://gpu.userbenchmark.com/";
 

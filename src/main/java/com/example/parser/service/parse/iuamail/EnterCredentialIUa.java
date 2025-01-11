@@ -23,14 +23,14 @@ public class EnterCredentialIUa {
 
     public void enter(WebDriver driver) {
         driver.get(MAIN_URL);
-        ParseUtil.addRandomDelayInSeconds(1,2,false);
+        ParseUtil.applyRandomDelay(1,2,false);
         driver.findElement(XPATH_LOGIN).sendKeys(LOGIN);
         driver.findElement(XPATH_PASSWORD).sendKeys(PASSWORD);
 
         WebElement dropdown = driver.findElement(XPATH_DROPDOWN);
         Select select = new Select(dropdown);
         select.selectByValue(DROPDOWN_TYPE);
-        ParseUtil.addRandomDelayInSeconds(1,2,false);
+        ParseUtil.applyRandomDelay(1,2,false);
         driver.findElement(XPATH_SUBMIT_BUTTON).click();
     }
 }

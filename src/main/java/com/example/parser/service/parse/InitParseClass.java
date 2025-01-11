@@ -9,7 +9,7 @@ import com.example.parser.service.GpuUserBenchmarkService;
 import com.example.parser.service.parse.artline.ArtLineCpuParser;
 import com.example.parser.service.parse.artline.TotalArtLineParser;
 import com.example.parser.service.parse.benchmark.user.UserBenchmarkCpuParserFromFile;
-import com.example.parser.service.parse.benchmark.user.GpuUserBenchmarkParserWithGsoup;
+import com.example.parser.service.parse.benchmark.user.UserBenchmarkGpuParserWithGsoup;
 import com.example.parser.service.parse.hotline.HotlineCpuPageParser;
 import com.example.parser.service.parse.hotline.HotlineGpuPageParser;
 import com.example.parser.service.parse.pda.PdaJsoupParser;
@@ -31,7 +31,7 @@ public class InitParseClass {
     private final ArtLineCpuParser artLineCpuParser;
     private final TotalArtLineParser totalArtLineParser;
     private final UserBenchmarkCpuParserFromFile userBenchmarkCpuParserFromFile;
-    private final GpuUserBenchmarkParserWithGsoup gpuUserBenchmarkParserWithGsoup;
+    private final UserBenchmarkGpuParserWithGsoup userBenchmarkGpuParserWithGsoup;
     private final PdaJsoupParser pdaJsoupParser;
     private final PdaSeleniumParser pdaSeleniumParser;
 

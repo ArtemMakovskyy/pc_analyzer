@@ -28,32 +28,21 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserBenchmarkCpuPageParser {
     private static final String CSS_QUERY_TABLE_ROW = "tr.hovertarget";
-    private static final ParseUtil.DelayInSeconds SMALL_PAUSE = new ParseUtil.DelayInSeconds(2, 4);
-    private static final ParseUtil.DelayInSeconds BIG_PAUSE = new ParseUtil.DelayInSeconds(4, 10);
-    private static final String XPATH_NEXT_PAGE_BUTTON = "//*[@id=\"tableDataForm:j_idt260\"]";
-    private static final String XPATH_LOCATOR_PAGE_QUANTITY = "//*[@id='tableDataForm:mhtddyntac']/nav/ul/li[1]/a";
+    private static final ParseUtil.DelayInSeconds SMALL_PAUSE
+            = new ParseUtil.DelayInSeconds(2, 4);
+    private static final ParseUtil.DelayInSeconds BIG_PAUSE
+            = new ParseUtil.DelayInSeconds(4, 10);
+    private static final String XPATH_NEXT_PAGE_BUTTON
+            = "//*[@id=\"tableDataForm:j_idt260\"]";
+    private static final String XPATH_LOCATOR_PAGE_QUANTITY
+            = "//*[@id='tableDataForm:mhtddyntac']/nav/ul/li[1]/a";
     private static final String PAGE_QUANTITY_PATTERN = "Page \\d+ of (\\d+)";
-    private static final String XPATH_BUTTON_PRICE_SORT = "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th[@data-mhth='MC_PRICE'][1]";
+    private static final String XPATH_BUTTON_PRICE_SORT
+            = "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th[@data-mhth='MC_PRICE'][1]";
     private static final String BASE_URL = "https://cpu.userbenchmark.com/";
     private final UserBenchmarkTestPage userBenchmarkTestPage;
     private final UserBenchmarkCpuDetailsPageParser userBenchmarkCpuDetailsPageParser;
 
-
-//    @PostConstruct
-    public void init() {
-//
-//        final List<CpuUserBenchmark> purse = purse();
-//        purse.forEach(System.out::println);
-
-
-
-//        List<CpuUserBenchmark> purse2 = new ArrayList<>();
-//        purse2.add(purse.get(0));
-//        purse2.add(purse.get(1));
-//        purse2.add(purse.get(2));
-
-//        updateDetails(purse2);
-    }
 
     public List<CpuUserBenchmarkCreateDto> purse() {
         WebDriver driver = null;
@@ -66,40 +55,34 @@ public class UserBenchmarkCpuPageParser {
             userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);
             int pages = findPageQuantity(driver);
             sortByPriceButton(driver);
-
-
-            //todo check it
-
-//            return parsePages(driver, pages);
-            return parsePages(driver, 2);
+            return parsePages(driver, pages);
         } finally {
             driver.quit();
         }
     }
 
     public List<CpuUserBenchmarkCreateDto> updateDetails(List<CpuUserBenchmarkCreateDto> cpus) {
-        WebDriver driver = null;
-        try {
-            driver = setUpWebDriver(
-                    BASE_URL,
-                    true,
-                    10);
-
-            for (CpuUserBenchmarkCreateDto cpu : cpus) {
-                driver.get(cpu.getUrlOfCpu());
-                userBenchmarkCpuDetailsPageParser.purseAndAddDetails(cpu, driver);
-            }
-
-        } finally {
-            driver.quit();
-        }
-
+//        WebDriver driver = null;
+//        try {
+//            driver = setUpWebDriver(
+//                    BASE_URL,
+//                    true,
+//                    10);
+//
+//            for (CpuUserBenchmarkCreateDto cpu : cpus) {
+//                driver.get(cpu.getUrlOfCpu());
+//                userBenchmarkCpuDetailsPageParser.purseAndAddDetails(cpu, driver);
+//            }
+//
+//        } finally {
+//            driver.quit();
+//        }
         return cpus;
     }
 
 
     private List<CpuUserBenchmarkCreateDto> parsePages(WebDriver driver, int pages) {
-
+            //todo why don't opened last page
         List<CpuUserBenchmarkCreateDto> cpuUserBenchmarks = new ArrayList<>();
         int currentPage = 1;
         do {
@@ -131,7 +114,6 @@ public class UserBenchmarkCpuPageParser {
             System.out.println(gpuUserBenchmarksOnPage.size());
         }
 
-
         log.info("Pause 2 in parsePage()");
         ParseUtil.applyRandomDelay(BIG_PAUSE);
 
@@ -150,11 +132,10 @@ public class UserBenchmarkCpuPageParser {
         }
 
         return items;
-        //            cpuUserBenchmarkParserByPosition.purseInnerPage(cpu);
     }
 
     private CpuUserBenchmarkCreateDto rowToCpu(Element row) {
-
+                //todo do this better
         String column2_1Manufacturer = row.select("td:nth-child(2) span.semi-strongs").first().ownText().trim();
         String column2_2Model = row.select("td:nth-child(2) span.semi-strongs a.nodec").text().trim();
         String column3UserRating = row.select("td:nth-child(3) div.mh-tc").first().text().replaceAll("[^0-9]", "");
@@ -164,7 +145,6 @@ public class UserBenchmarkCpuPageParser {
         String column6Memory = row.select("td:nth-child(6) div.mh-tc").text();
 
         String column10Price = row.select("td:nth-child(10) div.mh-tc").text().replaceAll("[^0-9]", "");
-
 
         CpuUserBenchmarkCreateDto cpu = new CpuUserBenchmarkCreateDto();
         cpu.setModel(column2_2Model);
@@ -222,7 +202,7 @@ public class UserBenchmarkCpuPageParser {
         userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);
     }
 
-    private WebDriver setUpWebDriver(String url,
+    public WebDriver setUpWebDriver(String url,
                                      boolean showGraphicalInterface,
                                      int timeoutSeconds) {
         WebDriver driver = null;
@@ -242,7 +222,8 @@ public class UserBenchmarkCpuPageParser {
         }
 
         if (timeoutSeconds > 0) {
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+            driver.manage().timeouts().implicitlyWait(
+                    Duration.ofSeconds(timeoutSeconds));
         }
 
         driver.get(url);

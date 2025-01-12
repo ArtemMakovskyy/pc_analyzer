@@ -9,4 +9,5 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(config = MapperConfig.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CpuUserBenchmarkMapper {
     UserBenchmarkCpu toEntity (CpuUserBenchmarkCreateDto dto);
+    CpuUserBenchmarkCreateDto toDto (UserBenchmarkCpu cpu);
 }

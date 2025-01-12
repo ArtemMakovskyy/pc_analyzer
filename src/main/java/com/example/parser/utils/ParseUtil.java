@@ -1,9 +1,13 @@
 package com.example.parser.utils;
 
+import java.time.Duration;
 import java.util.Random;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 @Log4j2
 public class ParseUtil {
@@ -25,6 +29,30 @@ public class ParseUtil {
         applyRandomDelay(delayInSeconds.getFromSec(), delayInSeconds.getToSec(), true);
     }
 
+    public static WebDriver setUpWebDriver(
+            boolean showGraphicalInterface,
+                                    int timeoutSeconds) {
+        WebDriver driver = null;
+
+        if (!showGraphicalInterface) {
+            ChromeOptions options = new ChromeOptions();
+            //Run without a graphical interface
+            options.addArguments("--headless");
+            // Optional, for improved compatibility
+            options.addArguments("--disable-gpu");
+            // Set the window size
+            options.addArguments("--window-size=1920,1080");
+
+            driver = new ChromeDriver(options);
+        } else {
+            driver = new ChromeDriver();
+        }
+
+        if (timeoutSeconds > 0) {
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        }
+        return driver;
+    }
 
     public static void applyRandomDelay(int fromSec, int toSec, boolean isDelay) {
         if (isDelay) {

@@ -17,4 +17,6 @@ public class CpuUserBenchmarkCreateDto {
     private Double desktopScore;
     private Double gamingScore;
     private Double workstationScore;
+    private Integer coresQuantity;
+    private Integer threadsQuantity;
 }

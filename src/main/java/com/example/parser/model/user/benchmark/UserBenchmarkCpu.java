@@ -56,6 +56,8 @@ public class UserBenchmarkCpu {
     private Double desktopScore;
     private Double gamingScore;
     private Double workstationScore;
+    private Integer coresQuantity;
+    private Integer threadsQuantity;
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 }

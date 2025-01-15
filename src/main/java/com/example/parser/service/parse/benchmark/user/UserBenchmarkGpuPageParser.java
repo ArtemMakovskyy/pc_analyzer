@@ -42,9 +42,6 @@ public class UserBenchmarkGpuPageParser {
 
     private static final String PAGE_QUANTITY_PATTERN = "Page \\d+ of (\\d+)";
 
-    public void init() {
-        purse().forEach(System.out::println);
-    }
 
     public List<GpuUserBenchmark> purse() {
         WebDriver driver = new ChromeDriver();
@@ -114,6 +111,7 @@ public class UserBenchmarkGpuPageParser {
     }
 
     private GpuUserBenchmark rowToGpu(Element row) {
+        //todo fix it
         //            String column1NumberPosition = row.select("td:nth-child(1) div")
 //                    .text();
         String column2_1Manufacturer = row.select("td:nth-child(2) span.semi-strongs")

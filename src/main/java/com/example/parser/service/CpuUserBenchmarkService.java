@@ -5,6 +5,7 @@ import com.example.parser.dto.userbenchmark.CpuUserBenchmarkCreateDto;
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.repository.CpuUserBenchmarkRepository;
 import com.example.parser.service.parse.benchmark.user.UserBenchmarkCpuDetailsPageParser;
+import com.example.parser.service.parse.benchmark.user.UserBenchmarkCpuPageParser;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -17,18 +18,20 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CpuUserBenchmarkService {
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
+    private final UserBenchmarkCpuPageParser userBenchmarkCpuPageParser;
     private final UserBenchmarkCpuDetailsPageParser userBenchmarkCpuDetailsPageParser;
     private final CpuUserBenchmarkMapper cpuUserBenchmarkMapper;
 
 
-    public List<UserBenchmarkCpu> saveAll(List<CpuUserBenchmarkCreateDto> createDto) {
-        return cpuUserBenchmarkRepository.saveAll(
-                createDto.stream()
-                        .map(cpuUserBenchmarkMapper::toEntity).toList()
-        );
+    public List<UserBenchmarkCpu> loadAndPurseAndSaveToDb() {
+        final List<CpuUserBenchmarkCreateDto> cpuUserBenchmarkCreateDtos =
+                userBenchmarkCpuPageParser.loadAndPurseAndSaveToDb();
+        final List<UserBenchmarkCpu> userBenchmarkCpus
+                = addAllToDb(cpuUserBenchmarkCreateDtos);
+        return userBenchmarkCpus;
     }
 
-    public void updateSpecificationCpuWereItIsNeed() {
+    public void loadAndParseAndAddSpecificationCpusWereCpuSpecificationIsNull() {
         final List<UserBenchmarkCpu> byCpuSpecificationIsNull
                 = cpuUserBenchmarkRepository.findByCpuSpecificationIsNull();
 
@@ -64,6 +67,13 @@ public class CpuUserBenchmarkService {
         } finally {
             driver.quit();
         }
+    }
+
+    private List<UserBenchmarkCpu> addAllToDb(List<CpuUserBenchmarkCreateDto> createDto) {
+        return cpuUserBenchmarkRepository.saveAll(
+                createDto.stream()
+                        .map(cpuUserBenchmarkMapper::toEntity).toList()
+        );
     }
 
 }

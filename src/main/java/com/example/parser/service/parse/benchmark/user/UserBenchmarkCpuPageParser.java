@@ -2,7 +2,6 @@ package com.example.parser.service.parse.benchmark.user;
 
 import com.example.parser.dto.userbenchmark.CpuUserBenchmarkCreateDto;
 import com.example.parser.utils.ParseUtil;
-import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,10 +40,13 @@ public class UserBenchmarkCpuPageParser {
             = "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th[@data-mhth='MC_PRICE'][1]";
     private static final String BASE_URL = "https://cpu.userbenchmark.com/";
     private final UserBenchmarkTestPage userBenchmarkTestPage;
-    private final UserBenchmarkCpuDetailsPageParser userBenchmarkCpuDetailsPageParser;
 
-
-    public List<CpuUserBenchmarkCreateDto> purse() {
+    /**
+     * Load and parse all cpu items from UserBenchmark without scores
+     * @return List<CpuUserBenchmarkCreateDto>
+     */
+    public List<CpuUserBenchmarkCreateDto> loadAndPurseAndSaveToDb() {
+        //todo check if the position exist
         WebDriver driver = null;
         try {
             driver = setUpWebDriver(
@@ -60,26 +62,6 @@ public class UserBenchmarkCpuPageParser {
             driver.quit();
         }
     }
-
-    public List<CpuUserBenchmarkCreateDto> updateDetails(List<CpuUserBenchmarkCreateDto> cpus) {
-//        WebDriver driver = null;
-//        try {
-//            driver = setUpWebDriver(
-//                    BASE_URL,
-//                    true,
-//                    10);
-//
-//            for (CpuUserBenchmarkCreateDto cpu : cpus) {
-//                driver.get(cpu.getUrlOfCpu());
-//                userBenchmarkCpuDetailsPageParser.purseAndAddDetails(cpu, driver);
-//            }
-//
-//        } finally {
-//            driver.quit();
-//        }
-        return cpus;
-    }
-
 
     private List<CpuUserBenchmarkCreateDto> parsePages(WebDriver driver, int pages) {
             //todo why don't opened last page
@@ -106,18 +88,19 @@ public class UserBenchmarkCpuPageParser {
 
     private List<CpuUserBenchmarkCreateDto> parsePage(WebDriver driver) {
         String currentHtmlPageSource = driver.getPageSource();
-        List<CpuUserBenchmarkCreateDto> gpuUserBenchmarksOnPage = pursePageSource(currentHtmlPageSource);
+        List<CpuUserBenchmarkCreateDto> cpuUserBenchmarksOnPage
+                = pursePageSource(currentHtmlPageSource);
 
         if (false) {
             //todo delete it
-            gpuUserBenchmarksOnPage.forEach(System.out::println);
-            System.out.println(gpuUserBenchmarksOnPage.size());
+            cpuUserBenchmarksOnPage.forEach(System.out::println);
+            System.out.println(cpuUserBenchmarksOnPage.size());
         }
 
         log.info("Pause 2 in parsePage()");
         ParseUtil.applyRandomDelay(BIG_PAUSE);
 
-        return gpuUserBenchmarksOnPage;
+        return cpuUserBenchmarksOnPage;
     }
 
     private List<CpuUserBenchmarkCreateDto> pursePageSource(String pageSource) {

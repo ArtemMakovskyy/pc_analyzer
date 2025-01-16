@@ -19,7 +19,7 @@ import org.hibernate.annotations.Where;
 @ToString
 @SQLDelete(sql = "UPDATE wines SET is_deleted = true WHERE id=?")
 @Where(clause = "is_deleted=false")
-public class GpuUserBenchmark {
+public class UserBenchmarkGpu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,7 +30,7 @@ public class GpuUserBenchmark {
     private Double valuePercents;
     private Double avgBench;
     private Double price;
-    private String urlOfCpu;
+    private String urlOfGpu;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;

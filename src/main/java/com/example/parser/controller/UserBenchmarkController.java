@@ -1,11 +1,12 @@
 package com.example.parser.controller;
 
-import com.example.parser.model.user.benchmark.GpuUserBenchmark;
+import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.service.CpuUserBenchmarkService;
 import com.example.parser.service.GpuUserBenchmarkService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,10 +39,10 @@ public class UserBenchmarkController {
         userBenchmarkService.loadAndParseAndAddSpecificationCpusWereCpuSpecificationIsNull();
     }
 
-    @PostMapping("/purse/gpu")
-    public List<GpuUserBenchmark> loadAndParseAndSaveGpus() {
+    @GetMapping("/purse/gpu")
+    public List<UserBenchmarkGpu> loadAndParseAndSaveGpus() {
         //todo check if exists data
-        final List<GpuUserBenchmark> gpus
+        final List<UserBenchmarkGpu> gpus
                 = gpuUserBenchmarkService.parseAllAndSaveToDb();
         return gpus;
     }

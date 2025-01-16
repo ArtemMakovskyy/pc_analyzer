@@ -1,6 +1,6 @@
 package com.example.parser.service.parse.benchmark.user;
 
-import com.example.parser.model.user.benchmark.GpuUserBenchmark;
+import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.utils.ParseUtil;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class UserBenchmarkGpuPageParser {
     private static final String PAGE_QUANTITY_PATTERN = "Page \\d+ of (\\d+)";
 
 
-    public List<GpuUserBenchmark> purse() {
+    public List<UserBenchmarkGpu> purse() {
         WebDriver driver = new ChromeDriver();
         try {
             driver.get(BASE_URL);
@@ -56,14 +56,14 @@ public class UserBenchmarkGpuPageParser {
         }
     }
 
-    private List<GpuUserBenchmark> parsePages(WebDriver driver, int pages) {
+    private List<UserBenchmarkGpu> parsePages(WebDriver driver, int pages) {
 
         log.info("Start open pages. Total quality is: " + pages);
-        List<GpuUserBenchmark> gpuUserBenchmarks = new ArrayList<>();
+        List<UserBenchmarkGpu> gpuUserBenchmarks = new ArrayList<>();
         int currentPage = 1;
         do {
             log.info("Current page is " + currentPage + " from " + pages + ".");
-            final List<GpuUserBenchmark> gpusUserBenchmarksOnPage
+            final List<UserBenchmarkGpu> gpusUserBenchmarksOnPage
                     = parsePage(driver);
             gpuUserBenchmarks.addAll(gpusUserBenchmarksOnPage);
             log.info("Pause 3 in parsePages() before click on next page");
@@ -77,9 +77,9 @@ public class UserBenchmarkGpuPageParser {
         return gpuUserBenchmarks;
     }
 
-    private List<GpuUserBenchmark> parsePage(WebDriver driver) {
+    private List<UserBenchmarkGpu> parsePage(WebDriver driver) {
         String currentHtmlPageSource = driver.getPageSource();
-        List<GpuUserBenchmark> gpuUserBenchmarksOnPage
+        List<UserBenchmarkGpu> gpuUserBenchmarksOnPage
                 = pursePageSource(currentHtmlPageSource);
 
         if (false) {
@@ -93,7 +93,7 @@ public class UserBenchmarkGpuPageParser {
         return gpuUserBenchmarksOnPage;
     }
 
-    private List<GpuUserBenchmark> pursePageSource(String pageSource) {
+    private List<UserBenchmarkGpu> pursePageSource(String pageSource) {
         Document htmlDocument = Jsoup.parse(pageSource);
 
         /**
@@ -101,8 +101,8 @@ public class UserBenchmarkGpuPageParser {
          */
 
         Elements rows = htmlDocument.select(CSS_QUERY_TABLE_ROW);
-        GpuUserBenchmark item;
-        List<GpuUserBenchmark> items = new ArrayList<>();
+        UserBenchmarkGpu item;
+        List<UserBenchmarkGpu> items = new ArrayList<>();
         for (Element row : rows) {
             item = rowToGpu(row);
             items.add(item);
@@ -110,7 +110,7 @@ public class UserBenchmarkGpuPageParser {
         return items;
     }
 
-    private GpuUserBenchmark rowToGpu(Element row) {
+    private UserBenchmarkGpu rowToGpu(Element row) {
         //todo fix it
         //            String column1NumberPosition = row.select("td:nth-child(1) div")
 //                    .text();
@@ -152,14 +152,14 @@ public class UserBenchmarkGpuPageParser {
             System.out.println("Column 10: " + column10Price);
             System.out.println("------------------------");
         }
-        GpuUserBenchmark item = new GpuUserBenchmark();
+        UserBenchmarkGpu item = new UserBenchmarkGpu();
         item.setModel(column2_2Model);
         item.setManufacturer(column2_1Manufacturer);
         item.setUserRating(ParseUtil.stringToDouble(column3UserRating));
         item.setValuePercents(ParseUtil.stringToDouble(column4Value));
         item.setAvgBench(ParseUtil.stringToDouble(column5_1Avg));
         item.setPrice(ParseUtil.stringToDouble(column8Price));
-        item.setUrlOfCpu(row.select("td a.nodec").attr("href"));
+        item.setUrlOfGpu(row.select("td a.nodec").attr("href"));
         return item;
     }
 

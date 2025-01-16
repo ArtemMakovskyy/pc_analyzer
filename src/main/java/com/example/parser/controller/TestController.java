@@ -9,12 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class TestController {
-    private final PdaJsoupParser parser;
 
-    @SneakyThrows
     @GetMapping
     public String test()  {
-        parser.parse();
-        return "test";
+        System.out.println("---------test--");
+        return "---------test--";
     }
 }

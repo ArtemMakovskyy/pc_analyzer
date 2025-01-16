@@ -1,6 +1,6 @@
 package com.example.parser.service.parse.benchmark.user.info;
 
-import com.example.parser.model.user.benchmark.GpuUserBenchmark;
+import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.utils.ParseUtil;
 import java.io.File;
@@ -28,15 +28,15 @@ public class UserBenchmarkGpuParserWithGsoup {
             + "\\UltimateJetBrains\\tutorials\\ms1\\parser\\parser\\src\\main\\resources\\static"
             + "\\other\\userbenchmark\\gpu\\";
 
-    public List<GpuUserBenchmark> purseAllPages() {
-        List<GpuUserBenchmark> gpuUserBenchmarks = new ArrayList<>();
+    public List<UserBenchmarkGpu> purseAllPages() {
+        List<UserBenchmarkGpu> gpuUserBenchmarks = new ArrayList<>();
         if (false){
             for (int i = 1; i <= 4; i++) {
                 gpuUserBenchmarks.addAll(pursePageFromFile(BASE_LINK + "ub_gpu_0" + i + ".html"));
             }
             return gpuUserBenchmarks;
         }else {
-            List<CompletableFuture<List<GpuUserBenchmark>>> futures = new ArrayList<>();
+            List<CompletableFuture<List<UserBenchmarkGpu>>> futures = new ArrayList<>();
             for (int i = 1; i <= 4; i++) {
                 String filePath = BASE_LINK + "ub_gpu_0" + i + ".html";
                 futures.add(CompletableFuture.supplyAsync(() -> pursePageFromFile(filePath)));
@@ -49,7 +49,7 @@ public class UserBenchmarkGpuParserWithGsoup {
         return gpuUserBenchmarks;
     }
 
-    private List<GpuUserBenchmark> pursePageFromFile(String link) {
+    private List<UserBenchmarkGpu> pursePageFromFile(String link) {
         Document htmlDocument
                 = htmlDocumentFetcher.getHtmlDocumentFromFile(
                 link, false);
@@ -57,9 +57,9 @@ public class UserBenchmarkGpuParserWithGsoup {
     }
 
 
-    public List<GpuUserBenchmark> pursePageFromUrl(String url) {
+    public List<UserBenchmarkGpu> pursePageFromUrl(String url) {
         Document htmlDocument;
-        List<GpuUserBenchmark> items = new ArrayList<>();
+        List<UserBenchmarkGpu> items = new ArrayList<>();
 
         boolean readFromWebPage = false;
         if (readFromWebPage) {
@@ -86,7 +86,7 @@ public class UserBenchmarkGpuParserWithGsoup {
          * <tr class="hovertarget " data-id="1943305">
          */
         Elements rows = htmlDocument.select("tr.hovertarget");
-        GpuUserBenchmark item ;
+        UserBenchmarkGpu item ;
         for (Element row : rows) {
             item = rowToGpu(row);
             items.add(item);
@@ -94,15 +94,15 @@ public class UserBenchmarkGpuParserWithGsoup {
         return items;
     }
 
-    private List<GpuUserBenchmark> processDocument(Document htmlDocument) {
+    private List<UserBenchmarkGpu> processDocument(Document htmlDocument) {
 
-        List<GpuUserBenchmark> gpuUserBenchmarks = new ArrayList<>();
+        List<UserBenchmarkGpu> gpuUserBenchmarks = new ArrayList<>();
 
         /**
          * <tr class="hovertarget " data-id="1943305">
          */
         Elements rows = htmlDocument.select("tr.hovertarget");
-        GpuUserBenchmark gpu;
+        UserBenchmarkGpu gpu;
         for (Element row : rows) {
             gpu = rowToGpu(row);
             gpuUserBenchmarks.add(gpu);
@@ -110,7 +110,7 @@ public class UserBenchmarkGpuParserWithGsoup {
         return gpuUserBenchmarks;
     }
 
-    private GpuUserBenchmark rowToGpu(Element row) {
+    private UserBenchmarkGpu rowToGpu(Element row) {
         //            String column1NumberPosition = row.select("td:nth-child(1) div")
 //                    .text();
         String column2_1Manufacturer = row.select("td:nth-child(2) span.semi-strongs")
@@ -151,14 +151,14 @@ public class UserBenchmarkGpuParserWithGsoup {
                 System.out.println("Column 10: " + column10Price);
                 System.out.println("------------------------");
             }
-        GpuUserBenchmark item = new GpuUserBenchmark();
+        UserBenchmarkGpu item = new UserBenchmarkGpu();
         item.setModel(column2_2Model);
         item.setManufacturer(column2_1Manufacturer);
         item.setUserRating(ParseUtil.stringToDouble(column3UserRating));
         item.setValuePercents(ParseUtil.stringToDouble(column4Value));
         item.setAvgBench(ParseUtil.stringToDouble(column5_1Avg));
         item.setPrice(ParseUtil.stringToDouble(column8Price));
-        item.setUrlOfCpu(row.select("td a.nodec").attr("href"));
+        item.setUrlOfGpu(row.select("td a.nodec").attr("href"));
         return item;
     }
 }

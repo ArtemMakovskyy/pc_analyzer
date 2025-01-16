@@ -3,6 +3,7 @@ package com.example.parser.service;
 import com.example.parser.dto.mapper.CpuUserBenchmarkMapper;
 import com.example.parser.dto.userbenchmark.CpuUserBenchmarkCreateDto;
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
+import com.example.parser.repository.CpuHotLineRepository;
 import com.example.parser.repository.CpuUserBenchmarkRepository;
 import com.example.parser.service.parse.benchmark.user.UserBenchmarkCpuDetailsPageParser;
 import com.example.parser.service.parse.benchmark.user.UserBenchmarkCpuPageParser;
@@ -21,7 +22,6 @@ public class CpuUserBenchmarkService {
     private final UserBenchmarkCpuPageParser userBenchmarkCpuPageParser;
     private final UserBenchmarkCpuDetailsPageParser userBenchmarkCpuDetailsPageParser;
     private final CpuUserBenchmarkMapper cpuUserBenchmarkMapper;
-
 
     public List<UserBenchmarkCpu> loadAndPurseAndSaveToDb() {
         final List<CpuUserBenchmarkCreateDto> cpuUserBenchmarkCreateDtos =

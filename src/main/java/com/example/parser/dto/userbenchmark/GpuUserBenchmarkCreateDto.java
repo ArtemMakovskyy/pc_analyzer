@@ -10,5 +10,5 @@ public class GpuUserBenchmarkCreateDto {
     private Double valuePercents;
     private Double avgBench;
     private Double price;
-    private String urlOfCpu;
+    private String urlOfGpu;
 }

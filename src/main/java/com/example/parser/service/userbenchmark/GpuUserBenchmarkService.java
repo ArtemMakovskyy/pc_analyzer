@@ -1,4 +1,4 @@
-package com.example.parser.service;
+package com.example.parser.service.userbenchmark;
 
 
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;

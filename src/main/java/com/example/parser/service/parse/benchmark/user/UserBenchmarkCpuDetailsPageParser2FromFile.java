@@ -2,6 +2,7 @@ package com.example.parser.service.parse.benchmark.user;
 
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.utils.ParseUtil;
+import jakarta.annotation.PostConstruct;
 import java.io.File;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -26,14 +27,14 @@ public class UserBenchmarkCpuDetailsPageParser2FromFile {
     private static final String CPU_TABLE_SCORE_SELECTOR2
             = "div.v-center:nth-child(1) > table:nth-child(2) > tbody:nth-child(1) > tr:nth-child(1)";
 
-    //    @PostConstruct
+//    @PostConstruct
     @SneakyThrows
     public void start() {
 
         UserBenchmarkCpu cpu = new UserBenchmarkCpu();
         Document document = Jsoup.parse(new File("C:\\Users\\Artem\\Documents\\Java\\UltimateJetBrains\\tutorials\\ms1\\parser\\parser\\src\\main\\java\\com\\example\\parser\\service\\parse\\benchmark\\user\\inner.html"));
 
-        purseAndAddDetails(cpu,document);
+        purseAndAddDetails(cpu, document);
 
 
         if (!isGetCpuScoreData(cpu)) {
@@ -42,7 +43,11 @@ public class UserBenchmarkCpuDetailsPageParser2FromFile {
             System.out.println(">>>>>>>>>>>>>OOOOOOOOOOOKKKKKKKKKKKKKKK");
         }
 
+        parseCpuSpecificationTemplate1(cpu, document);
+
         parseCpuSpecificationTemplate2(cpu, document);
+
+        System.out.println(cpu);
     }
 
 
@@ -74,7 +79,7 @@ public class UserBenchmarkCpuDetailsPageParser2FromFile {
         System.out.println(cpu);
     }
 
-    private void parseCpuSpecificationTemplate2(UserBenchmarkCpu cpu, Document document) {
+    private void parseCpuSpecificationTemplate1(UserBenchmarkCpu cpu, Document document) {
         Elements elementCpuSpecification = document.select(CPU_SPECIFICATION_CSS_SELECTOR1);
         String cpuSpecification = elementCpuSpecification.text();
         String[] cpuSpecificationArray = cpuSpecification.split(" ");
@@ -87,28 +92,67 @@ public class UserBenchmarkCpuDetailsPageParser2FromFile {
                     cpuSpecificationArray[CPU_QUANTITY_THREADS_INDEX2]));
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
             log.warn("Failed to parse CPU specifications. Setting defaults.", e);
-            cpu.setCoresQuantity(0);
-            cpu.setThreadsQuantity(0);
+            cpu.setCoresQuantity(-1);
+            cpu.setThreadsQuantity(-1);
         }
 
     }
 
+    private void parseCpuSpecificationTemplate2(UserBenchmarkCpu cpu, Document document) {
+        Elements elementCpuSpecification = document.select(CPU_SPECIFICATION_CSS_SELECTOR1);
+
+        if (elementCpuSpecification.isEmpty()) {
+            log.error("parseCpuSpecificationTemplate2(). Element not found!");
+            setErrorsCpuValues(cpu);
+            return;
+        }
+
+        try {
+            String textCpuSpecification = elementCpuSpecification.text();
+
+            // Извлечение данных с проверкой на пустоту
+            String coresString = textCpuSpecification.replaceAll(".*?(\\d+) Cores.*", "$1");
+            String frequencyString = textCpuSpecification.replaceAll(".*@([0-9,.]+) GHz.*", "$1");
+
+            if (coresString.isEmpty() || frequencyString.isEmpty()) {
+                throw new IllegalArgumentException("Missing cores or frequency information.");
+            }
+
+            double frequency = Double.parseDouble(frequencyString.replace(",", "."));
+
+            // Установка значений в CPU
+            cpu.setCoresQuantity(Integer.parseInt(coresString));
+            cpu.setThreadsQuantity(0);
+            cpu.setCpuSpecification(textCpuSpecification);
+
+        } catch (Exception e) {
+            log.error("Error parsing CPU specification: {}", e.getMessage(), e);
+            setErrorsCpuValues(cpu);
+        }
+    }
+
+    private void setErrorsCpuValues(UserBenchmarkCpu cpu) {
+        cpu.setCoresQuantity(-1);
+        cpu.setThreadsQuantity(-1);
+        cpu.setCpuSpecification(null);
+    }
+
     private double extractScore(String[] scorePartsArray, int index) {
         if (index >= scorePartsArray.length) {
-            return 0;
+            return -1;
         }
         try {
             return ParseUtil.stringToDouble(scorePartsArray[index]
                     .replaceAll(REGEX_REMOVE_NON_DIGITS, ""));
         } catch (NumberFormatException e) {
-            return 0;
+            return -1;
         }
     }
 
     private boolean isGetCpuScoreData(UserBenchmarkCpu cpu) {
-        if (cpu.getGamingScore() == null || cpu.getGamingScore() == 0
-                || cpu.getDesktopScore() == null || cpu.getDesktopScore() == 0
-                || cpu.getWorkstationScore() == null || cpu.getWorkstationScore() == 0
+        if (cpu.getGamingScore() == null || cpu.getGamingScore() == -1
+                || cpu.getDesktopScore() == null || cpu.getDesktopScore() == -1
+                || cpu.getWorkstationScore() == null || cpu.getWorkstationScore() == -1
         ) {
             return false;
         }
@@ -116,8 +160,8 @@ public class UserBenchmarkCpuDetailsPageParser2FromFile {
     }
 
     private boolean isGetCpuSpecificationData(UserBenchmarkCpu cpu) {
-        if (cpu.getCoresQuantity() == null || cpu.getCoresQuantity() == 0
-                || cpu.getThreadsQuantity() == null || cpu.getThreadsQuantity() == 0
+        if (cpu.getCoresQuantity() == null || cpu.getCoresQuantity() == -1
+                || cpu.getThreadsQuantity() == null || cpu.getThreadsQuantity() == -1
                 || cpu.getCpuSpecification() == null || cpu.getCpuSpecification().isBlank()
         ) {
             return false;

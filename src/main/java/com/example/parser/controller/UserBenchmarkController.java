@@ -2,8 +2,9 @@ package com.example.parser.controller;
 
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
-import com.example.parser.service.CpuUserBenchmarkService;
-import com.example.parser.service.GpuUserBenchmarkService;
+import com.example.parser.service.userbenchmark.CpuUserBenchmarkService;
+import com.example.parser.service.userbenchmark.GpuUserBenchmarkService;
+import jakarta.annotation.PostConstruct;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +20,7 @@ public class UserBenchmarkController {
     private final CpuUserBenchmarkService userBenchmarkService;
     private final GpuUserBenchmarkService gpuUserBenchmarkService;
 
-    //    @PostConstruct
+        @PostConstruct
     public void start() {
         //todo check if exists data
         // todo add template to add specification

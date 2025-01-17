@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 @Log4j2
 @RequiredArgsConstructor
 public class UserBenchmarkCpuDetailsPageParser {
+    private final static int FAILURE_VALUE = -1;
     private static final int GAMING_SCORE_INDEX1 = 1;
     private static final int DESKTOP_SCORE_INDEX3 = 3;
     private static final int DESKTOP_SCORE_INDEX4 = 4;
@@ -32,8 +33,7 @@ public class UserBenchmarkCpuDetailsPageParser {
     private static final String SCORE_ELEMENTS1
             = "div.v-center:nth-child(1) > table:nth-child(2)";
     private static final ParseUtil.DelayInSeconds DELAY_IN_SECONDS
-//            = new ParseUtil.DelayInSeconds(3, 6);
-                = new ParseUtil.DelayInSeconds(3, 10);
+            = new ParseUtil.DelayInSeconds(3, 6);
     private final UserBenchmarkTestPage userBenchmarkTestPage;
 
     public void purseAndAddDetails(
@@ -42,10 +42,7 @@ public class UserBenchmarkCpuDetailsPageParser {
 
         Document document = getDocument(driver);
 
-        if (
-                parseCpuScore(document, cpu)
-                        && parseCpuSpecification(document, cpu)
-        ) {
+        if (parseCpuScore(document, cpu) && parseCpuSpecification(document, cpu)) {
             log.info(cpu);
         } else {
             log.error("Can't parse data from cpu ID: " + cpu.getId());
@@ -57,31 +54,42 @@ public class UserBenchmarkCpuDetailsPageParser {
         parseCpuScoreTemplate1(document, cpu);
         System.out.println(cpu);
         if (isGetCpuScoreData(cpu)) {
+            log.info("parseCpuScoreTemplate1 successfully");
             return true;
         }
-        log.info("parseCpuScoreTemplate1 fails");
+        log.error("parseCpu Score Template1 fails");
 
         parseCpuScoresTemplate2(document, cpu);
         if (isGetCpuScoreData(cpu)) {
+            log.info("parseCpuScoreTemplate2 successfully");
             return true;
         }
-        log.info("parseCpuScoreTemplate2  fails");
+        log.error("parseCpu Score Template2  fails");
 
         parseCpuScoresTemplate3(document, cpu);
         if (isGetCpuScoreData(cpu)) {
+            log.info("parseCpuScoreTemplate3 successfully");
             return true;
         }
-
+        log.error("parseCpu Score Template3  fails");
         return false;
     }
 
     private boolean parseCpuSpecification(Document document, UserBenchmarkCpu cpu) {
         parseCpuSpecificationTemplate1(cpu, document);
         if (isGetCpuSpecificationData(cpu)) {
+            log.info("parseCpu Specification Template1 successfully");
             return true;
         }
-        log.info("parseCpuSpecificationTemplate1 fails");
-//        parseCpuSpecificationTemplate2(cpu, document);
+        log.error("parseCpu Specification Template1 fails");
+
+        parseCpuSpecificationTemplate2(cpu, document);
+        if (isGetCpuSpecificationData(cpu)) {
+            log.info("parseCpu Specification Template2 successfully");
+            return true;
+        }
+        log.error("parseCpu Specification Template2 fails");
+
         return false;
     }
 
@@ -127,6 +135,7 @@ public class UserBenchmarkCpuDetailsPageParser {
     }
 
     private void parseCpuSpecificationTemplate1(UserBenchmarkCpu cpu, Document document) {
+        log.info("parseCpuSpecificationTemplate1");
         Elements elementCpuSpecification = document.select(CPU_SPECIFICATION_CSS_SELECTOR1);
         String cpuSpecification = elementCpuSpecification.text();
         String[] cpuSpecificationArray = cpuSpecification.split(" ");
@@ -138,29 +147,71 @@ public class UserBenchmarkCpuDetailsPageParser {
             cpu.setThreadsQuantity(Integer.parseInt(
                     cpuSpecificationArray[CPU_QUANTITY_THREADS_INDEX2]));
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
-            log.warn("Failed to parse CPU specifications. Setting defaults.", e);
-            cpu.setCoresQuantity(0);
-            cpu.setThreadsQuantity(0);
+            cpu.setCoresQuantity(FAILURE_VALUE);
+            cpu.setThreadsQuantity(FAILURE_VALUE);
+            log.error("Failed to parse CPU specifications. Setting defaults.", e);
         }
 
     }
 
+    private void parseCpuSpecificationTemplate2(UserBenchmarkCpu cpu, Document document) {
+        log.info("parseCpuSpecificationTemplate2");
+        Elements elementCpuSpecification = document.select(CPU_SPECIFICATION_CSS_SELECTOR1);
+
+        if (elementCpuSpecification.isEmpty()) {
+            log.error("parseCpuSpecificationTemplate2(). Element not found!");
+            setErrorsCpuValues(cpu);
+            return;
+        }
+
+        try {
+            String textCpuSpecification = elementCpuSpecification.text();
+
+            // Извлечение данных с проверкой на пустоту
+            String coresString = textCpuSpecification.replaceAll(
+                    ".*?(\\d+) Cores.*", "$1");
+            String frequencyString = textCpuSpecification.replaceAll(
+                    ".*@([0-9,.]+) GHz.*", "$1");
+
+            if (coresString.isEmpty() || frequencyString.isEmpty()) {
+                throw new IllegalArgumentException("Missing cores or frequency information.");
+            }
+
+            double frequency = Double.parseDouble(frequencyString.replace(",", "."));
+
+            // Установка значений в CPU
+            cpu.setCoresQuantity(Integer.parseInt(coresString));
+            cpu.setThreadsQuantity(0);
+            cpu.setCpuSpecification(textCpuSpecification);
+
+        } catch (Exception e) {
+            setErrorsCpuValues(cpu);
+            log.error("Error parsing CPU specification: {}", e.getMessage(), e);
+        }
+    }
+
+    private void setErrorsCpuValues(UserBenchmarkCpu cpu) {
+        cpu.setCoresQuantity(FAILURE_VALUE);
+        cpu.setThreadsQuantity(FAILURE_VALUE);
+        cpu.setCpuSpecification(null);
+    }
+
     private double extractScore(String[] scorePartsArray, int index) {
         if (index >= scorePartsArray.length) {
-            return 0;
+            return FAILURE_VALUE;
         }
         try {
             return ParseUtil.stringToDouble(scorePartsArray[index]
                     .replaceAll(REGEX_REMOVE_NON_DIGITS, ""));
         } catch (NumberFormatException e) {
-            return 0;
+            return FAILURE_VALUE;
         }
     }
 
     private boolean isGetCpuScoreData(UserBenchmarkCpu cpu) {
-        if (cpu.getGamingScore() == null || cpu.getGamingScore() == 0
-                || cpu.getDesktopScore() == null || cpu.getDesktopScore() == 0
-                || cpu.getWorkstationScore() == null || cpu.getWorkstationScore() == 0
+        if (cpu.getGamingScore() == null || cpu.getGamingScore() == FAILURE_VALUE
+                || cpu.getDesktopScore() == null || cpu.getDesktopScore() == FAILURE_VALUE
+                || cpu.getWorkstationScore() == null || cpu.getWorkstationScore() == FAILURE_VALUE
         ) {
             return false;
         }
@@ -169,8 +220,8 @@ public class UserBenchmarkCpuDetailsPageParser {
 
 
     private boolean isGetCpuSpecificationData(UserBenchmarkCpu cpu) {
-        if (cpu.getCoresQuantity() == null || cpu.getCoresQuantity() == 0
-                || cpu.getThreadsQuantity() == null || cpu.getThreadsQuantity() == 0
+        if (cpu.getCoresQuantity() == null || cpu.getCoresQuantity() == FAILURE_VALUE
+                || cpu.getThreadsQuantity() == null || cpu.getThreadsQuantity() == FAILURE_VALUE
                 || cpu.getCpuSpecification() == null || cpu.getCpuSpecification().isBlank()
         ) {
             return false;

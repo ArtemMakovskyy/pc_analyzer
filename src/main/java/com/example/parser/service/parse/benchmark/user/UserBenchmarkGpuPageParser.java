@@ -154,6 +154,8 @@ public class UserBenchmarkGpuPageParser {
         }
         UserBenchmarkGpu item = new UserBenchmarkGpu();
         item.setModel(column2_2Model);
+        //todo check if this work
+        item.setModelHl(formatHlGpuName(column2_2Model));
         item.setManufacturer(column2_1Manufacturer);
         item.setUserRating(ParseUtil.stringToDouble(column3UserRating));
         item.setValuePercents(ParseUtil.stringToDouble(column4Value));
@@ -161,6 +163,21 @@ public class UserBenchmarkGpuPageParser {
         item.setPrice(ParseUtil.stringToDouble(column8Price));
         item.setUrlOfGpu(row.select("td a.nodec").attr("href"));
         return item;
+    }
+
+    private static String formatHlGpuName(String input) {
+        if (input.contains("-TS (Ti-Super)")) {
+            return input.replace("-TS (Ti-Super)", " Ti SUPER");
+        } else if (input.contains("-S (Super)")) {
+            return input.replace("-S (Super)", " SUPER");
+        } else if (input.contains("S (Super)")) {
+            return input.replace("S (Super)", " SUPER");
+        } else if (input.contains("-Ti")) {
+            return input.replace("-Ti", " Ti");
+        }else if (input.contains("-XT")) {
+            return input.replace("-XT", " XT");
+        }
+        return input;
     }
 
     private int findPageQuantity(WebDriver driver) {

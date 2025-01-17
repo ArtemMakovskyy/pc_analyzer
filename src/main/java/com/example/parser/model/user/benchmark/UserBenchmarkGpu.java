@@ -25,6 +25,7 @@ public class UserBenchmarkGpu {
     private Long id;
 
     private String model;
+    private String modelHl;
     private String manufacturer;
     private Double userRating;
     private Double valuePercents;

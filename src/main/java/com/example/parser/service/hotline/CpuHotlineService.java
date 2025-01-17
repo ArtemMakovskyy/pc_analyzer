@@ -33,7 +33,8 @@ public class CpuHotlineService {
         for (UserBenchmarkCpu cpu : userBenchmarkCpuList) {
             String modelName = " " + cpu.getModel() + " ";
 
-            List<CpuHotLine> byName = cpuHotLineRepository.findByPartialNameIgnoreCase(modelName);
+            List<CpuHotLine> byName
+                    = cpuHotLineRepository.findByPartialNameIgnoreCase(modelName);
 
             for (CpuHotLine cpuHotLine : byName) {
                 cpuHotLine.setUserBenchmarkCpu(cpu);

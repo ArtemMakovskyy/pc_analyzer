@@ -37,14 +37,14 @@ public class HotlineController {
         return gpuHotLines;
     }
 
-    @PutMapping("/cpu/score")
+    @GetMapping("/cpu/score")
     public void updateCpuHotlineWithBenchmarkData() {
         cpuHotlineService.updateWithBenchmarkData();
     }
 
-//    @PutMapping("/gpu/score")
-//    public void updateGpuHotlineWithBenchmarkData() {
-//        gpuHotlineService.updateWithBenchmarkData();
-//    }
+    @GetMapping("/gpu/score")
+    public void updateGpuHotlineWithBenchmarkData() {
+        gpuHotlineService.updateWithBenchmarkData();
+    }
 
 }

@@ -28,6 +28,7 @@ public class UserBenchmarkCpuDetailsPageParser2FromFile {
             = "div.v-center:nth-child(1) > table:nth-child(2) > tbody:nth-child(1) > tr:nth-child(1)";
 
 //    @PostConstruct
+    //todo improve
     @SneakyThrows
     public void start() {
 

@@ -20,8 +20,10 @@ public class CpuHotlineService {
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
 
-//    @PostConstruct
+    //    @PostConstruct
     public void start() {
+        //todo не совпадают колонки и названия проверить сокеты
+        parseThenCleanDbThenSaveNewItems();
         updateWithBenchmarkData();
     }
 
@@ -45,10 +47,11 @@ public class CpuHotlineService {
         log.info("Updated " + updateList.size() + " items.");
     }
 
-    public List<CpuHotLine> parseAndSave() {
-        final List<CpuHotLine> cpusHotLine
-                = hotlineCpuPageParser.purseAllPages();
+    public List<CpuHotLine> parseThenCleanDbThenSaveNewItems() {
+        List<CpuHotLine> cpusHotLine = hotlineCpuPageParser.purseAllPages();
+        cpuHotLineRepository.deleteAll();
         cpuHotLineRepository.saveAll(cpusHotLine);
+
         return cpusHotLine;
     }
 

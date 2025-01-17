@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 public class HotlineCpuPageParser {
     private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final String DOMAIN_LINK = "https://hotline.ua";
-    private static final String ABOUT_PRODUCT = "?tab=about";
     private static final String BASE_URL = "https://hotline.ua/ua/computer/processory/?p=";
 
     public List<CpuHotLine> purseAllPages() {
@@ -52,8 +51,6 @@ public class HotlineCpuPageParser {
 
             cpu.setUrl(titleElement != null ? DOMAIN_LINK + (titleElement.attr("href")) : "No data");
 
-            // Извлекаем характеристики. Зависаэ
-//            final Cpu cpu = parseInnerCpuCharacteristics(DOMEN_LINK + url + ABOUT_PRODUCT);
 
             Element priceElement = item.selectFirst(".list-item__value-price");
             cpu.setPrices(priceElement != null ? priceElement.text()

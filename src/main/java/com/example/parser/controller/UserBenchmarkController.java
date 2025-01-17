@@ -4,7 +4,6 @@ import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.service.userbenchmark.CpuUserBenchmarkService;
 import com.example.parser.service.userbenchmark.GpuUserBenchmarkService;
-import jakarta.annotation.PostConstruct;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +30,7 @@ public class UserBenchmarkController {
     public List<UserBenchmarkCpu> loadAndParseAndSaveCpusWithoutDetails() {
         //todo check if exists data
         final List<UserBenchmarkCpu> userBenchmarkCpus
-                = userBenchmarkService.loadAndPurseAndSaveToDb();
+                = userBenchmarkService.loadAndParseAndSaveToDb();
         return userBenchmarkCpus;
     }
     @PutMapping("/purse/cpu")

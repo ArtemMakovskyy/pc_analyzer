@@ -25,30 +25,49 @@ import org.springframework.stereotype.Service;
 @Log4j2
 @RequiredArgsConstructor
 public class UserBenchmarkGpuPageParser {
-    private final UserBenchmarkTestPage userBenchmarkTestPage;
-    private static final ParseUtil.DelayInSeconds SMALL_PAUSE
-            = new ParseUtil.DelayInSeconds(2, 4);
-    private static final ParseUtil.DelayInSeconds BIG_PAUSE
-            = new ParseUtil.DelayInSeconds(4, 10);
+
+    private static final ParseUtil.DelayInSeconds SMALL_PAUSE =
+            new ParseUtil.DelayInSeconds(2, 4);
+    private static final ParseUtil.DelayInSeconds BIG_PAUSE =
+            new ParseUtil.DelayInSeconds(4, 10);
+
+    private static final String XPATH_BUTTON_PRICE_SORT =
+            "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th"
+                    + "[@data-mhth='MC_PRICE'][1]";
+    private static final String XPATH_LOCATOR_PAGE_QUANTITY =
+            "//*[@id='tableDataForm:mhtddyntac']/nav/ul/li[1]/a";
+    private static final String XPATH_NEXT_PAGE_BUTTON =
+            "//*[@id=\"tableDataForm:j_idt260\"]";
+
     private static final String BASE_URL = "https://gpu.userbenchmark.com/";
-    private static final String XPATH_BUTTON_PRICE_SORT
-            = "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th[@data-mhth='MC_PRICE'][1]";
-    private static final String XPATH_LOCATOR_PAGE_QUANTITY
-            = "//*[@id='tableDataForm:mhtddyntac']/nav/ul/li[1]/a";
-    private static final String XPATH_NEXT_PAGE_BUTTON
-            = "//*[@id=\"tableDataForm:j_idt260\"]";
-
-    private static final String CSS_QUERY_TABLE_ROW = "tr.hovertarget";
-
     private static final String PAGE_QUANTITY_PATTERN = "Page \\d+ of (\\d+)";
+    private static final String ONLY_DIGITS_PATTERN = "[^0-9]";
+    private static final String TABLE_ROW_CSS_SELECTOR = "tr.hovertarget";
+    private static final String MANUFACTURER_CSS_SELECTOR =
+            "td:nth-child(2) span.semi-strongs";
+    private static final String MODEL_CSS_SELECTOR =
+            "td:nth-child(2) span.semi-strongs a.nodec";
+    private static final String USER_RATING_CSS_SELECTOR =
+            "td:nth-child(3) div.mh-tc";
+    private static final String VALUE_PERCENTS_CSS_SELECTOR =
+            "td:nth-child(4) div.mh-tc";
+    private static final String AVG_BENCH_CSS_SELECTOR =
+            "td:nth-child(5) div.mh-tc";
+    private static final String PRICE_CSS_SELECTOR =
+            "td:nth-child(8) div.mh-tc";
+    private static final String URL_CSS_SELECTOR = "td a.nodec";
 
 
-    public List<UserBenchmarkGpu> purse() {
+    private final UserBenchmarkTestPage userBenchmarkTestPage;
+
+    public List<UserBenchmarkGpu> parse(int pages) {
         WebDriver driver = new ChromeDriver();
         try {
             driver.get(BASE_URL);
             userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);
-            int pages = findPageQuantity(driver);
+            if (pages == 0) {
+                pages = findPageQuantity(driver);
+            }
             sortByPriceButton(driver);
             return parsePages(driver, pages);
         } finally {
@@ -80,27 +99,16 @@ public class UserBenchmarkGpuPageParser {
     private List<UserBenchmarkGpu> parsePage(WebDriver driver) {
         String currentHtmlPageSource = driver.getPageSource();
         List<UserBenchmarkGpu> gpuUserBenchmarksOnPage
-                = pursePageSource(currentHtmlPageSource);
+                = parsePageSource(currentHtmlPageSource);
 
-        if (false) {
-
-            gpuUserBenchmarksOnPage.forEach(System.out::println);
-            System.out.println(gpuUserBenchmarksOnPage.size());
-        }
         log.info("Pause 2 in parsePage()");
         ParseUtil.applyRandomDelay(BIG_PAUSE);
-
         return gpuUserBenchmarksOnPage;
     }
 
-    private List<UserBenchmarkGpu> pursePageSource(String pageSource) {
+    private List<UserBenchmarkGpu> parsePageSource(String pageSource) {
         Document htmlDocument = Jsoup.parse(pageSource);
-
-        /**
-         * <tr class="hovertarget " data-id="1943305">
-         */
-
-        Elements rows = htmlDocument.select(CSS_QUERY_TABLE_ROW);
+        Elements rows = htmlDocument.select(TABLE_ROW_CSS_SELECTOR);
         UserBenchmarkGpu item;
         List<UserBenchmarkGpu> items = new ArrayList<>();
         for (Element row : rows) {
@@ -111,58 +119,26 @@ public class UserBenchmarkGpuPageParser {
     }
 
     private UserBenchmarkGpu rowToGpu(Element row) {
-        //todo fix it
-        //            String column1NumberPosition = row.select("td:nth-child(1) div")
-//                    .text();
-        String column2_1Manufacturer = row.select("td:nth-child(2) span.semi-strongs")
-                .first().ownText().trim();
-        String column2_2Model = row.select("td:nth-child(2) span.semi-strongs a.nodec")
-                .text().trim();
-        String column3UserRating = row.select("td:nth-child(3) div.mh-tc")
-                .first().text().replaceAll("[^0-9]", "");
-        String column4Value = row.select("td:nth-child(4) div.mh-tc")
-                .text().trim();
-        String column5_1Avg = row.select("td:nth-child(5) div.mh-tc")
-                .text().split(" ")[0];
-//            String column5_2AvgFromTo = row.select("td:nth-child(5) div.mh-tc-cap")
-//                    .text();
-        String column6Memory = row.select("td:nth-child(6) div.mh-tc")
-                .text();
-        String column7Core = row.select("td:nth-child(7) div.mh-tc")
-                .text();
-        String column8Price = row.select("td:nth-child(8) div.mh-tc")
-                .text().replaceAll("[^0-9]", "");
-        String column9Age = row.select("td:nth-child(9) div.mh-tc")
-                .text();
-        String column10Price = row.select("td:nth-child(10) div.mh-tc")
-                .text().replaceAll("[^0-9]", "");
-
-        if (false) {
-//                System.out.println("Column 1: " + column1NumberPosition);
-            System.out.println("Column 201: " + column2_1Manufacturer);
-            System.out.println("Column 202: " + column2_2Model);
-            System.out.println("Column 3: " + column3UserRating);
-            System.out.println("Column 4: " + column4Value);
-            System.out.println("Column 5: " + column5_1Avg);
-//                System.out.println("Column 5: " + column5_2AvgFromTo);
-            System.out.println("Column 6: " + column6Memory);
-            System.out.println("Column 7: " + column7Core);
-            System.out.println("Column 8: " + column8Price);
-            System.out.println("Column 9: " + column9Age);
-            System.out.println("Column 10: " + column10Price);
-            System.out.println("------------------------");
-        }
         UserBenchmarkGpu item = new UserBenchmarkGpu();
-        item.setModel(column2_2Model);
-        //todo check if this work
-        item.setModelHl(formatHlGpuName(column2_2Model));
-        item.setManufacturer(column2_1Manufacturer);
-        item.setUserRating(ParseUtil.stringToDouble(column3UserRating));
-        item.setValuePercents(ParseUtil.stringToDouble(column4Value));
-        item.setAvgBench(ParseUtil.stringToDouble(column5_1Avg));
-        item.setPrice(ParseUtil.stringToDouble(column8Price));
-        item.setUrlOfGpu(row.select("td a.nodec").attr("href"));
+        item.setModel(getElementText(row, MODEL_CSS_SELECTOR));
+        item.setModelHl(formatHlGpuName(item.getModel()));
+        item.setManufacturer(getElementText(row, MANUFACTURER_CSS_SELECTOR));
+        item.setUserRating(ParseUtil.stringToDouble(
+                getElementText(row, USER_RATING_CSS_SELECTOR)
+                        .replaceAll(ONLY_DIGITS_PATTERN, "")));
+        item.setValuePercents(ParseUtil.stringToDouble(
+                getElementText(row, VALUE_PERCENTS_CSS_SELECTOR)));
+        item.setAvgBench(ParseUtil.stringToDouble(
+                getElementText(row, AVG_BENCH_CSS_SELECTOR).split(" ")[0]));
+        item.setPrice(ParseUtil.stringToDouble(getElementText(row, PRICE_CSS_SELECTOR)
+                .replaceAll(ONLY_DIGITS_PATTERN, "")));
+        item.setUrlOfGpu(row.select(URL_CSS_SELECTOR).attr("href"));
         return item;
+    }
+
+    private String getElementText(Element row, String selector) {
+        Element element = row.select(selector).first();
+        return element != null ? element.text().trim() : "";
     }
 
     private static String formatHlGpuName(String input) {
@@ -174,7 +150,7 @@ public class UserBenchmarkGpuPageParser {
             return input.replace("S (Super)", " SUPER");
         } else if (input.contains("-Ti")) {
             return input.replace("-Ti", " Ti");
-        }else if (input.contains("-XT")) {
+        } else if (input.contains("-XT")) {
             return input.replace("-XT", " XT");
         }
         return input;

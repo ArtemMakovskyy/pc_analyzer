@@ -5,10 +5,7 @@ import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.repository.GpuHotLineRepository;
 import com.example.parser.repository.GpuUserBenchmarkRepository;
 import com.example.parser.service.parse.hotline.HotlineGpuPageParser;
-import jakarta.annotation.PostConstruct;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -21,9 +18,8 @@ public class GpuHotlineService {
     private final HotlineGpuPageParser hotlineGpuPageParser;
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
 
-//    @PostConstruct
+    //    @PostConstruct
     public void start() {
-
     }
 
     public void updateWithBenchmarkData() {
@@ -45,10 +41,11 @@ public class GpuHotlineService {
         log.info("Updated " + gpuHl.size() + " items.");
     }
 
-    public List<GpuHotLine> parseAndSave() {
-        final List<GpuHotLine> gpusHotLine
-                = hotlineGpuPageParser.purseAllPages();
+    public List<GpuHotLine> parseThenCleanDbThenSaveNewItems() {
+        List<GpuHotLine> gpusHotLine = hotlineGpuPageParser.purseAllPages();
+        gpuHotLineRepository.deleteAll();
         gpuHotLineRepository.saveAll(gpusHotLine);
+
         return gpusHotLine;
     }
 

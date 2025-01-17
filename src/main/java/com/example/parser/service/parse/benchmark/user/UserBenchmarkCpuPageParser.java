@@ -17,8 +17,6 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,16 @@ import org.springframework.stereotype.Service;
 @Log4j2
 @RequiredArgsConstructor
 public class UserBenchmarkCpuPageParser {
-    private static final String CSS_QUERY_TABLE_ROW = "tr.hovertarget";
+    private static final int PARSE_ALL_PAGES_INDEX = -1;
+    private static final String CSS_SELECTOR_TABLE_ROW = "tr.hovertarget";
+    private static final String CSS_SELECTOR_MANUFACTURER = "td:nth-child(2) span.semi-strongs";
+    private static final String CSS_SELECTOR_MODEL = "td:nth-child(2) span.semi-strongs a.nodec";
+    private static final String CSS_SELECTOR_USER_RATING = "td:nth-child(3) div.mh-tc";
+    private static final String CSS_SELECTOR_VALUE_PERCENTS = "td:nth-child(4) div.mh-tc";
+    private static final String CSS_SELECTOR_AVG_BENCH = "td:nth-child(5) div.mh-tc";
+    private static final String CSS_SELECTOR_MEMORY = "td:nth-child(6) div.mh-tc";
+    private static final String CSS_SELECTOR_PRICE = "td:nth-child(10) div.mh-tc";
+    private static final String CSS_SELECTOR_URL = "td a.nodec";
     private static final ParseUtil.DelayInSeconds SMALL_PAUSE
             = new ParseUtil.DelayInSeconds(2, 4);
     private static final ParseUtil.DelayInSeconds BIG_PAUSE
@@ -37,18 +44,31 @@ public class UserBenchmarkCpuPageParser {
     private static final String XPATH_LOCATOR_PAGE_QUANTITY
             = "//*[@id='tableDataForm:mhtddyntac']/nav/ul/li[1]/a";
     private static final String PAGE_QUANTITY_PATTERN = "Page \\d+ of (\\d+)";
+    private static final String ONLY_DIGITS_PATTERN = "[^0-9]";
     private static final String XPATH_BUTTON_PRICE_SORT
             = "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th[@data-mhth='MC_PRICE'][1]";
+    private static final String XPATH_BUTTON_AGE_MONTH_SORT
+            = "//*[@id='tableDataForm:mhtddyntac']/table/thead/tr//th[@data-mhth='MC_RELEASEDATE'][1]";
+
     private static final String BASE_URL = "https://cpu.userbenchmark.com/";
     private final UserBenchmarkTestPage userBenchmarkTestPage;
     private final WebDriverFactory webDriverFactory;
 
     /**
      * Load and parse all cpu items from UserBenchmark without scores
+     *
      * @return List<CpuUserBenchmarkCreateDto>
      */
-    public List<CpuUserBenchmarkCreateDto> loadAndPurseAndSaveToDb() {
+
+    public List<CpuUserBenchmarkCreateDto> loadAndParse(boolean sortByAge) {
+       return loadAndParse(sortByAge,PARSE_ALL_PAGES_INDEX);
+    }
+
+    public List<CpuUserBenchmarkCreateDto> loadAndParse(boolean sortByAge,int pages) {
         //todo check if the position exist
+        if (pages == 0 || pages < PARSE_ALL_PAGES_INDEX){
+            throw new RuntimeException("Enter correct number of pages");
+        }
         WebDriver driver = null;
         try {
             driver = webDriverFactory.setUpWebDriver(
@@ -57,8 +77,17 @@ public class UserBenchmarkCpuPageParser {
                     10);
 
             userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);
-            int pages = findPageQuantity(driver);
-            sortByPriceButton(driver);
+            if (pages == PARSE_ALL_PAGES_INDEX){
+                pages = findPageQuantity(driver);
+            }
+
+            if (sortByAge) {
+                sortByAgeMonthButton(driver);
+                ParseUtil.applyRandomDelay(BIG_PAUSE);
+                sortByAgeMonthButton(driver);
+            } else {
+                sortByPriceButton(driver);
+            }
             return parsePages(driver, pages);
         } finally {
             driver.quit();
@@ -66,7 +95,7 @@ public class UserBenchmarkCpuPageParser {
     }
 
     private List<CpuUserBenchmarkCreateDto> parsePages(WebDriver driver, int pages) {
-            //todo why don't opened last page
+        //todo why don't opened last page
         List<CpuUserBenchmarkCreateDto> cpuUserBenchmarks = new ArrayList<>();
         int currentPage = 1;
         do {
@@ -93,12 +122,6 @@ public class UserBenchmarkCpuPageParser {
         List<CpuUserBenchmarkCreateDto> cpuUserBenchmarksOnPage
                 = pursePageSource(currentHtmlPageSource);
 
-        if (false) {
-            //todo delete it
-            cpuUserBenchmarksOnPage.forEach(System.out::println);
-            System.out.println(cpuUserBenchmarksOnPage.size());
-        }
-
         log.info("Pause 2 in parsePage()");
         ParseUtil.applyRandomDelay(BIG_PAUSE);
 
@@ -108,7 +131,7 @@ public class UserBenchmarkCpuPageParser {
     private List<CpuUserBenchmarkCreateDto> pursePageSource(String pageSource) {
         Document htmlDocument = Jsoup.parse(pageSource);
 
-        Elements rows = htmlDocument.select(CSS_QUERY_TABLE_ROW);
+        Elements rows = htmlDocument.select(CSS_SELECTOR_TABLE_ROW);
         CpuUserBenchmarkCreateDto item;
         List<CpuUserBenchmarkCreateDto> items = new ArrayList<>();
         for (Element row : rows) {
@@ -120,29 +143,27 @@ public class UserBenchmarkCpuPageParser {
     }
 
     private CpuUserBenchmarkCreateDto rowToCpu(Element row) {
-                //todo do this better
-        String column2_1Manufacturer = row.select("td:nth-child(2) span.semi-strongs").first().ownText().trim();
-        String column2_2Model = row.select("td:nth-child(2) span.semi-strongs a.nodec").text().trim();
-        String column3UserRating = row.select("td:nth-child(3) div.mh-tc").first().text().replaceAll("[^0-9]", "");
-        String column4Value = row.select("td:nth-child(4) div.mh-tc").text();
-        String column5_1Avg = row.select("td:nth-child(5) div.mh-tc").text().split(" ")[0];
-
-        String column6Memory = row.select("td:nth-child(6) div.mh-tc").text();
-
-        String column10Price = row.select("td:nth-child(10) div.mh-tc").text().replaceAll("[^0-9]", "");
+        String manufacturer = row.select(CSS_SELECTOR_MANUFACTURER).first().ownText().trim();
+        String model = row.select(CSS_SELECTOR_MODEL).text().trim();
+        String userRating = row.select(CSS_SELECTOR_USER_RATING).first().text()
+                .replaceAll(ONLY_DIGITS_PATTERN, "");
+        String valuePercents = row.select(CSS_SELECTOR_VALUE_PERCENTS).text();
+        String avgBench = row.select(CSS_SELECTOR_AVG_BENCH).text().split(" ")[0];
+        String memory = row.select(CSS_SELECTOR_MEMORY).text();
+        String price = row.select(CSS_SELECTOR_PRICE).text()
+                .replaceAll(ONLY_DIGITS_PATTERN, "");
 
         CpuUserBenchmarkCreateDto cpu = new CpuUserBenchmarkCreateDto();
-        cpu.setModel(column2_2Model);
-        cpu.setManufacturer(column2_1Manufacturer);
-        cpu.setUserRating(ParseUtil.stringToDouble(column3UserRating));
-        cpu.setValuePercents(ParseUtil.stringToDouble(column4Value));
-        cpu.setAvgBench(ParseUtil.stringToDouble(column5_1Avg));
-        cpu.setMemoryPercents(ParseUtil.stringToDouble(column6Memory));
-        cpu.setPrice(ParseUtil.stringToDouble(column10Price));
-        cpu.setUrlOfCpu(row.select("td a.nodec").attr("href"));
+        cpu.setModel(model);
+        cpu.setManufacturer(manufacturer);
+        cpu.setUserRating(ParseUtil.stringToDouble(userRating));
+        cpu.setValuePercents(ParseUtil.stringToDouble(valuePercents));
+        cpu.setAvgBench(ParseUtil.stringToDouble(avgBench));
+        cpu.setMemoryPercents(ParseUtil.stringToDouble(memory));
+        cpu.setPrice(ParseUtil.stringToDouble(price));
+        cpu.setUrlOfCpu(row.select(CSS_SELECTOR_URL).attr("href"));
         return cpu;
     }
-
 
     private int findPageQuantity(WebDriver driver) {
         int pages;
@@ -171,6 +192,17 @@ public class UserBenchmarkCpuPageParser {
         final WebElement elementPriceButton = driver.findElement(xpathPriceSortButton);
         if (!elementPriceButton.isDisplayed()) {
             throw new RuntimeException("Price sort button is not visible.");
+        }
+        log.info("Pause 1, before click on price button");
+        ParseUtil.applyRandomDelay(SMALL_PAUSE);
+        elementPriceButton.click();
+    }
+
+    private void sortByAgeMonthButton(WebDriver driver) {
+        By xpathPriceSortButton = By.xpath(XPATH_BUTTON_AGE_MONTH_SORT);
+        final WebElement elementPriceButton = driver.findElement(xpathPriceSortButton);
+        if (!elementPriceButton.isDisplayed()) {
+            throw new RuntimeException("AgeMonthButton sort button is not visible.");
         }
         log.info("Pause 1, before click on price button");
         ParseUtil.applyRandomDelay(SMALL_PAUSE);

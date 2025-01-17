@@ -7,8 +7,6 @@ import com.example.parser.service.hotline.GpuHotlineService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,14 +24,14 @@ public class HotlineController {
     @GetMapping("/cpu")
     public List<CpuHotLine> parseAndSaveAllCpus() {
         //todo chec if items exist
-        final List<CpuHotLine> cpuHotLines = cpuHotlineService.parseAndSave();
+        final List<CpuHotLine> cpuHotLines = cpuHotlineService.parseThenCleanDbThenSaveNewItems();
         return cpuHotLines;
     }
 
     @GetMapping("/gpu")
     public List<GpuHotLine> parseAndSaveAllGpus() {
         //todo chec if items exist
-        final List<GpuHotLine> gpuHotLines = gpuHotlineService.parseAndSave();
+        final List<GpuHotLine> gpuHotLines = gpuHotlineService.parseThenCleanDbThenSaveNewItems();
         return gpuHotLines;
     }
 

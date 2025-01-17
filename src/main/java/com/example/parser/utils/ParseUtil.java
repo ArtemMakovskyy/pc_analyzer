@@ -29,31 +29,6 @@ public class ParseUtil {
         applyRandomDelay(delayInSeconds.getFromSec(), delayInSeconds.getToSec(), true);
     }
 
-    public static WebDriver setUpWebDriver(
-            boolean showGraphicalInterface,
-                                    int timeoutSeconds) {
-        WebDriver driver = null;
-
-        if (!showGraphicalInterface) {
-            ChromeOptions options = new ChromeOptions();
-            //Run without a graphical interface
-            options.addArguments("--headless");
-            // Optional, for improved compatibility
-            options.addArguments("--disable-gpu");
-            // Set the window size
-            options.addArguments("--window-size=1920,1080");
-
-            driver = new ChromeDriver(options);
-        } else {
-            driver = new ChromeDriver();
-        }
-
-        if (timeoutSeconds > 0) {
-            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-        }
-        return driver;
-    }
-
     public static void applyRandomDelay(int fromSec, int toSec, boolean isDelay) {
         if (isDelay) {
             if (fromSec < 0 || toSec < 0 || fromSec > toSec) {

@@ -4,6 +4,7 @@ import com.example.parser.dto.mapper.CpuUserBenchmarkMapper;
 import com.example.parser.dto.userbenchmark.CpuUserBenchmarkCreateDto;
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.repository.CpuUserBenchmarkRepository;
+import com.example.parser.service.parse.WebDriverFactory;
 import com.example.parser.service.parse.benchmark.user.UserBenchmarkCpuDetailsPageParser;
 import com.example.parser.service.parse.benchmark.user.UserBenchmarkCpuPageParser;
 import java.util.List;
@@ -22,6 +23,7 @@ public class CpuUserBenchmarkService {
     private final UserBenchmarkCpuPageParser userBenchmarkCpuPageParser;
     private final UserBenchmarkCpuDetailsPageParser userBenchmarkCpuDetailsPageParser;
     private final CpuUserBenchmarkMapper cpuUserBenchmarkMapper;
+    private final WebDriverFactory webDriverFactory;
 
     public List<UserBenchmarkCpu> loadAndPurseAndSaveToDb() {
         final List<CpuUserBenchmarkCreateDto> cpuUserBenchmarkCreateDtos =
@@ -35,7 +37,7 @@ public class CpuUserBenchmarkService {
         final List<UserBenchmarkCpu> byCpuSpecificationIsNull
                 = cpuUserBenchmarkRepository.findByCpuSpecificationIsNull();
 
-        WebDriver driver = new ChromeDriver();
+        WebDriver driver = webDriverFactory.setUpWebDriver(true,10);
         int updated = 0;
         int notUpdated = 0;
         int progress = 0;
@@ -47,15 +49,14 @@ public class CpuUserBenchmarkService {
                 userBenchmarkCpuDetailsPageParser.purseAndAddDetails(cpu, driver);
 
                 if (
-                        cpu.getGamingScore() == null || cpu.getGamingScore() == -FAILURE_VALUE
-                                || cpu.getDesktopScore() == null || cpu.getDesktopScore() == -FAILURE_VALUE
+                        cpu.getGamingScore() == null || cpu.getGamingScore() == FAILURE_VALUE
+                                || cpu.getDesktopScore() == null || cpu.getDesktopScore() == FAILURE_VALUE
                                 || cpu.getWorkstationScore() == null || cpu.getWorkstationScore() == FAILURE_VALUE
-                                || cpu.getCoresQuantity() == null || cpu.getCoresQuantity() == -FAILURE_VALUE
-                                || cpu.getThreadsQuantity() == null || cpu.getThreadsQuantity() == -FAILURE_VALUE
+                                || cpu.getCoresQuantity() == null || cpu.getCoresQuantity() == FAILURE_VALUE
+                                || cpu.getThreadsQuantity() == null || cpu.getThreadsQuantity() == FAILURE_VALUE
                                 || cpu.getCpuSpecification() == null || cpu.getCpuSpecification().isBlank()
                 ) {
                     log.info(cpu.getId() + " not updated: " + notUpdated++);
-
                 } else {
                     updated++;
                     cpuUserBenchmarkRepository.save(cpu);

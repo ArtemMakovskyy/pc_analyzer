@@ -1,6 +1,7 @@
 package com.example.parser.service.parse.benchmark.user;
 
 import com.example.parser.dto.userbenchmark.CpuUserBenchmarkCreateDto;
+import com.example.parser.service.parse.WebDriverFactory;
 import com.example.parser.utils.ParseUtil;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ public class UserBenchmarkCpuPageParser {
             = "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th[@data-mhth='MC_PRICE'][1]";
     private static final String BASE_URL = "https://cpu.userbenchmark.com/";
     private final UserBenchmarkTestPage userBenchmarkTestPage;
+    private final WebDriverFactory webDriverFactory;
 
     /**
      * Load and parse all cpu items from UserBenchmark without scores
@@ -49,7 +51,7 @@ public class UserBenchmarkCpuPageParser {
         //todo check if the position exist
         WebDriver driver = null;
         try {
-            driver = setUpWebDriver(
+            driver = webDriverFactory.setUpWebDriver(
                     BASE_URL,
                     true,
                     10);
@@ -183,34 +185,6 @@ public class UserBenchmarkCpuPageParser {
         elementNextButton.click();
 
         userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);
-    }
-
-    public WebDriver setUpWebDriver(String url,
-                                     boolean showGraphicalInterface,
-                                     int timeoutSeconds) {
-        WebDriver driver = null;
-
-        if (!showGraphicalInterface) {
-            ChromeOptions options = new ChromeOptions();
-            //Run without a graphical interface
-            options.addArguments("--headless");
-            // Optional, for improved compatibility
-            options.addArguments("--disable-gpu");
-            // Set the window size
-            options.addArguments("--window-size=1920,1080");
-
-            driver = new ChromeDriver(options);
-        } else {
-            driver = new ChromeDriver();
-        }
-
-        if (timeoutSeconds > 0) {
-            driver.manage().timeouts().implicitlyWait(
-                    Duration.ofSeconds(timeoutSeconds));
-        }
-
-        driver.get(url);
-        return driver;
     }
 
 }

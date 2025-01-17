@@ -20,7 +20,7 @@ public class UserBenchmarkController {
     private final CpuUserBenchmarkService userBenchmarkService;
     private final GpuUserBenchmarkService gpuUserBenchmarkService;
 
-        @PostConstruct
+//        @PostConstruct
     public void start() {
         //todo check if exists data
         // todo add template to add specification

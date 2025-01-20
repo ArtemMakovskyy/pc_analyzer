@@ -43,9 +43,9 @@ public class UserBenchmarkCpuDetailsPageParser {
             = new ParseUtil.DelayInSeconds(3, 6);
     private final UserBenchmarkTestPage userBenchmarkTestPage;
 
-    @PostConstruct
+//    @PostConstruct
     public void testCode() {
-        parseFromFile();
+//        parseFromFile();
     }
 
     public void purseAndAddDetails(

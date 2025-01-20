@@ -5,6 +5,8 @@ import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.repository.CpuHotLineRepository;
 import com.example.parser.repository.CpuUserBenchmarkRepository;
 import com.example.parser.service.parse.hotline.HotlineCpuPageParser;
+import jakarta.annotation.PostConstruct;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,11 +22,11 @@ public class CpuHotlineService {
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
 
-    //    @PostConstruct
+//        @PostConstruct
     public void start() {
         //todo не совпадают колонки и названия проверить сокеты
-        parseThenCleanDbThenSaveNewItems();
-        updateWithBenchmarkData();
+//        parseThenCleanDbThenSaveNewItems();
+//        updateWithBenchmarkData();
     }
 
     public void updateWithBenchmarkData() {
@@ -52,7 +54,6 @@ public class CpuHotlineService {
         List<CpuHotLine> cpusHotLine = hotlineCpuPageParser.purseAllPages();
         cpuHotLineRepository.deleteAll();
         cpuHotLineRepository.saveAll(cpusHotLine);
-
         return cpusHotLine;
     }
 

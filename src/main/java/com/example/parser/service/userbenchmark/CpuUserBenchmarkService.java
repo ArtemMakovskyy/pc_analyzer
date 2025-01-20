@@ -27,11 +27,11 @@ public class CpuUserBenchmarkService {
     private final CpuUserBenchmarkMapper cpuUserBenchmarkMapper;
     private final WebDriverFactory webDriverFactory;
 
-    //todo delete post construct
+
 //    @PostConstruct
     public void init() {
 //        loadAndParseAndSaveToDb();
-//        loadAndParseAndAddSpecificationCpusWereCpuSpecificationIsNull();
+        loadAndParseAndAddSpecificationCpusWereCpuSpecificationIsNull();
     }
 
     public List<UserBenchmarkCpu> loadAndParseAndSaveToDb() {

@@ -156,11 +156,11 @@ public class UserBenchmarkCpuPageParser {
         CpuUserBenchmarkCreateDto cpu = new CpuUserBenchmarkCreateDto();
         cpu.setModel(model);
         cpu.setManufacturer(manufacturer);
-        cpu.setUserRating(ParseUtil.stringToDouble(userRating));
-        cpu.setValuePercents(ParseUtil.stringToDouble(valuePercents));
-        cpu.setAvgBench(ParseUtil.stringToDouble(avgBench));
-        cpu.setMemoryPercents(ParseUtil.stringToDouble(memory));
-        cpu.setPrice(ParseUtil.stringToDouble(price));
+        cpu.setUserRating(ParseUtil.stringToDoubleIfErrorReturnMinusOne(userRating));
+        cpu.setValuePercents(ParseUtil.stringToDoubleIfErrorReturnMinusOne(valuePercents));
+        cpu.setAvgBench(ParseUtil.stringToDoubleIfErrorReturnMinusOne(avgBench));
+        cpu.setMemoryPercents(ParseUtil.stringToDoubleIfErrorReturnMinusOne(memory));
+        cpu.setPrice(ParseUtil.stringToDoubleIfErrorReturnMinusOne(price));
         cpu.setUrlOfCpu(row.select(CSS_SELECTOR_URL).attr("href"));
         return cpu;
     }

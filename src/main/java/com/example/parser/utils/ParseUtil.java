@@ -1,28 +1,38 @@
 package com.example.parser.utils;
 
-import java.time.Duration;
 import java.util.Random;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.log4j.Log4j2;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 
 @Log4j2
 public class ParseUtil {
-    public static Double stringToDouble(String priceText) {
-        if (priceText == null || priceText.trim().isEmpty()) {
+    public static Double stringToDoubleIfErrorReturnMinusOne(String text) {
+        if (text == null || text.trim().isEmpty()) {
             return 0.0;
         }
         try {
-            if (priceText.matches("\\d+(\\.\\d+)?")) {
-                return Double.parseDouble(priceText);
+            if (text.matches("\\d+(\\.\\d+)?")) {
+                return Double.parseDouble(text);
             }
         } catch (NumberFormatException e) {
-
+            //ignore and return -1
         }
-        return 0.0;
+        return -1.0;
+    }
+
+    public static Integer stringToIntIfErrorReturnMinusOne(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return 0;
+        }
+        try {
+            if (text.matches("\\d+")) {
+                return Integer.parseInt(text);
+            }
+        } catch (NumberFormatException e) {
+            //ignore and return -1
+        }
+        return -1;
     }
 
     public static void applyRandomDelay(DelayInSeconds delayInSeconds) {

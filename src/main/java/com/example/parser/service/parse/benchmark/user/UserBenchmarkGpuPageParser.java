@@ -123,14 +123,14 @@ public class UserBenchmarkGpuPageParser {
         item.setModel(getElementText(row, MODEL_CSS_SELECTOR));
         item.setModelHl(formatHlGpuName(item.getModel()));
         item.setManufacturer(getElementText(row, MANUFACTURER_CSS_SELECTOR));
-        item.setUserRating(ParseUtil.stringToDouble(
+        item.setUserRating(ParseUtil.stringToDoubleIfErrorReturnMinusOne(
                 getElementText(row, USER_RATING_CSS_SELECTOR)
                         .replaceAll(ONLY_DIGITS_PATTERN, "")));
-        item.setValuePercents(ParseUtil.stringToDouble(
+        item.setValuePercents(ParseUtil.stringToDoubleIfErrorReturnMinusOne(
                 getElementText(row, VALUE_PERCENTS_CSS_SELECTOR)));
-        item.setAvgBench(ParseUtil.stringToDouble(
+        item.setAvgBench(ParseUtil.stringToDoubleIfErrorReturnMinusOne(
                 getElementText(row, AVG_BENCH_CSS_SELECTOR).split(" ")[0]));
-        item.setPrice(ParseUtil.stringToDouble(getElementText(row, PRICE_CSS_SELECTOR)
+        item.setPrice(ParseUtil.stringToDoubleIfErrorReturnMinusOne(getElementText(row, PRICE_CSS_SELECTOR)
                 .replaceAll(ONLY_DIGITS_PATTERN, "")));
         item.setUrlOfGpu(row.select(URL_CSS_SELECTOR).attr("href"));
         return item;

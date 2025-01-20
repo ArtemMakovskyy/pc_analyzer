@@ -2,6 +2,9 @@ package com.example.parser.service.parse.benchmark.user;
 
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.utils.ParseUtil;
+import jakarta.annotation.PostConstruct;
+import java.io.File;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.Jsoup;
@@ -14,6 +17,8 @@ import org.springframework.stereotype.Component;
 @Log4j2
 @RequiredArgsConstructor
 public class UserBenchmarkCpuDetailsPageParser {
+    private final static String HTML_PATH_GENERAL = "C:\\Users\\Artem\\Documents\\Java\\UltimateJetBrains\\tutorials\\ms1\\parser\\parser\\src\\main\\java\\com\\example\\parser\\service\\parse\\benchmark\\user\\other\\";
+    private final static String HTML_PATH_PENTIUM_DUAL_T_3200 = HTML_PATH_GENERAL + "InnerrPagePentiumDualT3200.html";
     private final static int FAILURE_VALUE = -1;
     private static final int GAMING_SCORE_INDEX1 = 1;
     private static final int DESKTOP_SCORE_INDEX3 = 3;
@@ -30,11 +35,18 @@ public class UserBenchmarkCpuDetailsPageParser {
     private static final String CPU_SCORE_ELEMENTS2 = "div.semi-strong";
     private static final String CPU_SCORE_ELEMENTS3 = "td .bsc-w > div:first-child";
     private static final String REGEX_REMOVE_NON_DIGITS = "\\D";
+    private static final String REGEX_EXTRACT_CORES = ".*?(\\d+) Cores.*";
+    private static final String GROUP_ONE_REFERENCE = "$1";
     private static final String SCORE_ELEMENTS1
             = "div.v-center:nth-child(1) > table:nth-child(2)";
     private static final ParseUtil.DelayInSeconds DELAY_IN_SECONDS
             = new ParseUtil.DelayInSeconds(3, 6);
     private final UserBenchmarkTestPage userBenchmarkTestPage;
+
+    @PostConstruct
+    public void testCode() {
+        parseFromFile();
+    }
 
     public void purseAndAddDetails(
             UserBenchmarkCpu cpu,
@@ -48,6 +60,20 @@ public class UserBenchmarkCpuDetailsPageParser {
             log.error("Can't parse data from cpu ID: " + cpu.getId());
         }
 
+    }
+
+    public void parseFromFile() {
+        UserBenchmarkCpu cpu = new UserBenchmarkCpu();
+        Document document = null;
+        try {
+            document = Jsoup.parse(new File(HTML_PATH_PENTIUM_DUAL_T_3200));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        parseCpuScore(document, cpu);
+        parseCpuSpecification(document, cpu);
+
+        log.info(cpu);
     }
 
     private boolean parseCpuScore(Document document, UserBenchmarkCpu cpu) {
@@ -135,16 +161,15 @@ public class UserBenchmarkCpuDetailsPageParser {
     }
 
     private void parseCpuSpecificationTemplate1(UserBenchmarkCpu cpu, Document document) {
-        log.info("parseCpuSpecificationTemplate1");
         Elements elementCpuSpecification = document.select(CPU_SPECIFICATION_CSS_SELECTOR1);
         String cpuSpecification = elementCpuSpecification.text();
         String[] cpuSpecificationArray = cpuSpecification.split(" ");
 
         try {
             cpu.setCpuSpecification(cpuSpecification);
-            cpu.setCoresQuantity(Integer.parseInt(
+            cpu.setCoresQuantity(ParseUtil.stringToIntIfErrorReturnMinusOne(
                     cpuSpecificationArray[CPU_QUANTITY_CORE_INDEX0]));
-            cpu.setThreadsQuantity(Integer.parseInt(
+            cpu.setThreadsQuantity(ParseUtil.stringToIntIfErrorReturnMinusOne(
                     cpuSpecificationArray[CPU_QUANTITY_THREADS_INDEX2]));
         } catch (IndexOutOfBoundsException | NumberFormatException e) {
             cpu.setCoresQuantity(FAILURE_VALUE);
@@ -155,7 +180,6 @@ public class UserBenchmarkCpuDetailsPageParser {
     }
 
     private void parseCpuSpecificationTemplate2(UserBenchmarkCpu cpu, Document document) {
-        log.info("parseCpuSpecificationTemplate2");
         Elements elementCpuSpecification = document.select(CPU_SPECIFICATION_CSS_SELECTOR1);
 
         if (elementCpuSpecification.isEmpty()) {
@@ -167,11 +191,10 @@ public class UserBenchmarkCpuDetailsPageParser {
         try {
             String textCpuSpecification = elementCpuSpecification.text();
 
-            // Извлечение данных с проверкой на пустоту
             String coresString = textCpuSpecification.replaceAll(
-                    ".*?(\\d+) Cores.*", "$1");
+                    REGEX_EXTRACT_CORES, GROUP_ONE_REFERENCE);
             String frequencyString = textCpuSpecification.replaceAll(
-                    ".*@([0-9,.]+) GHz.*", "$1");
+                    REGEX_EXTRACT_CORES, GROUP_ONE_REFERENCE);
 
             if (coresString.isEmpty() || frequencyString.isEmpty()) {
                 throw new IllegalArgumentException("Missing cores or frequency information.");
@@ -179,8 +202,7 @@ public class UserBenchmarkCpuDetailsPageParser {
 
             double frequency = Double.parseDouble(frequencyString.replace(",", "."));
 
-            // Установка значений в CPU
-            cpu.setCoresQuantity(Integer.parseInt(coresString));
+            cpu.setCoresQuantity(ParseUtil.stringToIntIfErrorReturnMinusOne(coresString));
             cpu.setThreadsQuantity(0);
             cpu.setCpuSpecification(textCpuSpecification);
 
@@ -201,8 +223,9 @@ public class UserBenchmarkCpuDetailsPageParser {
             return FAILURE_VALUE;
         }
         try {
-            return ParseUtil.stringToDouble(scorePartsArray[index]
+            Double result = ParseUtil.stringToDoubleIfErrorReturnMinusOne(scorePartsArray[index]
                     .replaceAll(REGEX_REMOVE_NON_DIGITS, ""));
+            return result == 0 ? FAILURE_VALUE : result;
         } catch (NumberFormatException e) {
             return FAILURE_VALUE;
         }

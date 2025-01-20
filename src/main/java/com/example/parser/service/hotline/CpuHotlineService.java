@@ -28,6 +28,7 @@ public class CpuHotlineService {
     }
 
     public void updateWithBenchmarkData() {
+        //todo сделать сортировку перед обновлением как в GpuHotlineService
         log.info("Started update cpu scores from User Benchmark DB");
         List<UserBenchmarkCpu> userBenchmarkCpuList = cpuUserBenchmarkRepository.findAll();
         Set<CpuHotLine> updateList = new HashSet<>();

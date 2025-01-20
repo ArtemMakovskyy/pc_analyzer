@@ -38,3 +38,8 @@ build/
 /.idea/
 /artline_parts.csv
 /artline_parts.xlsx
+/src/main/java/com/example/parser/service/parse/lessons/
+/src/main/java/com/example/parser/service/parse/benchmark/user/other/
+/src/main/java/com/example/parser/model/other/
+/src/main/java/com/example/parser/service/diferent/
+

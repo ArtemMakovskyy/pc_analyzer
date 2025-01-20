@@ -9,9 +9,9 @@ import lombok.extern.log4j.Log4j2;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 @Log4j2
 @RequiredArgsConstructor
 public class HotlineGpuPageParser {
@@ -93,7 +93,11 @@ public class HotlineGpuPageParser {
 
     private int findMaxPage() {
         Document document = htmlDocumentFetcher
-                .getHtmlDocumentFromWeb( BASE_URL + 1,false,false,false);
+                .getHtmlDocumentFromWeb(
+                        BASE_URL + 1,
+                        false,
+                        false,
+                        false);
 
         Elements pages = document.select("a.page");
         int maxPage = 0;

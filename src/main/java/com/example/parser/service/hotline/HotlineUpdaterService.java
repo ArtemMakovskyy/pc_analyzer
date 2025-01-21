@@ -25,8 +25,8 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Log4j2
 public class HotlineUpdaterService {
-//    private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
-    private static final int THREAD_POOL_SIZE = 16;
+    private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+
     private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
     private final HotlineCpuPageParser hotlineCpuPageParser;
@@ -38,17 +38,16 @@ public class HotlineUpdaterService {
 
 //    @PostConstruct
     public void parseAll() {
-        System.out.println("START parseAll()");
+        System.out.println("START parseAll() " + Runtime.getRuntime().availableProcessors());
         try {
             List<Future<?>> tasks = List.of(
                     executor.submit(this::parseThenCleanDbThenSaveNewCpuItems),
                     executor.submit(this::parseThenCleanDbThenSaveNewGpuItems)
             );
 
-            // Ждем завершения всех задач
             for (Future<?> task : tasks) {
                 try {
-                    task.get(); // Блокируем выполнение до завершения каждой задачи
+                    task.get();
                 } catch (InterruptedException | ExecutionException e) {
                     log.error("Error occurred while executing task", e);
                     Thread.currentThread().interrupt();

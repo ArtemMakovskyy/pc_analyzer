@@ -36,7 +36,7 @@ public class HotlineCpuPageParser {
                         BASE_URL + pageIndex,
                         true,
                         true,
-                        5,
+                        8,
                         10,
                         false);
                 log.info("... parsed page: " + pageIndex + " from: " + maxPage);

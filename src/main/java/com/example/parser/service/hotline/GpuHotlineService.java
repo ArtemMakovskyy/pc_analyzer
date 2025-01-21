@@ -23,15 +23,16 @@ public class GpuHotlineService {
     private final GpuHotLineRepository gpuHotLineRepository;
     private final HotlineGpuPageParser hotlineGpuPageParser;
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
-//    private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
     private static final int THREAD_POOL_SIZE = 8;
     private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
 //    @PostConstruct
     public void init(){
-        final List<GpuHotLine> cpuHotLines
-                = parseThenCleanDbThenSaveNewItems(true);
-        cpuHotLines.forEach(System.out::println);
+//        final List<GpuHotLine> cpuHotLines
+//                = parseThenCleanDbThenSaveNewItems(true);
+//        cpuHotLines.forEach(System.out::println);
+
+
     }
 
     public List<GpuHotLine> parseThenCleanDbThenSaveNewItems(boolean useMultithreading) {

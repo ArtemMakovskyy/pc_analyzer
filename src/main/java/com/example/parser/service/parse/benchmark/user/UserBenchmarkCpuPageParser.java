@@ -67,7 +67,6 @@ public class UserBenchmarkCpuPageParser {
      * @return List<CpuUserBenchmarkCreateDto>
      */
     public List<CpuUserBenchmarkCreateDto> loadAndParse(boolean sortByAge,int pages) {
-        //todo check if the position exist
         if (pages == 0 || pages < PARSE_ALL_PAGES_INDEX){
             throw new RuntimeException("Enter correct number of pages");
         }

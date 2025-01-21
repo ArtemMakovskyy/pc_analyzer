@@ -23,7 +23,6 @@ public class HotlineController {
 
     @GetMapping("/cpu")
     public List<CpuHotLine> parseAndSaveAllCpus() {
-        //todo chec if items exist
         final List<CpuHotLine> cpuHotLines = cpuHotlineService
                 .parseThenCleanDbThenSaveNewItems(true);
         return cpuHotLines;
@@ -31,8 +30,7 @@ public class HotlineController {
 
     @GetMapping("/gpu")
     public List<GpuHotLine> parseAndSaveAllGpus() {
-        //todo chec if items exist
-        final List<GpuHotLine> gpuHotLines = gpuHotlineService
+         final List<GpuHotLine> gpuHotLines = gpuHotlineService
                 .parseThenCleanDbThenSaveNewItems(true);
         return gpuHotLines;
     }

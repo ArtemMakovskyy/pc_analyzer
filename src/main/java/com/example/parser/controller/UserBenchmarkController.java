@@ -21,21 +21,18 @@ public class UserBenchmarkController {
 
 //        @PostConstruct
     public void start() {
-        //todo check if exists data
-        // todo add template to add specification
-        loadAndParseAndAddSpecificationCpusWereCpuSpecificationIsNull();
+
     }
 
     @PostMapping("/purse/cpu")
     public List<UserBenchmarkCpu> loadAndParseAndSaveCpusWithoutDetails() {
-        //todo check if exists data
         final List<UserBenchmarkCpu> userBenchmarkCpus
                 = userBenchmarkService.loadAndParseAndSaveToDb();
         return userBenchmarkCpus;
     }
+
     @PutMapping("/purse/cpu")
     public void loadAndParseAndAddSpecificationCpusWereCpuSpecificationIsNull() {
-        //todo check if exists data
         userBenchmarkService.loadAndParseAndAddSpecificationCpusWereCpuSpecificationIsNull();
     }
 

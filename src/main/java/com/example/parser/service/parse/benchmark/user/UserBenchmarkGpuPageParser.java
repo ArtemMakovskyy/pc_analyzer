@@ -1,6 +1,7 @@
 package com.example.parser.service.parse.benchmark.user;
 
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
+import com.example.parser.service.parse.WebDriverFactory;
 import com.example.parser.utils.ParseUtil;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ import org.springframework.stereotype.Component;
 @Log4j2
 @RequiredArgsConstructor
 public class UserBenchmarkGpuPageParser {
-
+    private static final int PARSE_ALL_PAGES_INDEX = -1;
     private static final ParseUtil.DelayInSeconds SMALL_PAUSE =
             new ParseUtil.DelayInSeconds(2, 4);
     private static final ParseUtil.DelayInSeconds BIG_PAUSE =
@@ -38,6 +39,10 @@ public class UserBenchmarkGpuPageParser {
             "//*[@id='tableDataForm:mhtddyntac']/nav/ul/li[1]/a";
     private static final String XPATH_NEXT_PAGE_BUTTON =
             "//*[@id=\"tableDataForm:j_idt260\"]";
+
+    private static final String XPATH_BUTTON_AGE_MONTH_SORT
+            = "//*[@id='tableDataForm:mhtddyntac']/table/thead/tr//th[@data-mhth='MC_RELEASEDATE'][1]";
+
 
     private static final String BASE_URL = "https://gpu.userbenchmark.com/";
     private static final String PAGE_QUANTITY_PATTERN = "Page \\d+ of (\\d+)";
@@ -59,16 +64,31 @@ public class UserBenchmarkGpuPageParser {
 
 
     private final UserBenchmarkTestPage userBenchmarkTestPage;
+    private final WebDriverFactory webDriverFactory;
 
-    public List<UserBenchmarkGpu> parse(int pages) {
-        WebDriver driver = new ChromeDriver();
+    public List<UserBenchmarkGpu> loadAndParse(boolean sortByAge,int pages) {
+        if (pages == 0 || pages < PARSE_ALL_PAGES_INDEX){
+            throw new RuntimeException("Enter correct number of pages");
+        }
+        WebDriver driver = null;
         try {
-            driver.get(BASE_URL);
+            driver = webDriverFactory.setUpWebDriver(
+                    BASE_URL,
+                    true,
+                    10);
+
             userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);
-            if (pages == 0) {
+            if (pages == PARSE_ALL_PAGES_INDEX) {
                 pages = findPageQuantity(driver);
             }
-            sortByPriceButton(driver);
+
+            if (sortByAge){
+                sortByAgeMonthButton(driver);
+                ParseUtil.applyRandomDelay(BIG_PAUSE,true);
+                sortByAgeMonthButton(driver);
+            }else {
+                sortByPriceButton(driver);
+            }
             return parsePages(driver, pages);
         } finally {
             driver.quit();
@@ -187,6 +207,17 @@ public class UserBenchmarkGpuPageParser {
         final WebElement elementPriceButton = driver.findElement(xpathPriceSortButton);
         if (!elementPriceButton.isDisplayed()) {
             throw new RuntimeException("Price sort button is not visible.");
+        }
+        log.info("Pause 1, before click on price button");
+        ParseUtil.applyRandomDelay(SMALL_PAUSE,true);
+        elementPriceButton.click();
+    }
+
+    private void sortByAgeMonthButton(WebDriver driver) {
+        By xpathPriceSortButton = By.xpath(XPATH_BUTTON_AGE_MONTH_SORT);
+        final WebElement elementPriceButton = driver.findElement(xpathPriceSortButton);
+        if (!elementPriceButton.isDisplayed()) {
+            throw new RuntimeException("AgeMonthButton sort button is not visible.");
         }
         log.info("Pause 1, before click on price button");
         ParseUtil.applyRandomDelay(SMALL_PAUSE,true);

@@ -34,7 +34,7 @@ public class HotlineGpuPageParser {
                         BASE_URL + pageIndex,
                         true,
                         true,
-                        5,
+                        8,
                         10,
                         false
                 );

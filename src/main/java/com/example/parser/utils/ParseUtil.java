@@ -35,8 +35,8 @@ public class ParseUtil {
         return -1;
     }
 
-    public static void applyRandomDelay(DelayInSeconds delayInSeconds) {
-        applyRandomDelay(delayInSeconds.getFromSec(), delayInSeconds.getToSec(), true);
+    public static void applyRandomDelay(DelayInSeconds delayInSeconds, boolean isDelay) {
+        applyRandomDelay(delayInSeconds.getFromSec(), delayInSeconds.getToSec(), isDelay);
     }
 
     public static void applyRandomDelay(int fromSec, int toSec, boolean isDelay) {

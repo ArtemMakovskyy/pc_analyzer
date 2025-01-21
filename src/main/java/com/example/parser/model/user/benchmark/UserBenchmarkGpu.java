@@ -18,7 +18,7 @@ import org.hibernate.annotations.Where;
 @Setter
 @Table(name = "gpus_user_benchmark")
 @ToString
-@SQLDelete(sql = "UPDATE wines SET is_deleted = true WHERE id=?")
+@SQLDelete(sql = "UPDATE gpus_user_benchmark SET is_deleted = true WHERE id=?")
 @Where(clause = "is_deleted=false")
 public class UserBenchmarkGpu {
     @Id

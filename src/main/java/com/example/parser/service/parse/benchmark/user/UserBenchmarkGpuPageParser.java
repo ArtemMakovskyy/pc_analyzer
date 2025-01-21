@@ -86,7 +86,7 @@ public class UserBenchmarkGpuPageParser {
                     = parsePage(driver);
             gpuUserBenchmarks.addAll(gpusUserBenchmarksOnPage);
             log.info("Pause 3 in parsePages() before click on next page");
-            ParseUtil.applyRandomDelay(BIG_PAUSE);
+            ParseUtil.applyRandomDelay(BIG_PAUSE,true);
             currentPage++;
             if (currentPage < pages) {
                 clickNextPage(driver);
@@ -102,7 +102,7 @@ public class UserBenchmarkGpuPageParser {
                 = parsePageSource(currentHtmlPageSource);
 
         log.info("Pause 2 in parsePage()");
-        ParseUtil.applyRandomDelay(BIG_PAUSE);
+        ParseUtil.applyRandomDelay(BIG_PAUSE,true);
         return gpuUserBenchmarksOnPage;
     }
 
@@ -189,7 +189,7 @@ public class UserBenchmarkGpuPageParser {
             throw new RuntimeException("Price sort button is not visible.");
         }
         log.info("Pause 1, before click on price button");
-        ParseUtil.applyRandomDelay(SMALL_PAUSE);
+        ParseUtil.applyRandomDelay(SMALL_PAUSE,true);
         elementPriceButton.click();
     }
 
@@ -197,7 +197,7 @@ public class UserBenchmarkGpuPageParser {
         By xpathNextButton = By.xpath(XPATH_NEXT_PAGE_BUTTON);
         WebElement elementNextButton = driver.findElement(xpathNextButton);
         log.info("Pause 4 in clickNextPage click before click on next page");
-        ParseUtil.applyRandomDelay(SMALL_PAUSE);
+        ParseUtil.applyRandomDelay(SMALL_PAUSE,true);
         elementNextButton.click();
 
         userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);

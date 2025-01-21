@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class CpuUserBenchmarkCreateDto {
     private String model;
+    private String modelHl;
     private String manufacturer;
     private Double userRating;
     private Double valuePercents;

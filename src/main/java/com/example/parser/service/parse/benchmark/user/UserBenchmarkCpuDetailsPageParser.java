@@ -254,7 +254,7 @@ public class UserBenchmarkCpuDetailsPageParser {
 
     private Document getDocument(WebDriver driver) {
         userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);
-        ParseUtil.applyRandomDelay(DELAY_IN_SECONDS);
+        ParseUtil.applyRandomDelay(DELAY_IN_SECONDS,true);
         return Jsoup.parse(driver.getPageSource());
     }
 

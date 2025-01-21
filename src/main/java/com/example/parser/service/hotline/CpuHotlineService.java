@@ -10,6 +10,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -21,12 +24,13 @@ public class CpuHotlineService {
     private final HotlineCpuPageParser hotlineCpuPageParser;
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
+    private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
+    private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
 //        @PostConstruct
     public void start() {
-        //todo не совпадают колонки и названия проверить сокеты
 //        parseThenCleanDbThenSaveNewItems();
-//        updateWithBenchmarkData();
+        updateWithBenchmarkData();
     }
 
     public void updateWithBenchmarkData() {
@@ -51,10 +55,27 @@ public class CpuHotlineService {
     }
 
     public List<CpuHotLine> parseThenCleanDbThenSaveNewItems() {
-        List<CpuHotLine> cpusHotLine = hotlineCpuPageParser.purseAllPages();
+        List<CpuHotLine> cpusHotLine = hotlineCpuPageParser.purseAllPagesMultiThread(executor);
+        shutdownExecutor();
         cpuHotLineRepository.deleteAll();
         cpuHotLineRepository.saveAll(cpusHotLine);
+        cpusHotLine.forEach(System.out::println);
         return cpusHotLine;
+    }
+
+    private void shutdownExecutor() {
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                    System.err.println("Executor did not terminate");
+                }
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
     }
 
 }

@@ -17,13 +17,14 @@ import org.hibernate.annotations.Where;
 @Setter
 @Table(name = "cpus_user_benchmark")
 @ToString
-@SQLDelete(sql = "UPDATE wines SET is_deleted = true WHERE id=?")
+@SQLDelete(sql = "UPDATE cpus_user_benchmark SET is_deleted = true WHERE id=?")
 @Where(clause = "is_deleted=false")
 public class UserBenchmarkCpu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String model;
+    private String modelHl;
     private String manufacturer;
     /**
      * User Rating % – рейтинг пользователей в процентах.

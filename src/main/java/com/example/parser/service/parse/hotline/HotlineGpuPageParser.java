@@ -4,6 +4,9 @@ import com.example.parser.model.hotline.GpuHotLine;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.nodes.Document;
@@ -16,9 +19,41 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class HotlineGpuPageParser {
     private final HtmlDocumentFetcher htmlDocumentFetcher;
-    private static final String DOMAIN_LINK = "https://hotline.ua";
-    private static final String ABOUT_PRODUCT = "?tab=about";
     private static final String BASE_URL = "https://hotline.ua/ua/computer/videokarty/?p=";
+
+    public List<GpuHotLine> purseAllPagesMultiThread(ExecutorService executor) {
+        int startPage = 1;
+        int maxPage = findMaxPage();
+        List<GpuHotLine> parts = new ArrayList<>();
+        List<Future<List<GpuHotLine>>> futures = new ArrayList<>();
+
+        for (int i = startPage; i <= maxPage; i++) {
+            int pageIndex = i;
+            Future<List<GpuHotLine>> future = executor.submit(() -> {
+                List<GpuHotLine> purse = pursePage(
+                        BASE_URL + pageIndex,
+                        true,
+                        true,
+                        5,
+                        10,
+                        false
+                );
+                log.info("... parsed page: " + pageIndex + " from: " + maxPage);
+                return purse;
+            });
+            futures.add(future);
+        }
+
+        for (Future<List<GpuHotLine>> future : futures) {
+            try {
+                parts.addAll(future.get());
+            } catch (InterruptedException | ExecutionException e) {
+                log.error("Error parsing page", e);
+                Thread.currentThread().interrupt();
+            }
+        }
+        return parts;
+    }
 
     public List<GpuHotLine> purseAllPages() {
         int startPage = 1;
@@ -26,21 +61,34 @@ public class HotlineGpuPageParser {
         List<GpuHotLine> parts = new ArrayList<>();
 
         for (int i = startPage; i <= maxPage; i++) {
-            final List<GpuHotLine> purse = pursePage(BASE_URL + i);
+            int pageIndex = i;
+            final List<GpuHotLine> purse = pursePage(
+                    BASE_URL + pageIndex,
+                    true,
+                    true,
+                    2,
+                    5,
+                    false);
             parts.addAll(purse);
             log.info("Connected to the page: " + BASE_URL + i + ", and parsed it.");
         }
         return parts;
     }
 
-    public List<GpuHotLine> pursePage(String url) {
+    public List<GpuHotLine> pursePage(String url,
+                                      boolean useUserAgent,
+                                      boolean useDelay,
+                                      int delayFrom,
+                                      int delayTo,
+                                      boolean isPrintDocumentToConsole) {
         final Document htmlDocument =
                 htmlDocumentFetcher.getHtmlDocumentFromWeb(
                         url,
-                        true,
-                        true,
-                        false);
-
+                        useUserAgent,
+                        useDelay,
+                        delayFrom,
+                        delayTo,
+                        isPrintDocumentToConsole);
 
         Elements elements = htmlDocument.select(".list-item");
         List<GpuHotLine> products = new ArrayList<>();
@@ -55,8 +103,8 @@ public class HotlineGpuPageParser {
                 if (spec == null) {
                     continue;
                 }
-                 String textUpperCase = spec.text().trim().toUpperCase();
-                 String textOrigin = spec.text().trim();
+                String textUpperCase = spec.text().trim().toUpperCase();
+                String textOrigin = spec.text().trim();
                 if (textUpperCase.contains("NVIDIA")
                         || textUpperCase.contains("INTEL")
                         || textUpperCase.contains("AMD")) {

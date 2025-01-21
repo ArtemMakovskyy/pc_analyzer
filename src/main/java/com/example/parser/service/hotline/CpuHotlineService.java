@@ -27,7 +27,7 @@ public class CpuHotlineService {
     private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
     private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
-    @PostConstruct
+//    @PostConstruct
     public void start() {
 //        parseThenCleanDbThenSaveNewItems();
 //        updateWithBenchmarkData();
@@ -53,27 +53,6 @@ public class CpuHotlineService {
         cpuHotLineRepository.saveAll(cpuHL);
         log.info("Updated " + cpuHL.size() + " items.");
     }
-
-//    public void updateWithBenchmarkData() {
-//        //todo сделать сортировку перед обновлением как в GpuHotlineService
-//        log.info("Started update cpu scores from User Benchmark DB");
-//        List<UserBenchmarkCpu> userBenchmarkCpuList = cpuUserBenchmarkRepository.findAll();
-//        Set<CpuHotLine> updateList = new HashSet<>();
-//
-//        for (UserBenchmarkCpu cpu : userBenchmarkCpuList) {
-//            String modelName = " " + cpu.getModel() + " ";
-//
-//            List<CpuHotLine> byName
-//                    = cpuHotLineRepository.findByPartialNameIgnoreCase(modelName);
-//
-//            for (CpuHotLine cpuHotLine : byName) {
-//                cpuHotLine.setUserBenchmarkCpu(cpu);
-//            }
-//            updateList.addAll(byName);
-//        }
-//        cpuHotLineRepository.saveAll(updateList);
-//        log.info("Updated " + updateList.size() + " items.");
-//    }
 
     public List<CpuHotLine> parseThenCleanDbThenSaveNewItems() {
         List<CpuHotLine> cpusHotLine = hotlineCpuPageParser.purseAllPagesMultiThread(executor);

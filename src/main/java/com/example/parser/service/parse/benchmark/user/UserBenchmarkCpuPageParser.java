@@ -56,7 +56,6 @@ public class UserBenchmarkCpuPageParser {
     private static final String BASE_URL = "https://cpu.userbenchmark.com/";
     private final UserBenchmarkTestPage userBenchmarkTestPage;
     private final WebDriverFactory webDriverFactory;
-    private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
 
     public List<CpuUserBenchmarkCreateDto> loadAndParse(boolean sortByAge) {
        return loadAndParse(sortByAge,PARSE_ALL_PAGES_INDEX);
@@ -169,29 +168,18 @@ public class UserBenchmarkCpuPageParser {
         return cpu;
     }
 
-//    @PostConstruct
-    public void changeThenDelete(){
-        final List<UserBenchmarkCpu> cpus = cpuUserBenchmarkRepository.findAll();
-        for (UserBenchmarkCpu cpu : cpus) {
-            cpu.setModelHl(formatHlCpuName(cpu.getModel()));
-        }
-        cpuUserBenchmarkRepository.saveAll(cpus);
-    }
 
     private static String formatHlCpuName(String input) {
-        if (input.contains("-TS (Ti-Super)")) {
-            return input.replace("-TS (Ti-Super)", " Ti SUPER");
+        if (input.matches("Ryzen 7 5700G")) {
+            return input.replace("Ryzen 7 5700G", "Ryzen 7 5700");
         } else if (input.matches(".*\\d+KF.*")) {
             return input.replaceAll("(\\d+)KF", "$1K");
-        } else if (input.contains("-S (Super)")) {
-            return input.replace("-S (Super)", " SUPER");
-        } else if (input.contains("S (Super)")) {
-            return input.replace("S (Super)", " SUPER");
-        } else if (input.contains("-Ti")) {
-            return input.replace("-Ti", " Ti");
-        } else if (input.contains("-XT")) {
-            return input.replace("-XT", " XT");
+        } else if (input.contains("Core i3-10105F")) {
+            return input.replace("Core i3-10105F", "Core i3-10105");
+        } else if (input.contains("Ryzen 5 1500X")) {
+            return input.replace("Ryzen 5 1500X", "Ryzen 5 1500X");
         }
+
         return input;
     }
 

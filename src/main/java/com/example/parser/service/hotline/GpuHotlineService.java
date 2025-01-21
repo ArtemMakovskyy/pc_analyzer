@@ -24,16 +24,16 @@ public class GpuHotlineService {
 
     public void updateWithBenchmarkData() {
         log.info("Started update gpu scores from User Benchmark DB");
-        List<UserBenchmarkGpu> ubPpuSortByModelDesc
+        List<UserBenchmarkGpu> ubGpuSortByModelDesc
                 = gpuUserBenchmarkRepository.findAllOrderByModelLengthDesc();
         final List<GpuHotLine> gpuHl = gpuHotLineRepository.findAll();
-        for (UserBenchmarkGpu gpuUB : ubPpuSortByModelDesc) {
-            for (GpuHotLine gpuHL : gpuHl) {
-                if (gpuHL.getName() != null
-                        && gpuHL.getUserBenchmarkGpu() == null
-                        && gpuHL.getName().contains(gpuUB.getModelHl())
+        for (UserBenchmarkGpu gpuUB : ubGpuSortByModelDesc) {
+            for (GpuHotLine gpuHotLine : gpuHl) {
+                if (gpuHotLine.getName() != null
+                        && gpuHotLine.getUserBenchmarkGpu() == null
+                        && gpuHotLine.getName().contains(gpuUB.getModelHl())
                 ) {
-                    gpuHL.setUserBenchmarkGpu(gpuUB);
+                    gpuHotLine.setUserBenchmarkGpu(gpuUB);
                 }
             }
         }

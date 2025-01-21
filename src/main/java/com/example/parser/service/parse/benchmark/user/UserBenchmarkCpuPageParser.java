@@ -1,8 +1,11 @@
 package com.example.parser.service.parse.benchmark.user;
 
 import com.example.parser.dto.userbenchmark.CpuUserBenchmarkCreateDto;
+import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
+import com.example.parser.repository.CpuUserBenchmarkRepository;
 import com.example.parser.service.parse.WebDriverFactory;
 import com.example.parser.utils.ParseUtil;
+import jakarta.annotation.PostConstruct;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,17 +56,17 @@ public class UserBenchmarkCpuPageParser {
     private static final String BASE_URL = "https://cpu.userbenchmark.com/";
     private final UserBenchmarkTestPage userBenchmarkTestPage;
     private final WebDriverFactory webDriverFactory;
+    private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
+
+    public List<CpuUserBenchmarkCreateDto> loadAndParse(boolean sortByAge) {
+       return loadAndParse(sortByAge,PARSE_ALL_PAGES_INDEX);
+    }
 
     /**
      * Load and parse all cpu items from UserBenchmark without scores
      *
      * @return List<CpuUserBenchmarkCreateDto>
      */
-
-    public List<CpuUserBenchmarkCreateDto> loadAndParse(boolean sortByAge) {
-       return loadAndParse(sortByAge,PARSE_ALL_PAGES_INDEX);
-    }
-
     public List<CpuUserBenchmarkCreateDto> loadAndParse(boolean sortByAge,int pages) {
         //todo check if the position exist
         if (pages == 0 || pages < PARSE_ALL_PAGES_INDEX){
@@ -155,6 +158,7 @@ public class UserBenchmarkCpuPageParser {
 
         CpuUserBenchmarkCreateDto cpu = new CpuUserBenchmarkCreateDto();
         cpu.setModel(model);
+        cpu.setModel(formatHlCpuName(model));
         cpu.setManufacturer(manufacturer);
         cpu.setUserRating(ParseUtil.stringToDoubleIfErrorReturnMinusOne(userRating));
         cpu.setValuePercents(ParseUtil.stringToDoubleIfErrorReturnMinusOne(valuePercents));
@@ -164,6 +168,33 @@ public class UserBenchmarkCpuPageParser {
         cpu.setUrlOfCpu(row.select(CSS_SELECTOR_URL).attr("href"));
         return cpu;
     }
+
+//    @PostConstruct
+    public void changeThenDelete(){
+        final List<UserBenchmarkCpu> cpus = cpuUserBenchmarkRepository.findAll();
+        for (UserBenchmarkCpu cpu : cpus) {
+            cpu.setModelHl(formatHlCpuName(cpu.getModel()));
+        }
+        cpuUserBenchmarkRepository.saveAll(cpus);
+    }
+
+    private static String formatHlCpuName(String input) {
+        if (input.contains("-TS (Ti-Super)")) {
+            return input.replace("-TS (Ti-Super)", " Ti SUPER");
+        } else if (input.matches(".*\\d+KF.*")) {
+            return input.replaceAll("(\\d+)KF", "$1K");
+        } else if (input.contains("-S (Super)")) {
+            return input.replace("-S (Super)", " SUPER");
+        } else if (input.contains("S (Super)")) {
+            return input.replace("S (Super)", " SUPER");
+        } else if (input.contains("-Ti")) {
+            return input.replace("-Ti", " Ti");
+        } else if (input.contains("-XT")) {
+            return input.replace("-XT", " XT");
+        }
+        return input;
+    }
+
 
     private int findPageQuantity(WebDriver driver) {
         int pages;

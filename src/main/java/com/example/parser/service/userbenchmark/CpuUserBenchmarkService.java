@@ -7,7 +7,6 @@ import com.example.parser.repository.CpuUserBenchmarkRepository;
 import com.example.parser.service.parse.WebDriverFactory;
 import com.example.parser.service.parse.benchmark.user.UserBenchmarkCpuDetailsPageParser;
 import com.example.parser.service.parse.benchmark.user.UserBenchmarkCpuPageParser;
-import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,24 +20,17 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CpuUserBenchmarkService {
     private final static int FAILURE_VALUE = -1;
+    private final static int PROCESS_ALL_PAGES_VALUE = -1;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
     private final UserBenchmarkCpuPageParser userBenchmarkCpuPageParser;
     private final UserBenchmarkCpuDetailsPageParser userBenchmarkCpuDetailsPageParser;
     private final CpuUserBenchmarkMapper cpuUserBenchmarkMapper;
     private final WebDriverFactory webDriverFactory;
 
+    public List<UserBenchmarkCpu> loadAndSaveNewItems() {
 
-//    @PostConstruct
-    public void init() {
-//        loadAndParseAndSaveToDb();
-        loadAndParseAndAddSpecificationCpusWereCpuSpecificationIsNull();
-    }
-
-    public List<UserBenchmarkCpu> loadAndParseAndSaveToDb() {
-        //todo improve mapping
-        //working good
         final List<CpuUserBenchmarkCreateDto> cpuUserBenchmarkCreateDtos =
-                userBenchmarkCpuPageParser.loadAndParse(true,-1);
+                userBenchmarkCpuPageParser.loadAndParse(true, PROCESS_ALL_PAGES_VALUE);
 
         final List<UserBenchmarkCpu> newItems = filterNewItems(cpuUserBenchmarkRepository.findAll(),
                 cpuUserBenchmarkCreateDtos
@@ -47,7 +39,7 @@ public class CpuUserBenchmarkService {
                         .toList());
 
         final List<UserBenchmarkCpu> userBenchmarkCpus
-                = addAllToDb(
+                = saveAllToDb(
 
                 newItems.stream()
                         .map(cpuUserBenchmarkMapper::toDto)
@@ -56,10 +48,9 @@ public class CpuUserBenchmarkService {
         );
         log.info("Successfully Was added " + userBenchmarkCpus.size() + " new positions");
         return userBenchmarkCpus;
-
     }
 
-    public void loadAndParseAndAddSpecificationCpusWereCpuSpecificationIsNull() {
+    public void updateMissingSpecifications() {
         final List<UserBenchmarkCpu> byCpuSpecificationIsNull
                 = cpuUserBenchmarkRepository.findByCpuSpecificationIsNull();
 
@@ -74,14 +65,7 @@ public class CpuUserBenchmarkService {
                 driver.get(cpu.getUrlOfCpu());
                 userBenchmarkCpuDetailsPageParser.purseAndAddDetails(cpu, driver);
 
-                if (
-                        cpu.getGamingScore() == null || cpu.getGamingScore() == FAILURE_VALUE
-                                || cpu.getDesktopScore() == null || cpu.getDesktopScore() == FAILURE_VALUE
-                                || cpu.getWorkstationScore() == null || cpu.getWorkstationScore() == FAILURE_VALUE
-                                || cpu.getCoresQuantity() == null || cpu.getCoresQuantity() == FAILURE_VALUE
-                                || cpu.getThreadsQuantity() == null || cpu.getThreadsQuantity() == FAILURE_VALUE
-                                || cpu.getCpuSpecification() == null || cpu.getCpuSpecification().isBlank()
-                ) {
+                if (isCpuDetailsComplete(cpu)) {
                     log.info(cpu.getId() + " not updated: " + notUpdated++);
                 } else {
                     updated++;
@@ -96,23 +80,32 @@ public class CpuUserBenchmarkService {
         }
     }
 
-    private List<UserBenchmarkCpu> addAllToDb(List<CpuUserBenchmarkCreateDto> createDto) {
+    private List<UserBenchmarkCpu> saveAllToDb(List<CpuUserBenchmarkCreateDto> createDto) {
         return cpuUserBenchmarkRepository.saveAll(
                 createDto.stream()
                         .map(cpuUserBenchmarkMapper::toEntity).toList()
         );
     }
 
-    private static List<UserBenchmarkCpu> filterNewItems(List<UserBenchmarkCpu> oldList, List<UserBenchmarkCpu> newList) {
+    private static List<UserBenchmarkCpu> filterNewItems(
+            List<UserBenchmarkCpu> oldList, List<UserBenchmarkCpu> newList) {
 
         Set<String> oldNames = oldList.stream()
                 .map(UserBenchmarkCpu::getModel)
                 .collect(Collectors.toSet());
 
-
         return newList.stream()
                 .filter(newItem -> !oldNames.contains(newItem.getModel()))
                 .collect(Collectors.toList());
+    }
+
+    private boolean isCpuDetailsComplete(UserBenchmarkCpu cpu) {
+        return cpu.getGamingScore() == null || cpu.getGamingScore() == FAILURE_VALUE
+                || cpu.getDesktopScore() == null || cpu.getDesktopScore() == FAILURE_VALUE
+                || cpu.getWorkstationScore() == null || cpu.getWorkstationScore() == FAILURE_VALUE
+                || cpu.getCoresQuantity() == null || cpu.getCoresQuantity() == FAILURE_VALUE
+                || cpu.getThreadsQuantity() == null || cpu.getThreadsQuantity() == FAILURE_VALUE
+                || cpu.getCpuSpecification() == null || cpu.getCpuSpecification().isBlank();
     }
 
 }

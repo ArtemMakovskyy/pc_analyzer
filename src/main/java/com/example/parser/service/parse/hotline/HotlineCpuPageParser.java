@@ -23,16 +23,17 @@ public class HotlineCpuPageParser {
     private static final String BASE_URL = "https://hotline.ua/ua/computer/processory/?p=";
     private static final String TABLE_CSS_SELECTOR = "div.list-body__content.content.flex-wrap > div";
 
-    public List<CpuHotLine> purseAllPagesMultiThread(ExecutorService executor) {
+    public List<CpuHotLine> parseAllPagesMultiThread(ExecutorService executor) {
         int startPage = 1;
         int maxPage = findMaxPage();
         List<CpuHotLine> parts = new ArrayList<>();
         List<Future<List<CpuHotLine>>> futures = new ArrayList<>();
 
+
         for (int i = startPage; i <= maxPage; i++) {
             int pageIndex = i;
             Future<List<CpuHotLine>> future = executor.submit(() -> {
-                List<CpuHotLine> purse = pursePage(
+                List<CpuHotLine> parse = parsePage(
                         BASE_URL + pageIndex,
                         true,
                         true,
@@ -40,7 +41,7 @@ public class HotlineCpuPageParser {
                         10,
                         false);
                 log.info("... parsed page: " + pageIndex + " from: " + maxPage);
-                return purse;
+                return parse;
             });
             futures.add(future);
         }
@@ -56,26 +57,27 @@ public class HotlineCpuPageParser {
         return parts;
     }
 
-    public List<CpuHotLine> purseAllPages() {
-        int pageIndex = 1;
+    public List<CpuHotLine> parseAllPages() {
+        int startPage = 1;
         int maxPage = findMaxPage();
         List<CpuHotLine> parts = new ArrayList<>();
 
-        for (int i = pageIndex; i <= maxPage; i++) {
-            final List<CpuHotLine> purse = pursePage(
+        for (int i = startPage; i <= maxPage; i++) {
+            int pageIndex = i;
+            final List<CpuHotLine> parse = parsePage(
                     BASE_URL + pageIndex,
                     true,
                     true,
                     2,
                     5,
                     false);
-            parts.addAll(purse);
+            parts.addAll(parse);
             log.info("... parsed page: " + i + " from: " + maxPage);
         }
         return parts;
     }
 
-    public List<CpuHotLine> pursePage(
+    public List<CpuHotLine> parsePage(
             String url,
             boolean useUserAgent,
             boolean useDelay,
@@ -88,8 +90,8 @@ public class HotlineCpuPageParser {
                 useUserAgent,
                 useDelay,
                 delayFrom,
-                delayTo
-                , isPrintDocumentToConsole);
+                delayTo,
+                isPrintDocumentToConsole);
 
         Elements tableElements = htmlDocument.select(TABLE_CSS_SELECTOR);
         List<CpuHotLine> cpus = new ArrayList<>();

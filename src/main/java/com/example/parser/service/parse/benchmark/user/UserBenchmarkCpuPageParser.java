@@ -52,7 +52,6 @@ public class UserBenchmarkCpuPageParser {
             = "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th[@data-mhth='MC_PRICE'][1]";
     private static final String XPATH_BUTTON_AGE_MONTH_SORT
             = "//*[@id='tableDataForm:mhtddyntac']/table/thead/tr//th[@data-mhth='MC_RELEASEDATE'][1]";
-
     private static final String BASE_URL = "https://cpu.userbenchmark.com/";
     private final UserBenchmarkTestPage userBenchmarkTestPage;
     private final WebDriverFactory webDriverFactory;
@@ -104,7 +103,6 @@ public class UserBenchmarkCpuPageParser {
             final List<CpuUserBenchmarkCreateDto> cpusUserBenchmarksOnPage = parsePage(driver);
             cpuUserBenchmarks.addAll(cpusUserBenchmarksOnPage);
 
-
             if (currentPage != pages) {
                 log.info("Pause 3 in parsePages() before click on next page");
                 ParseUtil.applyRandomDelay(BIG_PAUSE,true);
@@ -116,7 +114,6 @@ public class UserBenchmarkCpuPageParser {
         log.info("Parse pages successfully stopped");
         return cpuUserBenchmarks;
     }
-
 
     private List<CpuUserBenchmarkCreateDto> parsePage(WebDriver driver) {
         String currentHtmlPageSource = driver.getPageSource();
@@ -167,7 +164,6 @@ public class UserBenchmarkCpuPageParser {
         return cpu;
     }
 
-
     private static String formatHlCpuName(String input) {
         if (input.matches("Ryzen 7 5700G")) {
             return input.replace("Ryzen 7 5700G", "Ryzen 7 5700");
@@ -181,7 +177,6 @@ public class UserBenchmarkCpuPageParser {
 
         return input;
     }
-
 
     private int findPageQuantity(WebDriver driver) {
         int pages;

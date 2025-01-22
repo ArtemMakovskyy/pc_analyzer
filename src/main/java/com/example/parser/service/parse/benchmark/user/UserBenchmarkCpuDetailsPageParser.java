@@ -43,11 +43,6 @@ public class UserBenchmarkCpuDetailsPageParser {
             = new ParseUtil.DelayInSeconds(3, 6);
     private final UserBenchmarkTestPage userBenchmarkTestPage;
 
-//    @PostConstruct
-    public void testCode() {
-//        parseFromFile();
-    }
-
     public void purseAndAddDetails(
             UserBenchmarkCpu cpu,
             WebDriver driver) {

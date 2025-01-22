@@ -1,13 +1,10 @@
 package com.example.parser.service.hotline;
 
-import com.example.parser.model.hotline.CpuHotLine;
 import com.example.parser.model.hotline.GpuHotLine;
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.repository.GpuHotLineRepository;
 import com.example.parser.repository.GpuUserBenchmarkRepository;
 import com.example.parser.service.parse.hotline.HotlineGpuPageParser;
-import jakarta.annotation.PostConstruct;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,22 +23,13 @@ public class GpuHotlineService {
     private static final int THREAD_POOL_SIZE = 8;
     private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
-//    @PostConstruct
-    public void init(){
-//        final List<GpuHotLine> cpuHotLines
-//                = parseThenCleanDbThenSaveNewItems(true);
-//        cpuHotLines.forEach(System.out::println);
-
-
-    }
-
     public List<GpuHotLine> parseThenCleanDbThenSaveNewItems(boolean useMultithreading) {
         List<GpuHotLine> gpusHotLine;
         if (useMultithreading){
-            gpusHotLine = hotlineGpuPageParser.purseAllPagesMultiThread(executor);
+            gpusHotLine = hotlineGpuPageParser.parseAllPagesMultiThread(executor);
             shutdownExecutor();
         }else {
-            gpusHotLine = hotlineGpuPageParser.purseAllPages();
+            gpusHotLine = hotlineGpuPageParser.parseAllPages();
         }
         gpuHotLineRepository.deleteAll();
         gpuHotLineRepository.saveAll(gpusHotLine);

@@ -31,7 +31,6 @@ public class UserBenchmarkGpuPageParser {
             new ParseUtil.DelayInSeconds(2, 4);
     private static final ParseUtil.DelayInSeconds BIG_PAUSE =
             new ParseUtil.DelayInSeconds(4, 10);
-
     private static final String XPATH_BUTTON_PRICE_SORT =
             "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th"
                     + "[@data-mhth='MC_PRICE'][1]";
@@ -39,11 +38,8 @@ public class UserBenchmarkGpuPageParser {
             "//*[@id='tableDataForm:mhtddyntac']/nav/ul/li[1]/a";
     private static final String XPATH_NEXT_PAGE_BUTTON =
             "//*[@id=\"tableDataForm:j_idt260\"]";
-
     private static final String XPATH_BUTTON_AGE_MONTH_SORT
             = "//*[@id='tableDataForm:mhtddyntac']/table/thead/tr//th[@data-mhth='MC_RELEASEDATE'][1]";
-
-
     private static final String BASE_URL = "https://gpu.userbenchmark.com/";
     private static final String PAGE_QUANTITY_PATTERN = "Page \\d+ of (\\d+)";
     private static final String ONLY_DIGITS_PATTERN = "[^0-9]";
@@ -61,8 +57,6 @@ public class UserBenchmarkGpuPageParser {
     private static final String PRICE_CSS_SELECTOR =
             "td:nth-child(8) div.mh-tc";
     private static final String URL_CSS_SELECTOR = "td a.nodec";
-
-
     private final UserBenchmarkTestPage userBenchmarkTestPage;
     private final WebDriverFactory webDriverFactory;
 

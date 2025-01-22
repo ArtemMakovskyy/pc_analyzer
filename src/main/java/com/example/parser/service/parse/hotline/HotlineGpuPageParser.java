@@ -21,7 +21,7 @@ public class HotlineGpuPageParser {
     private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final String BASE_URL = "https://hotline.ua/ua/computer/videokarty/?p=";
 
-    public List<GpuHotLine> purseAllPagesMultiThread(ExecutorService executor) {
+    public List<GpuHotLine> parseAllPagesMultiThread(ExecutorService executor) {
         int startPage = 1;
         int maxPage = findMaxPage();
         List<GpuHotLine> parts = new ArrayList<>();
@@ -30,7 +30,7 @@ public class HotlineGpuPageParser {
         for (int i = startPage; i <= maxPage; i++) {
             int pageIndex = i;
             Future<List<GpuHotLine>> future = executor.submit(() -> {
-                List<GpuHotLine> purse = pursePage(
+                List<GpuHotLine> parse = parsePage(
                         BASE_URL + pageIndex,
                         true,
                         true,
@@ -39,7 +39,7 @@ public class HotlineGpuPageParser {
                         false
                 );
                 log.info("... parsed page: " + pageIndex + " from: " + maxPage);
-                return purse;
+                return parse;
             });
             futures.add(future);
         }
@@ -55,27 +55,27 @@ public class HotlineGpuPageParser {
         return parts;
     }
 
-    public List<GpuHotLine> purseAllPages() {
+    public List<GpuHotLine> parseAllPages() {
         int startPage = 1;
         int maxPage = findMaxPage();
         List<GpuHotLine> parts = new ArrayList<>();
 
         for (int i = startPage; i <= maxPage; i++) {
             int pageIndex = i;
-            final List<GpuHotLine> purse = pursePage(
+            final List<GpuHotLine> parse = parsePage(
                     BASE_URL + pageIndex,
                     true,
                     true,
                     2,
                     5,
                     false);
-            parts.addAll(purse);
+            parts.addAll(parse);
             log.info("Connected to the page: " + BASE_URL + i + ", and parsed it.");
         }
         return parts;
     }
 
-    public List<GpuHotLine> pursePage(String url,
+    public List<GpuHotLine> parsePage(String url,
                                       boolean useUserAgent,
                                       boolean useDelay,
                                       int delayFrom,

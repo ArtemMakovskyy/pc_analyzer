@@ -5,12 +5,7 @@ import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.repository.CpuHotLineRepository;
 import com.example.parser.repository.CpuUserBenchmarkRepository;
 import com.example.parser.service.parse.hotline.HotlineCpuPageParser;
-import jakarta.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -25,24 +20,16 @@ public class CpuHotlineService {
     private final HotlineCpuPageParser hotlineCpuPageParser;
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
-//    private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors() * 2;
-    private static final int THREAD_POOL_SIZE = 8;
+    private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
     private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
-
-//    @PostConstruct
-    public void init(){
-        final List<CpuHotLine> cpuHotLines
-                = parseThenCleanDbThenSaveNewItems(true);
-        cpuHotLines.forEach(System.out::println);
-    }
 
     public List<CpuHotLine> parseThenCleanDbThenSaveNewItems(boolean useMultithreading) {
         List<CpuHotLine> cpusHotLine;
         if (useMultithreading){
-            cpusHotLine = hotlineCpuPageParser.purseAllPagesMultiThread(executor);
+            cpusHotLine = hotlineCpuPageParser.parseAllPagesMultiThread(executor);
             shutdownExecutor();
         }else {
-           cpusHotLine = hotlineCpuPageParser.purseAllPages();
+           cpusHotLine = hotlineCpuPageParser.parseAllPages();
         }
         cpuHotLineRepository.deleteAll();
         cpuHotLineRepository.saveAll(cpusHotLine);

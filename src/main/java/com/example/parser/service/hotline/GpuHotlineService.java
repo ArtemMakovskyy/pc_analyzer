@@ -4,11 +4,8 @@ import com.example.parser.model.hotline.GpuHotLine;
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.repository.GpuHotLineRepository;
 import com.example.parser.repository.GpuUserBenchmarkRepository;
-import com.example.parser.service.parse.hotlinepageparser.impl.HotlineGpuPageParserImpl;
+import com.example.parser.service.parse.hotlinepageparser.impl.GpuPageParserImpl;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -18,17 +15,17 @@ import org.springframework.stereotype.Service;
 @Log4j2
 public class GpuHotlineService {
     private final GpuHotLineRepository gpuHotLineRepository;
-    private final HotlineGpuPageParserImpl hotlineGpuPageParserImpl;
+    private final GpuPageParserImpl hotlineGpuPageParserImpl;
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
 
 
-    public List<GpuHotLine> parseThenCleanDbThenSaveNewItems(boolean useMultithreading) {
+    public List<GpuHotLine> parseThenCleanDbThenSaveNewItems(boolean useMultithreading, String baseUrl) {
         List<GpuHotLine> gpusHotLine;
         if (useMultithreading){
-            gpusHotLine = hotlineGpuPageParserImpl.parseAllPagesMultiThread();
+            gpusHotLine = hotlineGpuPageParserImpl.parseAllPagesMultiThread(baseUrl);
 
         }else {
-            gpusHotLine = hotlineGpuPageParserImpl.parseAllPages();
+            gpusHotLine = hotlineGpuPageParserImpl.parse();
         }
         gpuHotLineRepository.deleteAll();
         gpuHotLineRepository.saveAll(gpusHotLine);

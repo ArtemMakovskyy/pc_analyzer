@@ -4,11 +4,8 @@ import com.example.parser.model.hotline.CpuHotLine;
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.repository.CpuHotLineRepository;
 import com.example.parser.repository.CpuUserBenchmarkRepository;
-import com.example.parser.service.parse.hotlinepageparser.impl.HotlineCpuPageParserImpl;
+import com.example.parser.service.parse.hotlinepageparser.impl.CpuPageParserImpl;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -17,17 +14,17 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Log4j2
 public class CpuHotlineService {
-    private final HotlineCpuPageParserImpl hotlineCpuPageParserImpl;
+    private final CpuPageParserImpl hotlineCpuPageParserImpl;
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
 
 
-    public List<CpuHotLine> parseThenCleanDbThenSaveNewItems(boolean useMultithreading) {
+    public List<CpuHotLine> parseThenCleanDbThenSaveNewItems(boolean useMultithreading, String baseUrl) {
         List<CpuHotLine> cpusHotLine;
         if (useMultithreading){
-            cpusHotLine = hotlineCpuPageParserImpl.parseAllPagesMultiThread();
+            cpusHotLine = hotlineCpuPageParserImpl.parseMultiThread();
         }else {
-           cpusHotLine = hotlineCpuPageParserImpl.parseAllPages();
+           cpusHotLine = hotlineCpuPageParserImpl.parse();
         }
         cpuHotLineRepository.deleteAll();
         cpuHotLineRepository.saveAll(cpusHotLine);

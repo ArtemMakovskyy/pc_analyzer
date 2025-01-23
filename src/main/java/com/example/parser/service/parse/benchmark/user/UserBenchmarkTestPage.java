@@ -1,6 +1,6 @@
 package com.example.parser.service.parse.benchmark.user;
 
-import com.example.parser.utils.ParseUtil;
+import com.example.parser.service.parse.utils.ParseUtil;
 import java.time.Duration;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.By;

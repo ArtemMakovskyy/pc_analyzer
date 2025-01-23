@@ -1,7 +1,7 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
 import com.example.parser.model.hotline.GpuHotLine;
-import com.example.parser.service.parse.HotlinePageParser;
+import com.example.parser.service.parse.PageParser;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,17 +19,22 @@ import org.springframework.stereotype.Component;
 @Component
 @Log4j2
 @RequiredArgsConstructor
-public class HotlineGpuPageParserImpl implements HotlinePageParser<GpuHotLine> {
+public class GpuPageParserImpl implements PageParser<GpuHotLine> {
     private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
     private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
-
     private static final String BASE_URL = "https://hotline.ua/ua/computer/videokarty/?p=";
 
-    @Override
-    public List<GpuHotLine> parseAllPagesMultiThread() {
+    //    @PostConstruct
+    public void init() {
+        final List<GpuHotLine> gpuHotLines = parsePage("https://hotline.ua/ua/computer/videokarty/?p=1",
+                true, true, 3, 6, false);
+        gpuHotLines.forEach(System.out::println);
+    }
+
+    public List<GpuHotLine> parseAllPagesMultiThread(String baseUrl) {
         int startPage = 1;
-        int maxPage = findMaxPage();
+        int maxPage = findMaxPage(baseUrl);
         List<GpuHotLine> parts = new ArrayList<>();
         List<Future<List<GpuHotLine>>> futures = new ArrayList<>();
 
@@ -37,7 +42,7 @@ public class HotlineGpuPageParserImpl implements HotlinePageParser<GpuHotLine> {
             int pageIndex = i;
             Future<List<GpuHotLine>> future = executor.submit(() -> {
                 List<GpuHotLine> parse = parsePage(
-                        BASE_URL + pageIndex,
+                        baseUrl + pageIndex,
                         true,
                         true,
                         8,
@@ -61,10 +66,10 @@ public class HotlineGpuPageParserImpl implements HotlinePageParser<GpuHotLine> {
         return parts;
     }
 
-    @Override
-    public List<GpuHotLine> parseAllPages() {
+
+    public List<GpuHotLine> parse() {
         int startPage = 1;
-        int maxPage = findMaxPage();
+        int maxPage = findMaxPage(BASE_URL);
         List<GpuHotLine> parts = new ArrayList<>();
 
         for (int i = startPage; i <= maxPage; i++) {
@@ -83,13 +88,13 @@ public class HotlineGpuPageParserImpl implements HotlinePageParser<GpuHotLine> {
     }
 
     private List<GpuHotLine> parsePage(String url,
-                                      boolean useUserAgent,
-                                      boolean useDelay,
-                                      int delayFrom,
-                                      int delayTo,
-                                      boolean isPrintDocumentToConsole) {
+                                       boolean useUserAgent,
+                                       boolean useDelay,
+                                       int delayFrom,
+                                       int delayTo,
+                                       boolean isPrintDocumentToConsole) {
         final Document htmlDocument =
-                htmlDocumentFetcher.getHtmlDocumentFromWeb(
+                htmlDocumentFetcher.fetchDocument(
                         url,
                         useUserAgent,
                         useDelay,
@@ -146,10 +151,10 @@ public class HotlineGpuPageParserImpl implements HotlinePageParser<GpuHotLine> {
         return products;
     }
 
-    private int findMaxPage() {
+    private int findMaxPage(String baseUrl) {
         Document document = htmlDocumentFetcher
-                .getHtmlDocumentFromWeb(
-                        BASE_URL + 1,
+                .fetchDocument(
+                        baseUrl + 1,
                         false,
                         false,
                         false);
@@ -168,4 +173,5 @@ public class HotlineGpuPageParserImpl implements HotlinePageParser<GpuHotLine> {
         }
         return maxPage;
     }
+
 }

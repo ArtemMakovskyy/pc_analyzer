@@ -1,11 +1,8 @@
 package com.example.parser.service.parse.benchmark.user;
 
 import com.example.parser.dto.userbenchmark.CpuUserBenchmarkCreateDto;
-import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
-import com.example.parser.repository.CpuUserBenchmarkRepository;
 import com.example.parser.service.parse.WebDriverFactory;
-import com.example.parser.utils.ParseUtil;
-import jakarta.annotation.PostConstruct;
+import com.example.parser.service.parse.utils.ParseUtil;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;

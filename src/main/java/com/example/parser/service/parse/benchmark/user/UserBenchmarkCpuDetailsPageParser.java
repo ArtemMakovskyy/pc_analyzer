@@ -1,8 +1,7 @@
 package com.example.parser.service.parse.benchmark.user;
 
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
-import com.example.parser.utils.ParseUtil;
-import jakarta.annotation.PostConstruct;
+import com.example.parser.service.parse.utils.ParseUtil;
 import java.io.File;
 import java.io.IOException;
 import lombok.RequiredArgsConstructor;

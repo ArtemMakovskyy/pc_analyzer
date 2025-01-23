@@ -1,8 +1,8 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
 import com.example.parser.model.hotline.CpuHotLine;
-import com.example.parser.service.parse.HotlinePageParser;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
+import com.example.parser.service.parse.MultiThreadPageParser;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
 @Component
 @Log4j2
 @RequiredArgsConstructor
-public class HotlineCpuPageParserImpl
-        implements HotlinePageParser<CpuHotLine> {
+public class CpuPageParserImpl
+        implements MultiThreadPageParser<CpuHotLine> {
     private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final String DOMAIN_LINK = "https://hotline.ua";
     private static final String BASE_URL = "https://hotline.ua/ua/computer/processory/?p=";
@@ -28,10 +28,11 @@ public class HotlineCpuPageParserImpl
     private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
     private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
+
     @Override
-    public List<CpuHotLine> parseAllPagesMultiThread() {
+    public List<CpuHotLine> parseMultiThread() {
         int startPage = 1;
-        int maxPage = findMaxPage();
+        int maxPage = findMaxPage(BASE_URL);
         List<CpuHotLine> parts = new ArrayList<>();
         List<Future<List<CpuHotLine>>> futures = new ArrayList<>();
 
@@ -64,9 +65,9 @@ public class HotlineCpuPageParserImpl
     }
 
     @Override
-    public List<CpuHotLine> parseAllPages() {
+    public List<CpuHotLine> parse() {
         int startPage = 1;
-        int maxPage = findMaxPage();
+        int maxPage = findMaxPage(BASE_URL);
         List<CpuHotLine> parts = new ArrayList<>();
 
         for (int i = startPage; i <= maxPage; i++) {
@@ -92,7 +93,7 @@ public class HotlineCpuPageParserImpl
             int delayTo,
             boolean isPrintDocumentToConsole
     ) {
-        Document htmlDocument = htmlDocumentFetcher.getHtmlDocumentFromWeb(
+        Document htmlDocument = htmlDocumentFetcher.fetchDocument(
                 url,
                 useUserAgent,
                 useDelay,
@@ -200,9 +201,9 @@ public class HotlineCpuPageParserImpl
         return textArray[index];
     }
 
-    private int findMaxPage() {
-        Document htmlDocument = htmlDocumentFetcher.getHtmlDocumentFromWeb(
-                BASE_URL + 1,
+    private int findMaxPage(String baseUrl) {
+        Document htmlDocument = htmlDocumentFetcher.fetchDocument(
+                baseUrl + 1,
                 true,
                 false,
                 false);
@@ -222,5 +223,6 @@ public class HotlineCpuPageParserImpl
         log.info("Pages quality: " + maxPage);
         return maxPage;
     }
+
 
 }

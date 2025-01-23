@@ -1,4 +1,4 @@
-package com.example.parser.utils;
+package com.example.parser.service.parse.utils;
 
 import java.util.Random;
 import lombok.AllArgsConstructor;

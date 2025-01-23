@@ -2,7 +2,7 @@ package com.example.parser.service.parse.benchmark.user;
 
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.service.parse.WebDriverFactory;
-import com.example.parser.utils.ParseUtil;
+import com.example.parser.service.parse.utils.ParseUtil;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,6 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.stereotype.Component;

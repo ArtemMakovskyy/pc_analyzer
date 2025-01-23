@@ -15,29 +15,29 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CpuHotlineController {
 
-    private final CpuHotlineService cpuHotlineService;
-
-    /**
-     * Parse, clean the database, and save new CPU items.
-     *
-     * @param useMultithreading whether to use multithreading for parsing.
-     * @return list of parsed and saved CpuHotLine items.
-     */
-    @PostMapping("/parse-and-save")
-    public ResponseEntity<List<CpuHotLine>> parseThenCleanDbThenSaveNewItems(
-            @RequestParam(defaultValue = "false") boolean useMultithreading) {
-        List<CpuHotLine> result = cpuHotlineService.parseThenCleanDbThenSaveNewItems(useMultithreading);
-        return ResponseEntity.ok(result);
-    }
-
-    /**
-     * Update CPU scores from User Benchmark DB.
-     *
-     * @return ResponseEntity indicating the status of the update process.
-     */
-    @PostMapping("/update-benchmark")
-    public ResponseEntity<String> updateWithBenchmarkData() {
-        cpuHotlineService.updateWithBenchmarkData();
-        return ResponseEntity.ok("CPU benchmark data updated successfully.");
-    }
+//    private final CpuHotlineService cpuHotlineService;
+//
+//    /**
+//     * Parse, clean the database, and save new CPU items.
+//     *
+//     * @param useMultithreading whether to use multithreading for parsing.
+//     * @return list of parsed and saved CpuHotLine items.
+//     */
+//    @PostMapping("/parse-and-save")
+//    public ResponseEntity<List<CpuHotLine>> parseThenCleanDbThenSaveNewItems(
+//            @RequestParam(defaultValue = "false") boolean useMultithreading) {
+//        List<CpuHotLine> result = cpuHotlineService.parseThenCleanDbThenSaveNewItems(useMultithreading);
+//        return ResponseEntity.ok(result);
+//    }
+//
+//    /**
+//     * Update CPU scores from User Benchmark DB.
+//     *
+//     * @return ResponseEntity indicating the status of the update process.
+//     */
+//    @PostMapping("/update-benchmark")
+//    public ResponseEntity<String> updateWithBenchmarkData() {
+//        cpuHotlineService.updateWithBenchmarkData();
+//        return ResponseEntity.ok("CPU benchmark data updated successfully.");
+//    }
 }

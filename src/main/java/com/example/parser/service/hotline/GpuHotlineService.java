@@ -20,14 +20,13 @@ public class GpuHotlineService {
     private final GpuHotLineRepository gpuHotLineRepository;
     private final HotlineGpuPageParserImpl hotlineGpuPageParserImpl;
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
-    private static final int THREAD_POOL_SIZE = 8;
-    private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+
 
     public List<GpuHotLine> parseThenCleanDbThenSaveNewItems(boolean useMultithreading) {
         List<GpuHotLine> gpusHotLine;
         if (useMultithreading){
-            gpusHotLine = hotlineGpuPageParserImpl.parseAllPagesMultiThread(executor);
-            shutdownExecutor();
+            gpusHotLine = hotlineGpuPageParserImpl.parseAllPagesMultiThread();
+
         }else {
             gpusHotLine = hotlineGpuPageParserImpl.parseAllPages();
         }
@@ -54,21 +53,6 @@ public class GpuHotlineService {
         }
         gpuHotLineRepository.saveAll(gpuHl);
         log.info("Updated " + gpuHl.size() + " items.");
-    }
-
-    private void shutdownExecutor() {
-        executor.shutdown();
-        try {
-            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
-                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                    System.err.println("Executor did not terminate");
-                }
-            }
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
     }
 
 }

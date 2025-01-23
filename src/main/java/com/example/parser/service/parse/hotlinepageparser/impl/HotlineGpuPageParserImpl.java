@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,10 +21,13 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class HotlineGpuPageParserImpl implements HotlinePageParser<GpuHotLine> {
     private final HtmlDocumentFetcher htmlDocumentFetcher;
+    private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+    private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+
     private static final String BASE_URL = "https://hotline.ua/ua/computer/videokarty/?p=";
 
     @Override
-    public List<GpuHotLine> parseAllPagesMultiThread(ExecutorService executor) {
+    public List<GpuHotLine> parseAllPagesMultiThread() {
         int startPage = 1;
         int maxPage = findMaxPage();
         List<GpuHotLine> parts = new ArrayList<>();

@@ -50,13 +50,13 @@ public class HotlineUpdaterService {
                 }
             }
         } finally {
-            shutdownExecutor();
+
         }
     }
 
     private List<CpuHotLine> parseThenCleanDbThenSaveNewCpuItems() {
         List<CpuHotLine> cpusHotLine = hotlineCpuPageParserImpl
-                .parseAllPagesMultiThread(executor);
+                .parseAllPagesMultiThread();
         cpuHotLineRepository.deleteAll();
         cpuHotLineRepository.saveAll(cpusHotLine);
         updateCpuWithBenchmarkData();
@@ -65,7 +65,7 @@ public class HotlineUpdaterService {
 
     private List<GpuHotLine> parseThenCleanDbThenSaveNewGpuItems() {
         List<GpuHotLine> gpusHotLine = hotlineGpuPageParserImpl
-                .parseAllPagesMultiThread(executor);
+                .parseAllPagesMultiThread();
         gpuHotLineRepository.deleteAll();
         gpuHotLineRepository.saveAll(gpusHotLine);
         updateGpuWithBenchmarkData();
@@ -109,21 +109,6 @@ public class HotlineUpdaterService {
         }
         gpuHotLineRepository.saveAll(gpuHl);
         log.info("Updated " + gpuHl.size() + " items.");
-    }
-
-    private void shutdownExecutor() {
-        executor.shutdown();
-        try {
-            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
-                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                    System.err.println("Executor did not terminate");
-                }
-            }
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
     }
 
 }

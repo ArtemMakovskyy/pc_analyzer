@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,14 +19,17 @@ import org.springframework.stereotype.Component;
 @Component
 @Log4j2
 @RequiredArgsConstructor
-public class HotlineCpuPageParserImpl implements HotlinePageParser<CpuHotLine> {
+public class HotlineCpuPageParserImpl
+        implements HotlinePageParser<CpuHotLine> {
     private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final String DOMAIN_LINK = "https://hotline.ua";
     private static final String BASE_URL = "https://hotline.ua/ua/computer/processory/?p=";
     private static final String TABLE_CSS_SELECTOR = "div.list-body__content.content.flex-wrap > div";
+    private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
+    private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
 
     @Override
-    public List<CpuHotLine> parseAllPagesMultiThread(ExecutorService executor) {
+    public List<CpuHotLine> parseAllPagesMultiThread() {
         int startPage = 1;
         int maxPage = findMaxPage();
         List<CpuHotLine> parts = new ArrayList<>();
@@ -103,20 +107,22 @@ public class HotlineCpuPageParserImpl implements HotlinePageParser<CpuHotLine> {
             log.error("No data");
             throw new RuntimeException();
         } else {
-            for (Element cpuBlock : tableElements) {
+            for (Element itemBlock : tableElements) {
                 CpuHotLine cpu = new CpuHotLine();
-                cpu.setUrl(DOMAIN_LINK + parseUrl(cpuBlock));
-                cpu.setName(parseName(cpuBlock));
-                cpu.setPrices(parsePrices(cpuBlock));
-
-                Element characteristicsBlock = cpuBlock.select("div.specs__text").first();
-                parseDataFromCharacteristicsBlock(characteristicsBlock, cpu);
-
+                setFields(cpu, itemBlock);
                 cpus.add(cpu);
             }
         }
 
         return cpus;
+    }
+
+    private void setFields(CpuHotLine cpu, Element itemBlock) {
+        cpu.setUrl(DOMAIN_LINK + parseUrl(itemBlock));
+        cpu.setName(parseName(itemBlock));
+        cpu.setPrices(parsePrices(itemBlock));
+        Element characteristicsBlock = itemBlock.select("div.specs__text").first();
+        parseDataFromCharacteristicsBlock(characteristicsBlock, cpu);
     }
 
     private String parsePrices(Element cpuBlock) {

@@ -14,16 +14,20 @@ import lombok.ToString;
 @Setter
 @Table(name = "mother_boards_hotline")
 @ToString
-public class MotherBoardHotLIne {
+public class MotherBoardHotLine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String url;
     private String prices;
+    private Double avgPrice;
+    private Integer propositionsQuantity;
 
     private String manufacturer;
     private String socketType;
     private String chipset;
+    private String chipsetManufacturer;
     private String memoryType;
+    private String caseType;
 }

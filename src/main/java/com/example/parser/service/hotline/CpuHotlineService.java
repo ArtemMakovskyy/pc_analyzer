@@ -20,14 +20,12 @@ public class CpuHotlineService {
     private final HotlineCpuPageParserImpl hotlineCpuPageParserImpl;
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
-    private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
-    private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+
 
     public List<CpuHotLine> parseThenCleanDbThenSaveNewItems(boolean useMultithreading) {
         List<CpuHotLine> cpusHotLine;
         if (useMultithreading){
-            cpusHotLine = hotlineCpuPageParserImpl.parseAllPagesMultiThread(executor);
-            shutdownExecutor();
+            cpusHotLine = hotlineCpuPageParserImpl.parseAllPagesMultiThread();
         }else {
            cpusHotLine = hotlineCpuPageParserImpl.parseAllPages();
         }
@@ -55,21 +53,6 @@ public class CpuHotlineService {
         }
         cpuHotLineRepository.saveAll(cpuHL);
         log.info("Updated " + cpuHL.size() + " items.");
-    }
-
-    private void shutdownExecutor() {
-        executor.shutdown();
-        try {
-            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
-                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                    System.err.println("Executor did not terminate");
-                }
-            }
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
     }
 
 }

@@ -8,8 +8,8 @@ import com.example.parser.repository.CpuHotLineRepository;
 import com.example.parser.repository.CpuUserBenchmarkRepository;
 import com.example.parser.repository.GpuHotLineRepository;
 import com.example.parser.repository.GpuUserBenchmarkRepository;
-import com.example.parser.service.parse.hotline.HotlineCpuPageParser;
-import com.example.parser.service.parse.hotline.HotlineGpuPageParser;
+import com.example.parser.service.parse.hotlinepageparser.impl.HotlineCpuPageParserImpl;
+import com.example.parser.service.parse.hotlinepageparser.impl.HotlineGpuPageParserImpl;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -26,11 +26,11 @@ import org.springframework.stereotype.Service;
 public class HotlineUpdaterService {
     private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
     private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
-    private final HotlineCpuPageParser hotlineCpuPageParser;
+    private final HotlineCpuPageParserImpl hotlineCpuPageParserImpl;
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
     private final GpuHotLineRepository gpuHotLineRepository;
-    private final HotlineGpuPageParser hotlineGpuPageParser;
+    private final HotlineGpuPageParserImpl hotlineGpuPageParserImpl;
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
 
     public void parseAllMT() {
@@ -55,7 +55,7 @@ public class HotlineUpdaterService {
     }
 
     private List<CpuHotLine> parseThenCleanDbThenSaveNewCpuItems() {
-        List<CpuHotLine> cpusHotLine = hotlineCpuPageParser
+        List<CpuHotLine> cpusHotLine = hotlineCpuPageParserImpl
                 .parseAllPagesMultiThread(executor);
         cpuHotLineRepository.deleteAll();
         cpuHotLineRepository.saveAll(cpusHotLine);
@@ -64,7 +64,7 @@ public class HotlineUpdaterService {
     }
 
     private List<GpuHotLine> parseThenCleanDbThenSaveNewGpuItems() {
-        List<GpuHotLine> gpusHotLine = hotlineGpuPageParser
+        List<GpuHotLine> gpusHotLine = hotlineGpuPageParserImpl
                 .parseAllPagesMultiThread(executor);
         gpuHotLineRepository.deleteAll();
         gpuHotLineRepository.saveAll(gpusHotLine);

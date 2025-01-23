@@ -4,7 +4,7 @@ import com.example.parser.model.hotline.GpuHotLine;
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.repository.GpuHotLineRepository;
 import com.example.parser.repository.GpuUserBenchmarkRepository;
-import com.example.parser.service.parse.hotline.HotlineGpuPageParser;
+import com.example.parser.service.parse.hotlinepageparser.impl.HotlineGpuPageParserImpl;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @Log4j2
 public class GpuHotlineService {
     private final GpuHotLineRepository gpuHotLineRepository;
-    private final HotlineGpuPageParser hotlineGpuPageParser;
+    private final HotlineGpuPageParserImpl hotlineGpuPageParserImpl;
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
     private static final int THREAD_POOL_SIZE = 8;
     private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
@@ -26,10 +26,10 @@ public class GpuHotlineService {
     public List<GpuHotLine> parseThenCleanDbThenSaveNewItems(boolean useMultithreading) {
         List<GpuHotLine> gpusHotLine;
         if (useMultithreading){
-            gpusHotLine = hotlineGpuPageParser.parseAllPagesMultiThread(executor);
+            gpusHotLine = hotlineGpuPageParserImpl.parseAllPagesMultiThread(executor);
             shutdownExecutor();
         }else {
-            gpusHotLine = hotlineGpuPageParser.parseAllPages();
+            gpusHotLine = hotlineGpuPageParserImpl.parseAllPages();
         }
         gpuHotLineRepository.deleteAll();
         gpuHotLineRepository.saveAll(gpusHotLine);

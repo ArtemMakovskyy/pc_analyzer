@@ -1,6 +1,7 @@
-package com.example.parser.service.parse.hotline;
+package com.example.parser.service.parse.hotlinepageparser.impl;
 
 import com.example.parser.model.hotline.CpuHotLine;
+import com.example.parser.service.parse.HotlinePageParser;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +18,13 @@ import org.springframework.stereotype.Component;
 @Component
 @Log4j2
 @RequiredArgsConstructor
-public class HotlineCpuPageParser {
+public class HotlineCpuPageParserImpl implements HotlinePageParser<CpuHotLine> {
     private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final String DOMAIN_LINK = "https://hotline.ua";
     private static final String BASE_URL = "https://hotline.ua/ua/computer/processory/?p=";
     private static final String TABLE_CSS_SELECTOR = "div.list-body__content.content.flex-wrap > div";
 
+    @Override
     public List<CpuHotLine> parseAllPagesMultiThread(ExecutorService executor) {
         int startPage = 1;
         int maxPage = findMaxPage();
@@ -57,6 +59,7 @@ public class HotlineCpuPageParser {
         return parts;
     }
 
+    @Override
     public List<CpuHotLine> parseAllPages() {
         int startPage = 1;
         int maxPage = findMaxPage();
@@ -77,7 +80,7 @@ public class HotlineCpuPageParser {
         return parts;
     }
 
-    public List<CpuHotLine> parsePage(
+    private List<CpuHotLine> parsePage(
             String url,
             boolean useUserAgent,
             boolean useDelay,

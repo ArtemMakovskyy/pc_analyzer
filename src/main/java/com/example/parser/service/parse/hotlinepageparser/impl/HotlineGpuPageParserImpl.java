@@ -1,6 +1,7 @@
-package com.example.parser.service.parse.hotline;
+package com.example.parser.service.parse.hotlinepageparser.impl;
 
 import com.example.parser.model.hotline.GpuHotLine;
+import com.example.parser.service.parse.HotlinePageParser;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +18,11 @@ import org.springframework.stereotype.Component;
 @Component
 @Log4j2
 @RequiredArgsConstructor
-public class HotlineGpuPageParser {
+public class HotlineGpuPageParserImpl implements HotlinePageParser<GpuHotLine> {
     private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final String BASE_URL = "https://hotline.ua/ua/computer/videokarty/?p=";
 
+    @Override
     public List<GpuHotLine> parseAllPagesMultiThread(ExecutorService executor) {
         int startPage = 1;
         int maxPage = findMaxPage();
@@ -55,6 +57,7 @@ public class HotlineGpuPageParser {
         return parts;
     }
 
+    @Override
     public List<GpuHotLine> parseAllPages() {
         int startPage = 1;
         int maxPage = findMaxPage();
@@ -75,7 +78,7 @@ public class HotlineGpuPageParser {
         return parts;
     }
 
-    public List<GpuHotLine> parsePage(String url,
+    private List<GpuHotLine> parsePage(String url,
                                       boolean useUserAgent,
                                       boolean useDelay,
                                       int delayFrom,

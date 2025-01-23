@@ -4,7 +4,7 @@ import com.example.parser.model.hotline.CpuHotLine;
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.repository.CpuHotLineRepository;
 import com.example.parser.repository.CpuUserBenchmarkRepository;
-import com.example.parser.service.parse.hotline.HotlineCpuPageParser;
+import com.example.parser.service.parse.hotlinepageparser.impl.HotlineCpuPageParserImpl;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Log4j2
 public class CpuHotlineService {
-    private final HotlineCpuPageParser hotlineCpuPageParser;
+    private final HotlineCpuPageParserImpl hotlineCpuPageParserImpl;
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
     private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
@@ -26,10 +26,10 @@ public class CpuHotlineService {
     public List<CpuHotLine> parseThenCleanDbThenSaveNewItems(boolean useMultithreading) {
         List<CpuHotLine> cpusHotLine;
         if (useMultithreading){
-            cpusHotLine = hotlineCpuPageParser.parseAllPagesMultiThread(executor);
+            cpusHotLine = hotlineCpuPageParserImpl.parseAllPagesMultiThread(executor);
             shutdownExecutor();
         }else {
-           cpusHotLine = hotlineCpuPageParser.parseAllPages();
+           cpusHotLine = hotlineCpuPageParserImpl.parseAllPages();
         }
         cpuHotLineRepository.deleteAll();
         cpuHotLineRepository.saveAll(cpusHotLine);

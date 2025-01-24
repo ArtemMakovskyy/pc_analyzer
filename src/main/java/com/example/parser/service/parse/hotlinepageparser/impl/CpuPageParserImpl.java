@@ -21,7 +21,6 @@ public class CpuPageParserImpl extends HotLinePageParserAbstract<CpuHotLine> {
     private static final String PRICE_CSS_SELECTOR = "div.list-item__value-price";
     private static final String NAME_CSS_SELECTOR = "div.list-item__title-container a";
     private static final String LINK_CSS_SELECTOR = "a.item-title.link--black";
-
     private static final String PROPOSITION_QUANTITY_CSS_SELECTOR
             = "a.link.link--black.text-sm.m_b-5";
     private static final String NO_ELEMENT_CSS_SELECTOR
@@ -32,12 +31,6 @@ public class CpuPageParserImpl extends HotLinePageParserAbstract<CpuHotLine> {
     public CpuPageParserImpl(HtmlDocumentFetcher htmlDocumentFetcher) {
         super(htmlDocumentFetcher, BASE_URL);
     }
-
-    //todo working implement service
-//    @PostConstruct
-//    public void init(){
-//        parseMultiThread().forEach(System.out::println);
-//    }
 
     @Override
     protected List<CpuHotLine> parseData(Document htmlDocument) {
@@ -55,7 +48,7 @@ public class CpuPageParserImpl extends HotLinePageParserAbstract<CpuHotLine> {
 
     private void setFields(CpuHotLine cpu, Element itemBlock) {
         cpu.setUrl(DOMAIN_LINK + parseUrl(itemBlock));
-        cpu.setPropositionsQuantity(setPropositionQuantity(itemBlock, cpu));
+        cpu.setPropositionsQuantity(setPropositionQuantity(itemBlock));
         cpu.setName(parseName(itemBlock));
         String prices = parsePrices(itemBlock);
         cpu.setPrices(prices);
@@ -65,7 +58,7 @@ public class CpuPageParserImpl extends HotLinePageParserAbstract<CpuHotLine> {
         parseDataFromCharacteristicsBlock(characteristicsBlock, cpu);
     }
 
-    private int setPropositionQuantity(Element itemBlock, CpuHotLine cpu) {
+    private int setPropositionQuantity(Element itemBlock) {
         Elements noElement = itemBlock.select(NO_ELEMENT_CSS_SELECTOR);
         if (!noElement.isEmpty()) {
             String waitingText = noElement.text();

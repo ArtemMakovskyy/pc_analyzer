@@ -58,7 +58,8 @@ public class CpuHotlineService {
                 if (cpuHotLine.getName() != null
                         && cpuHotLine.getUserBenchmarkCpu() == null
                         && cpuUB.getModelHl() != null
-                        && cpuHotLine.getName().contains(cpuUB.getModelHl())) {
+                        && cpuHotLine.getName().contains(cpuUB.getModelHl())
+                ) {
                     cpuHotLine.setUserBenchmarkCpu(cpuUB);
                 }
             }

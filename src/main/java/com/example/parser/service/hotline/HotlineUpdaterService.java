@@ -32,82 +32,82 @@ public class HotlineUpdaterService {
     private final GpuPageParserImpl hotlineGpuPageParserImpl;
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
 
-    public void parseAllMT() {
-
-        try {
-            List<Future<?>> tasks = List.of(
-                    executor.submit(this::parseThenCleanDbThenSaveNewCpuItems),
-                    executor.submit(this::parseThenCleanDbThenSaveNewGpuItems)
-            );
-
-            for (Future<?> task : tasks) {
-                try {
-                    task.get();
-                } catch (InterruptedException | ExecutionException e) {
-                    log.error("Error occurred while executing task", e);
-                    Thread.currentThread().interrupt();
-                }
-            }
-        } finally {
-
-        }
-    }
-
-    private List<CpuHotLine> parseThenCleanDbThenSaveNewCpuItems() {
-        List<CpuHotLine> cpusHotLine = hotlineCpuPageParserImpl
-                .parseMultiThread();
-        cpuHotLineRepository.deleteAll();
-        cpuHotLineRepository.saveAll(cpusHotLine);
-        updateCpuWithBenchmarkData();
-        return cpusHotLine;
-    }
-
-    private List<GpuHotLine> parseThenCleanDbThenSaveNewGpuItems() {
-        List<GpuHotLine> gpusHotLine = hotlineGpuPageParserImpl
-                .parseAllPagesMultiThread("");
-        gpuHotLineRepository.deleteAll();
-        gpuHotLineRepository.saveAll(gpusHotLine);
-        updateGpuWithBenchmarkData();
-        return gpusHotLine;
-    }
-
-    private void updateCpuWithBenchmarkData() {
-        log.info("Started update cpu scores from User Benchmark DB");
-        List<UserBenchmarkCpu> ubCpuSortByModelDesc
-                = cpuUserBenchmarkRepository.findAllOrderByModelLengthDesc();
-        final List<CpuHotLine> cpuHL = cpuHotLineRepository.findAll();
-
-        for (UserBenchmarkCpu cpuUB : ubCpuSortByModelDesc) {
-            for (CpuHotLine cpuHotLine : cpuHL) {
-                if (cpuHotLine.getName() != null
-                        && cpuHotLine.getUserBenchmarkCpu() == null
-                        && cpuHotLine.getName().contains(cpuUB.getModelHl())
-                ) {
-                    cpuHotLine.setUserBenchmarkCpu(cpuUB);
-                }
-            }
-        }
-        cpuHotLineRepository.saveAll(cpuHL);
-        log.info("Updated " + cpuHL.size() + " items.");
-    }
-
-    private void updateGpuWithBenchmarkData() {
-        log.info("Started update gpu scores from User Benchmark DB");
-        List<UserBenchmarkGpu> ubGpuSortByModelDesc
-                = gpuUserBenchmarkRepository.findAllOrderByModelLengthDesc();
-        final List<GpuHotLine> gpuHl = gpuHotLineRepository.findAll();
-        for (UserBenchmarkGpu gpuUB : ubGpuSortByModelDesc) {
-            for (GpuHotLine gpuHotLine : gpuHl) {
-                if (gpuHotLine.getName() != null
-                        && gpuHotLine.getUserBenchmarkGpu() == null
-                        && gpuHotLine.getName().contains(gpuUB.getModelHl())
-                ) {
-                    gpuHotLine.setUserBenchmarkGpu(gpuUB);
-                }
-            }
-        }
-        gpuHotLineRepository.saveAll(gpuHl);
-        log.info("Updated " + gpuHl.size() + " items.");
-    }
+//    public void parseAllMT() {
+//
+//        try {
+//            List<Future<?>> tasks = List.of(
+//                    executor.submit(this::parseThenCleanDbThenSaveNewCpuItems),
+//                    executor.submit(this::parseThenCleanDbThenSaveNewGpuItems)
+//            );
+//
+//            for (Future<?> task : tasks) {
+//                try {
+//                    task.get();
+//                } catch (InterruptedException | ExecutionException e) {
+//                    log.error("Error occurred while executing task", e);
+//                    Thread.currentThread().interrupt();
+//                }
+//            }
+//        } finally {
+//
+//        }
+//    }
+//
+//    private List<CpuHotLine> parseThenCleanDbThenSaveNewCpuItems() {
+//        List<CpuHotLine> cpusHotLine = hotlineCpuPageParserImpl
+//                .parseMultiThread();
+//        cpuHotLineRepository.deleteAll();
+//        cpuHotLineRepository.saveAll(cpusHotLine);
+//        updateCpuWithBenchmarkData();
+//        return cpusHotLine;
+//    }
+//
+//    private List<GpuHotLine> parseThenCleanDbThenSaveNewGpuItems() {
+//        List<GpuHotLine> gpusHotLine = hotlineGpuPageParserImpl
+//                .parseAllPagesMultiThread("");
+//        gpuHotLineRepository.deleteAll();
+//        gpuHotLineRepository.saveAll(gpusHotLine);
+//        updateGpuWithBenchmarkData();
+//        return gpusHotLine;
+//    }
+//
+//    private void updateCpuWithBenchmarkData() {
+//        log.info("Started update cpu scores from User Benchmark DB");
+//        List<UserBenchmarkCpu> ubCpuSortByModelDesc
+//                = cpuUserBenchmarkRepository.findAllOrderByModelLengthDesc();
+//        final List<CpuHotLine> cpuHL = cpuHotLineRepository.findAll();
+//
+//        for (UserBenchmarkCpu cpuUB : ubCpuSortByModelDesc) {
+//            for (CpuHotLine cpuHotLine : cpuHL) {
+//                if (cpuHotLine.getName() != null
+//                        && cpuHotLine.getUserBenchmarkCpu() == null
+//                        && cpuHotLine.getName().contains(cpuUB.getModelHl())
+//                ) {
+//                    cpuHotLine.setUserBenchmarkCpu(cpuUB);
+//                }
+//            }
+//        }
+//        cpuHotLineRepository.saveAll(cpuHL);
+//        log.info("Updated " + cpuHL.size() + " items.");
+//    }
+//
+//    private void updateGpuWithBenchmarkData() {
+//        log.info("Started update gpu scores from User Benchmark DB");
+//        List<UserBenchmarkGpu> ubGpuSortByModelDesc
+//                = gpuUserBenchmarkRepository.findAllOrderByModelLengthDesc();
+//        final List<GpuHotLine> gpuHl = gpuHotLineRepository.findAll();
+//        for (UserBenchmarkGpu gpuUB : ubGpuSortByModelDesc) {
+//            for (GpuHotLine gpuHotLine : gpuHl) {
+//                if (gpuHotLine.getName() != null
+//                        && gpuHotLine.getUserBenchmarkGpu() == null
+//                        && gpuHotLine.getName().contains(gpuUB.getModelHl())
+//                ) {
+//                    gpuHotLine.setUserBenchmarkGpu(gpuUB);
+//                }
+//            }
+//        }
+//        gpuHotLineRepository.saveAll(gpuHl);
+//        log.info("Updated " + gpuHl.size() + " items.");
+//    }
 
 }

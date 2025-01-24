@@ -17,9 +17,9 @@ public class HotlineUpdaterController {
      *
      * @return ResponseEntity indicating the status of the operation.
      */
-    @PostMapping("/parse-and-update")
-    public ResponseEntity<String> parseAllMT() {
-        hotlineUpdaterService.parseAllMT();
-        return ResponseEntity.ok("Parsing and updating of CPU and GPU data completed successfully.");
-    }
+//    @PostMapping("/parse-and-update")
+//    public ResponseEntity<String> parseAllMT() {
+//        hotlineUpdaterService.parseAllMT();
+//        return ResponseEntity.ok("Parsing and updating of CPU and GPU data completed successfully.");
+//    }
 }

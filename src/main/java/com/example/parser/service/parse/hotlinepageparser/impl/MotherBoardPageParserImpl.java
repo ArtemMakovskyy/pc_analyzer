@@ -48,7 +48,7 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
 
     private void setFields(MotherBoardHotLine mb, Element itemBlock) {
         mb.setUrl(DOMAIN_LINK + parseUrl(itemBlock));
-        mb.setPropositionsQuantity(setPropositionQuantity(itemBlock, mb));
+        mb.setPropositionsQuantity(setPropositionQuantity(itemBlock));
         parseAndSetManufacturerAndName(itemBlock, mb);
         String prices = parsePrices(itemBlock);
         mb.setPrices(prices);
@@ -58,7 +58,7 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
         parseDataFromCharacteristicsBlock(characteristicsBlock, mb);
     }
 
-    private int setPropositionQuantity(Element itemBlock, MotherBoardHotLine mb) {
+    private int setPropositionQuantity(Element itemBlock) {
         Elements noElement = itemBlock.select(NO_ELEMENT_CSS_SELECTOR);
         if (!noElement.isEmpty()) {
             String waitingText = noElement.text();

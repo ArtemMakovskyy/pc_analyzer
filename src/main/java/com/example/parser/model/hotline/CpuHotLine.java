@@ -27,6 +27,7 @@ public class CpuHotLine {
     private String name;
     private String url;
     private String prices;
+    private Double avgPrice;
 
     private String socketType;
     private String frequency;
@@ -35,7 +36,7 @@ public class CpuHotLine {
     private String threads;
     private String packageType;
     private String releaseDate;
-
+    private Integer propositionsQuantity;
 
     private String brand;
     private String type;
@@ -50,8 +51,8 @@ public class CpuHotLine {
     @ManyToOne
     private UserBenchmarkCpu userBenchmarkCpu;
 
-    @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted = false;
+//    @Column(name = "is_deleted", nullable = false)
+//    private boolean isDeleted = false;
 
     @Override
     public boolean equals(Object o) {

@@ -95,7 +95,7 @@ public abstract class HotLinePageParserAbstract<T> implements MultiThreadPagePar
             boolean isPrintDocumentToConsole
     ) {
         Document htmlDocument = fetchHtmlDocumentWithRetries(url, useUserAgent, useDelay, delayFrom, delayTo, isPrintDocumentToConsole);
-        return parseTableElements(htmlDocument);
+        return parseData(htmlDocument);
     }
 
     protected Document fetchHtmlDocumentWithRetries(
@@ -138,7 +138,7 @@ public abstract class HotLinePageParserAbstract<T> implements MultiThreadPagePar
         throw new RuntimeException("Failed to load page: " + url);
     }
 
-    protected abstract List<T> parseTableElements(Document htmlDocument);
+    protected abstract List<T> parseData(Document htmlDocument);
 
     protected int findMaxPage(String baseUrl) {
         Document htmlDocument = htmlDocumentFetcher.fetchDocument(

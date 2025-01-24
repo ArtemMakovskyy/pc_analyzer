@@ -36,7 +36,7 @@ public HotLinePageParserAbstract___Delete___it___after__Impl(HtmlDocumentFetcher
     }
 
     @Override
-    protected List<MotherBoardHotLine> parseTableElements(Document htmlDocument) {
+    protected List<MotherBoardHotLine> parseData(Document htmlDocument) {
         Elements tableElements = htmlDocument.select(TABLE_CSS_SELECTOR);
         List<com.example.parser.model.hotline.MotherBoardHotLine> motherBoards = new ArrayList<>();
 

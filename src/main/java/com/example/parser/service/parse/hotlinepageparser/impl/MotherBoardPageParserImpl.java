@@ -20,8 +20,9 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
     private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
     private static final String PRICE_CSS_SELECTOR = "div.list-item__value-price";
     private static final String NAME_CSS_SELECTOR = "div.list-item__title-container a";
-    private static final String PROPOSITION_QUANTITY_CSS_SELECTOR = "a.link.link--black.text-sm.m_b-5";
     private static final String LINK_CSS_SELECTOR = "a.item-title.link--black";
+    private static final String PROPOSITION_QUANTITY_CSS_SELECTOR
+            = "a.link.link--black.text-sm.m_b-5";
     private static final String NO_ELEMENT_CSS_SELECTOR
             = "div.list-item__value > div.list-item__value--overlay."
             + "list-item__value--full > div > div > div.m_b-10";
@@ -32,7 +33,7 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
     }
 
     @Override
-    protected List<MotherBoardHotLine> parseTableElements(Document htmlDocument) {
+    protected List<MotherBoardHotLine> parseData(Document htmlDocument) {
         Elements tableElements = htmlDocument.select(TABLE_CSS_SELECTOR);
         List<MotherBoardHotLine> motherBoards = new ArrayList<>();
 
@@ -56,7 +57,6 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
                 = itemBlock.select(CHARACTERISTICS_BLOCK_CSS_SELECTOR).first();
         parseDataFromCharacteristicsBlock(characteristicsBlock, mb);
     }
-
 
     private int setPropositionQuantity(Element itemBlock, MotherBoardHotLine mb) {
         Elements noElement = itemBlock.select(NO_ELEMENT_CSS_SELECTOR);
@@ -123,7 +123,8 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
         return linkElement.attr("href");
     }
 
-    private void parseDataFromCharacteristicsBlock(Element characteristicsBlock, MotherBoardHotLine mb) {
+    private void parseDataFromCharacteristicsBlock(
+            Element characteristicsBlock, MotherBoardHotLine mb) {
         if (characteristicsBlock == null) {
             log.warn("Can't find span element to parse data");
         } else {
@@ -199,4 +200,5 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
         }
         return textArray[index];
     }
+
 }

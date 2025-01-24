@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Log4j2
 public class MotherBoardHotlineService {
+
     private final MultiThreadPageParser<MotherBoardHotLine> motherBoardPageParserImpl;
     private final MotherBoardHotLineRepository motherBoardHotLineRepository;
 
@@ -36,4 +37,5 @@ public class MotherBoardHotlineService {
             throw new CustomServiceException("Failed to process motherboard data", e);
         }
     }
+
 }

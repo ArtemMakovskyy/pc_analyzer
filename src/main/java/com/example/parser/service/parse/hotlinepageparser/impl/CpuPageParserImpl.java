@@ -2,116 +2,52 @@ package com.example.parser.service.parse.hotlinepageparser.impl;
 
 import com.example.parser.model.hotline.CpuHotLine;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
-import com.example.parser.service.parse.MultiThreadPageParser;
+import com.example.parser.service.parse.utils.ParseUtil;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import lombok.RequiredArgsConstructor;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
-@Component
 @Log4j2
-@RequiredArgsConstructor
-public class CpuPageParserImpl implements MultiThreadPageParser<CpuHotLine> {
-    private final HtmlDocumentFetcher htmlDocumentFetcher;
-    private static final String DOMAIN_LINK = "https://hotline.ua";
+@Component
+public class CpuPageParserImpl extends HotLinePageParserAbstract<CpuHotLine> {
     private static final String BASE_URL = "https://hotline.ua/ua/computer/processory/?p=";
-    private static final String TABLE_CSS_SELECTOR = "div.list-body__content.content.flex-wrap > div";
-    private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
-    private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+    private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
+    private static final String PRICE_CSS_SELECTOR = "div.list-item__value-price";
+    private static final String NAME_CSS_SELECTOR = "div.list-item__title-container a";
+    private static final String LINK_CSS_SELECTOR = "a.item-title.link--black";
 
+    private static final String PROPOSITION_QUANTITY_CSS_SELECTOR
+            = "a.link.link--black.text-sm.m_b-5";
+    private static final String NO_ELEMENT_CSS_SELECTOR
+            = "div.list-item__value > div.list-item__value--overlay."
+            + "list-item__value--full > div > div > div.m_b-10";
+    private static final String DIGITS_REGEX = "\\d+";
 
-    @Override
-    public List<CpuHotLine> parseMultiThread() {
-        int startPage = 1;
-        int maxPage = findMaxPage(BASE_URL);
-        List<CpuHotLine> parts = new ArrayList<>();
-        List<Future<List<CpuHotLine>>> futures = new ArrayList<>();
-
-
-        for (int i = startPage; i <= maxPage; i++) {
-            int pageIndex = i;
-            Future<List<CpuHotLine>> future = executor.submit(() -> {
-                List<CpuHotLine> parse = parsePage(
-                        BASE_URL + pageIndex,
-                        true,
-                        true,
-                        8,
-                        10,
-                        false);
-                log.info("... parsed page: " + pageIndex + " from: " + maxPage);
-                return parse;
-            });
-            futures.add(future);
-        }
-
-        for (Future<List<CpuHotLine>> future : futures) {
-            try {
-                parts.addAll(future.get());
-            } catch (InterruptedException | ExecutionException e) {
-                log.error("Error parsing page", e);
-                Thread.currentThread().interrupt();
-            }
-        }
-        return parts;
+    public CpuPageParserImpl(HtmlDocumentFetcher htmlDocumentFetcher) {
+        super(htmlDocumentFetcher, BASE_URL);
     }
 
+    //todo working implement service
+//    @PostConstruct
+//    public void init(){
+//        parseMultiThread().forEach(System.out::println);
+//    }
+
     @Override
-    public List<CpuHotLine> parse() {
-        int startPage = 1;
-        int maxPage = findMaxPage(BASE_URL);
-        List<CpuHotLine> parts = new ArrayList<>();
-
-        for (int i = startPage; i <= maxPage; i++) {
-            int pageIndex = i;
-            final List<CpuHotLine> parse = parsePage(
-                    BASE_URL + pageIndex,
-                    true,
-                    true,
-                    2,
-                    5,
-                    false);
-            parts.addAll(parse);
-            log.info("... parsed page: " + i + " from: " + maxPage);
-        }
-        return parts;
-    }
-
-    private List<CpuHotLine> parsePage(
-            String url,
-            boolean useUserAgent,
-            boolean useDelay,
-            int delayFrom,
-            int delayTo,
-            boolean isPrintDocumentToConsole
-    ) {
-        Document htmlDocument = htmlDocumentFetcher.fetchDocument(
-                url,
-                useUserAgent,
-                useDelay,
-                delayFrom,
-                delayTo,
-                isPrintDocumentToConsole);
-
+    protected List<CpuHotLine> parseData(Document htmlDocument) {
         Elements tableElements = htmlDocument.select(TABLE_CSS_SELECTOR);
         List<CpuHotLine> cpus = new ArrayList<>();
 
-        if (tableElements.isEmpty()) {
-            log.error("No data");
-            throw new RuntimeException();
-        } else {
-            for (Element itemBlock : tableElements) {
-                CpuHotLine cpu = new CpuHotLine();
-                setFields(cpu, itemBlock);
-                cpus.add(cpu);
-            }
+        for (Element itemBlock : tableElements) {
+            CpuHotLine cpu = new CpuHotLine();
+            setFields(cpu, itemBlock);
+            cpus.add(cpu);
         }
 
         return cpus;
@@ -119,23 +55,70 @@ public class CpuPageParserImpl implements MultiThreadPageParser<CpuHotLine> {
 
     private void setFields(CpuHotLine cpu, Element itemBlock) {
         cpu.setUrl(DOMAIN_LINK + parseUrl(itemBlock));
+        cpu.setPropositionsQuantity(setPropositionQuantity(itemBlock, cpu));
         cpu.setName(parseName(itemBlock));
-        cpu.setPrices(parsePrices(itemBlock));
-        Element characteristicsBlock = itemBlock.select("div.specs__text").first();
+        String prices = parsePrices(itemBlock);
+        cpu.setPrices(prices);
+        processTextToPriceAvg(prices, cpu);
+        Element characteristicsBlock
+                = itemBlock.select(CHARACTERISTICS_BLOCK_CSS_SELECTOR).first();
         parseDataFromCharacteristicsBlock(characteristicsBlock, cpu);
     }
 
+    private int setPropositionQuantity(Element itemBlock, CpuHotLine cpu) {
+        Elements noElement = itemBlock.select(NO_ELEMENT_CSS_SELECTOR);
+        if (!noElement.isEmpty()) {
+            String waitingText = noElement.text();
+
+            if (waitingText.contains("Очікується в продажу")) {
+                return 0;
+            }
+        }
+
+        Elements propositionQuantityElement = itemBlock.select(PROPOSITION_QUANTITY_CSS_SELECTOR);
+        if (!propositionQuantityElement.isEmpty()) {
+            String text = propositionQuantityElement.text().trim();
+            Pattern pattern = Pattern.compile(DIGITS_REGEX);
+            Matcher matcher = pattern.matcher(text);
+
+            if (matcher.find()) {
+                String number = matcher.group();
+                return ParseUtil.stringToIntIfErrorReturnMinusOne(number);
+            }
+        }
+        return 1;
+    }
+
     private String parsePrices(Element cpuBlock) {
-        return cpuBlock.select("div.list-item__value-price").text();
+        return cpuBlock.select(PRICE_CSS_SELECTOR).text();
+    }
+
+    public void processTextToPriceAvg(String input, CpuHotLine cpu) {
+        input = input.replace("грн", "").trim();
+        String[] parts = input.split("–");
+        double num1;
+        if (parts.length == 2) {
+            num1 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
+                    parts[0].trim().replace(" ", ""));
+            double num2 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
+                    parts[1].trim().replace(" ", ""));
+            cpu.setAvgPrice((num1 + num2) / 2);
+        } else if (parts.length == 1) {
+            num1 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
+                    parts[0].trim().replace(" ", ""));
+            cpu.setAvgPrice(num1);
+        } else {
+            cpu.setAvgPrice(0.00);
+        }
     }
 
     private String parseName(Element cpuBlock) {
-        Element nameElement = cpuBlock.select("div.list-item__title-container a").first();
+        Element nameElement = cpuBlock.select(NAME_CSS_SELECTOR).first();
         return nameElement != null ? nameElement.text().trim() : "Не найдено";
     }
 
     private String parseUrl(Element cpuBlock) {
-        Element linkElement = cpuBlock.select("a.item-title.link--black").first();
+        Element linkElement = cpuBlock.select(LINK_CSS_SELECTOR).first();
         if (linkElement == null) {
             log.warn("Can't find url");
             return "";
@@ -184,8 +167,6 @@ public class CpuPageParserImpl implements MultiThreadPageParser<CpuHotLine> {
             cpu.setPackageType(
                     "Box"
             );
-        } else {
-            // ignore
         }
 
     }
@@ -193,35 +174,11 @@ public class CpuPageParserImpl implements MultiThreadPageParser<CpuHotLine> {
     private String splitAndExtractDataByIndex(String text, int index) {
         String[] textArray = text.split(" ");
         if (textArray.length < index) {
-            log.warn("HotlineCpuPageParser.splitAndExtractData(): Invalid index "
+            log.warn(this.getClass() + ": Invalid index "
                     + index + ". Text array length is " + textArray.length);
             return "";
         }
         return textArray[index];
     }
-
-    private int findMaxPage(String baseUrl) {
-        Document htmlDocument = htmlDocumentFetcher.fetchDocument(
-                baseUrl + 1,
-                true,
-                false,
-                false);
-
-        Elements pages = htmlDocument.select("a.page");
-        int maxPage = 0;
-
-        for (Element page : pages) {
-            String pageText = page.text().trim();
-            try {
-                int pageNumber = Integer.parseInt(pageText);
-                maxPage = Math.max(maxPage, pageNumber);
-            } catch (NumberFormatException e) {
-                log.info("Cant get number with pageText: " + pageText + " Ignore it.");
-            }
-        }
-        log.info("Pages quality: " + maxPage);
-        return maxPage;
-    }
-
 
 }

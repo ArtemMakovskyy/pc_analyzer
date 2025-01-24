@@ -19,8 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Log4j2
 @RequiredArgsConstructor
-public class CpuPageParserImpl
-        implements MultiThreadPageParser<CpuHotLine> {
+public class CpuPageParserImpl implements MultiThreadPageParser<CpuHotLine> {
     private final HtmlDocumentFetcher htmlDocumentFetcher;
     private static final String DOMAIN_LINK = "https://hotline.ua";
     private static final String BASE_URL = "https://hotline.ua/ua/computer/processory/?p=";

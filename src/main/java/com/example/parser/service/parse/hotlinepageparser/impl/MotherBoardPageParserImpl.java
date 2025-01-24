@@ -3,7 +3,6 @@ package com.example.parser.service.parse.hotlinepageparser.impl;
 import com.example.parser.model.hotline.MotherBoardHotLine;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.service.parse.utils.ParseUtil;
-import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -18,22 +17,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherBoardHotLine> {
     private static final String BASE_URL = "https://hotline.ua/ua/computer/materinskie-platy/?p=";
+    private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
+    private static final String PRICE_CSS_SELECTOR = "div.list-item__value-price";
+    private static final String NAME_CSS_SELECTOR = "div.list-item__title-container a";
+    private static final String PROPOSITION_QUANTITY_CSS_SELECTOR = "a.link.link--black.text-sm.m_b-5";
+    private static final String LINK_CSS_SELECTOR = "a.item-title.link--black";
+    private static final String NO_ELEMENT_CSS_SELECTOR
+            = "div.list-item__value > div.list-item__value--overlay."
+            + "list-item__value--full > div > div > div.m_b-10";
+    private static final String DIGITS_REGEX = "\\d+";
 
     public MotherBoardPageParserImpl(HtmlDocumentFetcher htmlDocumentFetcher) {
         super(htmlDocumentFetcher, BASE_URL);
-    }
-
-//        @PostConstruct
-    public void test() {
-        final List<MotherBoardHotLine> motherBoardHotLines
-                = parseMultiThread();
-        motherBoardHotLines.forEach(System.out::println);
-
-//        final List<MotherBoardHotLine> motherBoardHotLines = parsePage("https://hotline.ua/ua/computer/materinskie-platy/?p=2",
-//                true,
-//                true,
-//                6, 10, false);
-//        motherBoardHotLines.forEach(System.out::println);
     }
 
     @Override
@@ -57,26 +52,26 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
         String prices = parsePrices(itemBlock);
         mb.setPrices(prices);
         processTextToPriceAvg(prices, mb);
-        Element characteristicsBlock = itemBlock.select("div.specs__text").first();
+        Element characteristicsBlock
+                = itemBlock.select(CHARACTERISTICS_BLOCK_CSS_SELECTOR).first();
         parseDataFromCharacteristicsBlock(characteristicsBlock, mb);
     }
 
 
     private int setPropositionQuantity(Element itemBlock, MotherBoardHotLine mb) {
-
-        final Elements noElement = itemBlock.select("div.list-item__value > div.list-item__value--overlay.list-item__value--full > div > div > div.m_b-10");
+        Elements noElement = itemBlock.select(NO_ELEMENT_CSS_SELECTOR);
         if (!noElement.isEmpty()) {
-            final String waitingText = noElement.text();
+            String waitingText = noElement.text();
 
             if (waitingText.contains("Очікується в продажу")) {
                 return 0;
             }
         }
 
-        final Elements propositionQuantityElement = itemBlock.select("a.link.link--black.text-sm.m_b-5");
+        Elements propositionQuantityElement = itemBlock.select(PROPOSITION_QUANTITY_CSS_SELECTOR);
         if (!propositionQuantityElement.isEmpty()) {
-            final String text = propositionQuantityElement.text().trim();
-            Pattern pattern = Pattern.compile("\\d+");
+            String text = propositionQuantityElement.text().trim();
+            Pattern pattern = Pattern.compile(DIGITS_REGEX);
             Matcher matcher = pattern.matcher(text);
 
             if (matcher.find()) {
@@ -88,7 +83,7 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
     }
 
     private String parsePrices(Element itemBlock) {
-        return itemBlock.select("div.list-item__value-price").text();
+        return itemBlock.select(PRICE_CSS_SELECTOR).text();
     }
 
     public void processTextToPriceAvg(String input, MotherBoardHotLine mb) {
@@ -96,11 +91,14 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
         String[] parts = input.split("–");
         double num1;
         if (parts.length == 2) {
-            num1 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(parts[0].trim().replace(" ", ""));
-            double num2 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(parts[1].trim().replace(" ", ""));
+            num1 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
+                    parts[0].trim().replace(" ", ""));
+            double num2 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
+                    parts[1].trim().replace(" ", ""));
             mb.setAvgPrice((num1 + num2) / 2);
         } else if (parts.length == 1) {
-            num1 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(parts[0].trim().replace(" ", ""));
+            num1 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
+                    parts[0].trim().replace(" ", ""));
             mb.setAvgPrice(num1);
         } else {
             mb.setAvgPrice(0.00);
@@ -108,8 +106,8 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
     }
 
     private void parseAndSetManufacturerAndName(Element itemBlock, MotherBoardHotLine mb) {
-        Element nameElement = itemBlock.select("div.list-item__title-container a").first();
-        final String text = nameElement != null ? nameElement.text().trim() : "Не найдено";
+        Element nameElement = itemBlock.select(NAME_CSS_SELECTOR).first();
+        String text = nameElement != null ? nameElement.text().trim() : "Не найдено";
         String manufacturer = text.split(" ")[0];
         String name = text.substring(manufacturer.length()).trim();
         mb.setManufacturer(manufacturer);
@@ -117,7 +115,7 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
     }
 
     private String parseUrl(Element itemBlock) {
-        Element linkElement = itemBlock.select("a.item-title.link--black").first();
+        Element linkElement = itemBlock.select(LINK_CSS_SELECTOR).first();
         if (linkElement == null) {
             log.warn("Can't find url");
             return "";
@@ -131,8 +129,8 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
         } else {
             Elements positions = characteristicsBlock.select("span");
 
-            if (false) {
-                //todo delete after
+            boolean isCheckMode = false;
+            if (isCheckMode) {
                 iterateSpanCheckMode(positions);
             }
 
@@ -188,8 +186,6 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
             mb.setCaseType(
                     splitAndExtractDataByIndex(text, 0).replaceAll(",+$", "")
             );
-        } else {
-            // ignore
         }
 
     }
@@ -197,7 +193,7 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
     private String splitAndExtractDataByIndex(String text, int index) {
         String[] textArray = text.split(" ");
         if (textArray.length < index) {
-            log.warn("HotlineCpuPageParser.splitAndExtractData(): Invalid index "
+            log.warn(this.getClass() + ": Invalid index "
                     + index + ". Text array length is " + textArray.length);
             return "";
         }

@@ -142,7 +142,7 @@ public abstract class HotLinePageParserAbstract<T> implements MultiThreadPagePar
 
     protected int findMaxPage(String baseUrl) {
         Document htmlDocument = htmlDocumentFetcher.fetchDocument(
-                baseUrl + 1,
+                baseUrl,
                 true,
                 false,
                 false);

@@ -20,13 +20,6 @@ public class GpuHotlineService {
     private final GpuHotLineRepository gpuHotLineRepository;
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
 
-        //todo working implement service
-//    @PostConstruct
-//    public void init() {
-//        parseThenCleanDbThenSaveNewItems().forEach(System.out::println);
-//        updateWithBenchmarkData();
-//    }
-
     @Transactional
     public List<GpuHotLine> parseThenCleanDbThenSaveNewItems() {
         try {
@@ -37,9 +30,9 @@ public class GpuHotlineService {
             gpuHotLineRepository.deleteAll();
             log.info("Deleted old gpu data.");
 
-            gpuHotLineRepository.saveAll(gpusHotLine);
-            log.info("Saved {} new gpu records.", gpusHotLine.size());
-            return gpusHotLine;
+            final List<GpuHotLine> gpuHotLinesFromDb = gpuHotLineRepository.saveAll(gpusHotLine);
+            log.info("Saved {} new gpu records.", gpuHotLinesFromDb.size());
+            return gpuHotLinesFromDb;
         } catch (Exception e) {
             log.error("Error occurred during gpu data update process: {}", e.getMessage(), e);
             throw new CustomServiceException("Failed to process gpu data", e);

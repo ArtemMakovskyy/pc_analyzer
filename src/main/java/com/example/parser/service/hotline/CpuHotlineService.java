@@ -20,13 +20,6 @@ public class CpuHotlineService {
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
 
-//    //todo working implement service
-//    @PostConstruct
-//    public void init() {
-//        parseThenCleanDbThenSaveNewItems().forEach(System.out::println);
-//        updateWithBenchmarkData();
-//    }
-
     @Transactional
     public List<CpuHotLine> parseThenCleanDbThenSaveNewItems() {
         try {
@@ -37,9 +30,9 @@ public class CpuHotlineService {
             cpuHotLineRepository.deleteAll();
             log.info("Deleted old cpu data.");
 
-            cpuHotLineRepository.saveAll(cpusHotLine);
-            log.info("Saved {} new cpu records.", cpusHotLine.size());
-            return cpusHotLine;
+            final List<CpuHotLine> cpuHotLinesFromDb = cpuHotLineRepository.saveAll(cpusHotLine);
+            log.info("Saved {} new cpu records.", cpuHotLinesFromDb.size());
+            return cpuHotLinesFromDb;
         } catch (Exception e) {
             log.error("Error occurred during cpu data update process: {}", e.getMessage(), e);
             throw new CustomServiceException("Failed to process cpu data", e);

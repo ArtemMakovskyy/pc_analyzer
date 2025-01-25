@@ -22,18 +22,22 @@ public class MotherBoardHotlineService {
     public List<MotherBoardHotLine> parseThenCleanDbThenSaveNewItems() {
         try {
             log.info("Starting motherboard data update process...");
-            List<MotherBoardHotLine> motherBoards = motherBoardPageParserImpl.parseAllMultiThread();
+            List<MotherBoardHotLine> motherBoards
+                    = motherBoardPageParserImpl.parseAllMultiThread();
 
             log.info("Parsed {} motherboards.", motherBoards.size());
             motherBoardHotLineRepository.deleteAll();
             log.info("Deleted old motherboard data.");
 
-            motherBoardHotLineRepository.saveAll(motherBoards);
-            log.info("Saved {} new motherboard records.", motherBoards.size());
+            final List<MotherBoardHotLine> motherBoardHotLinesFromDb
+                    = motherBoardHotLineRepository.saveAll(motherBoards);
+            log.info("Saved {} new motherboard records.",
+                    motherBoardHotLinesFromDb.size());
 
             return motherBoards;
         } catch (Exception e) {
-            log.error("Error occurred during motherboard data update process: {}", e.getMessage(), e);
+            log.error("Error occurred during motherboard data update process: {}"
+                    , e.getMessage(), e);
             throw new CustomServiceException("Failed to process motherboard data", e);
         }
     }

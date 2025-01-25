@@ -22,11 +22,6 @@ public class MemoryHotlineService {
     private final MultiThreadPagesParser<MemoryHotLine> memoryPageParserImpl;
     private final MemoryHotLineRepository memoryHotLineRepository;
 
-        @PostConstruct
-    public void init() {
-            parseThenCleanDbThenSaveNewItems();
-    }
-
     @Transactional
     public List<MemoryHotLine> parseThenCleanDbThenSaveNewItems() {
         try {
@@ -38,8 +33,8 @@ public class MemoryHotlineService {
             memoryHotLineRepository.deleteAll();
             log.info("Deleted old memory data.");
 
-            memoryHotLineRepository.saveAll(memories);
-            log.info("Saved {} new memory records.", memories.size());
+            final List<MemoryHotLine> memoryHotLinesFromDb = memoryHotLineRepository.saveAll(memories);
+            log.info("Saved {} new memory records.", memoryHotLinesFromDb.size());
 
             return memories;
         } catch (Exception e) {

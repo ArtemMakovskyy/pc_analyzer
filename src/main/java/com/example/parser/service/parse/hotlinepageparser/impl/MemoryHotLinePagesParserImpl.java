@@ -1,8 +1,9 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
-import com.example.parser.model.hotline.MotherBoardHotLine;
+import com.example.parser.model.hotline.MemoryHotLine;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.service.parse.utils.ParseUtil;
+import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Log4j2
 @Component
-public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherBoardHotLine> {
+public class MemoryHotLinePagesParserImpl extends HotLinePagesParserAbstract<MemoryHotLine> {
     private static final String BASE_URL = "https://hotline.ua/ua/computer/materinskie-platy/?p=";
     private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
     private static final String PRICE_CSS_SELECTOR = "div.list-item__value-price";
@@ -28,38 +29,44 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
             + "list-item__value--full > div > div > div.m_b-10";
     private static final String DIGITS_REGEX = "\\d+";
 
-    public MotherBoardPageParserImpl(HtmlDocumentFetcher htmlDocumentFetcher) {
+    public MemoryHotLinePagesParserImpl(HtmlDocumentFetcher htmlDocumentFetcher) {
         super(htmlDocumentFetcher, BASE_URL);
     }
 
-    @Override
-    protected List<MotherBoardHotLine> parseData(Document htmlDocument) {
-        Elements tableElements = htmlDocument.select(TABLE_CSS_SELECTOR);
-        List<MotherBoardHotLine> motherBoards = new ArrayList<>();
+//    @PostConstruct
+//    public void init() {
+//        final List<MemoryHotLine> memoryHotLines = parsePage("https://hotline.ua/ua/computer/moduli-pamyati-dlya-pk-i-noutbukov/3102-19139-98765/?sort=priceUp");
+//        memoryHotLines.forEach(System.out::println);
+//    }
 
-        for (Element itemBlock : tableElements) {
-            MotherBoardHotLine mb = new MotherBoardHotLine();
-            setFields(mb, itemBlock);
-            motherBoards.add(mb);
+    @Override
+    protected List<MemoryHotLine> parseData(Document htmlDocument) {
+        Elements tableElements = htmlDocument.select(TABLE_CSS_SELECTOR);
+        List<MemoryHotLine> motherBoards = new ArrayList<>();
+
+        for (Element itememorylock : tableElements) {
+            MemoryHotLine memory = new MemoryHotLine();
+            setFields(memory, itememorylock);
+            motherBoards.add(memory);
         }
 
         return motherBoards;
     }
 
-    private void setFields(MotherBoardHotLine mb, Element itemBlock) {
-        mb.setUrl(DOMAIN_LINK + parseUrl(itemBlock));
-        mb.setPropositionsQuantity(setPropositionQuantity(itemBlock));
-        parseAndSetManufacturerAndName(itemBlock, mb);
-        String prices = parsePrices(itemBlock);
-        mb.setPrices(prices);
-        processTextToPriceAvg(prices, mb);
+    private void setFields(MemoryHotLine memory, Element itememorylock) {
+        memory.setUrl(DOMAIN_LINK + parseUrl(itememorylock));
+        memory.setPropositionsQuantity(setPropositionQuantity(itememorylock));
+        parseAndSetManufacturerAndName(itememorylock, memory);
+        String prices = parsePrices(itememorylock);
+        memory.setPrices(prices);
+        processTextToPriceAvg(prices, memory);
         Element characteristicsBlock
-                = itemBlock.select(CHARACTERISTICS_BLOCK_CSS_SELECTOR).first();
-        parseDataFromCharacteristicsBlock(characteristicsBlock, mb);
+                = itememorylock.select(CHARACTERISTICS_BLOCK_CSS_SELECTOR).first();
+        parseDataFromCharacteristicsBlock(characteristicsBlock, memory);
     }
 
-    private int setPropositionQuantity(Element itemBlock) {
-        Elements noElement = itemBlock.select(NO_ELEMENT_CSS_SELECTOR);
+    private int setPropositionQuantity(Element itememorylock) {
+        Elements noElement = itememorylock.select(NO_ELEMENT_CSS_SELECTOR);
         if (!noElement.isEmpty()) {
             String waitingText = noElement.text();
 
@@ -68,25 +75,25 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
             }
         }
 
-        Elements propositionQuantityElement = itemBlock.select(PROPOSITION_QUANTITY_CSS_SELECTOR);
+        Elements propositionQuantityElement = itememorylock.select(PROPOSITION_QUANTITY_CSS_SELECTOR);
         if (!propositionQuantityElement.isEmpty()) {
             String text = propositionQuantityElement.text().trim();
             Pattern pattern = Pattern.compile(DIGITS_REGEX);
             Matcher matcher = pattern.matcher(text);
 
             if (matcher.find()) {
-                String number = matcher.group();
-                return ParseUtil.stringToIntIfErrorReturnMinusOne(number);
+                String numemoryer = matcher.group();
+                return ParseUtil.stringToIntIfErrorReturnMinusOne(numemoryer);
             }
         }
         return 1;
     }
 
-    private String parsePrices(Element itemBlock) {
-        return itemBlock.select(PRICE_CSS_SELECTOR).text();
+    private String parsePrices(Element itememorylock) {
+        return itememorylock.select(PRICE_CSS_SELECTOR).text();
     }
 
-    public void processTextToPriceAvg(String input, MotherBoardHotLine mb) {
+    public void processTextToPriceAvg(String input, MemoryHotLine memory) {
         input = input.replace("грн", "").trim();
         String[] parts = input.split("–");
         double num1;
@@ -95,27 +102,27 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
                     parts[0].trim().replace(" ", ""));
             double num2 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
                     parts[1].trim().replace(" ", ""));
-            mb.setAvgPrice((num1 + num2) / 2);
+            memory.setAvgPrice((num1 + num2) / 2);
         } else if (parts.length == 1) {
             num1 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
                     parts[0].trim().replace(" ", ""));
-            mb.setAvgPrice(num1);
+            memory.setAvgPrice(num1);
         } else {
-            mb.setAvgPrice(0.00);
+            memory.setAvgPrice(0.00);
         }
     }
 
-    private void parseAndSetManufacturerAndName(Element itemBlock, MotherBoardHotLine mb) {
-        Element nameElement = itemBlock.select(NAME_CSS_SELECTOR).first();
+    private void parseAndSetManufacturerAndName(Element itememorylock, MemoryHotLine memory) {
+        Element nameElement = itememorylock.select(NAME_CSS_SELECTOR).first();
         String text = nameElement != null ? nameElement.text().trim() : "Не найдено";
         String manufacturer = text.split(" ")[0];
         String name = text.substring(manufacturer.length()).trim();
-        mb.setManufacturer(manufacturer);
-        mb.setName(name);
+        memory.setManufacturer(manufacturer);
+        memory.setName(name);
     }
 
-    private String parseUrl(Element itemBlock) {
-        Element linkElement = itemBlock.select(LINK_CSS_SELECTOR).first();
+    private String parseUrl(Element itememorylock) {
+        Element linkElement = itememorylock.select(LINK_CSS_SELECTOR).first();
         if (linkElement == null) {
             log.warn("Can't find url");
             return "";
@@ -124,7 +131,7 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
     }
 
     private void parseDataFromCharacteristicsBlock(
-            Element characteristicsBlock, MotherBoardHotLine mb) {
+            Element characteristicsBlock, MemoryHotLine memory) {
         if (characteristicsBlock == null) {
             log.warn("Can't find span element to parse data");
         } else {
@@ -136,7 +143,7 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
             }
 
             for (Element position : positions) {
-                extractData(position.text(), mb);
+                extractData(position.text(), memory);
             }
         }
     }
@@ -147,45 +154,34 @@ public class MotherBoardPageParserImpl extends HotLinePageParserAbstract<MotherB
         }
     }
 
-    private void extractData(String text, MotherBoardHotLine mb) {
-
-        if (text.contains("Socket ")) {
-            mb.setSocketType(
-                    splitAndExtractDataByIndex(text, 1)
+    private void extractData(String text, MemoryHotLine memory) {
+        if (text.contains(" ГБ")) {
+            memory.setCapacity(
+                    splitAndExtractDataByIndex(text, 0)
             );
-        } else if (text.contains("Intel ")) {
-            mb.setChipset(
-                    splitAndExtractDataByIndex(text, 1)
-            );
-            mb.setChipsetManufacturer("Intel");
-        } else if (text.contains("AMD ")) {
-            mb.setChipset(
-                    splitAndExtractDataByIndex(text, 1)
-            );
-            mb.setChipsetManufacturer("AMD");
         } else if (text.contains("DDR2")) {
-            mb.setMemoryType(
+            memory.setType(
                     "DDR2"
             );
         } else if (text.contains("DDR3")) {
-            mb.setMemoryType(
+            memory.setType(
                     "DDR3"
             );
         } else if (text.contains("DDR4")) {
-            mb.setMemoryType(
+            memory.setType(
                     "DDR4"
             );
         } else if (text.contains("DDR5")) {
-            mb.setMemoryType(
+            memory.setType(
                     "DDR5"
             );
         } else if (text.contains("DDR6")) {
-            mb.setMemoryType(
+            memory.setType(
                     "DDR6"
             );
-        } else if (text.contains("ATX") || text.contains("ITX")) {
-            mb.setCaseType(
-                    splitAndExtractDataByIndex(text, 0).replaceAll(",+$", "")
+        } else if (text.contains(" МГц")) {
+            memory.setFrequency(
+                    splitAndExtractDataByIndex(text, 0)
             );
         }
 

@@ -1,15 +1,11 @@
 package com.example.parser.service.hotline;
 
 import com.example.parser.exseption.CustomServiceException;
-import com.example.parser.model.hotline.CpuHotLine;
 import com.example.parser.model.hotline.GpuHotLine;
-import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.repository.GpuHotLineRepository;
 import com.example.parser.repository.GpuUserBenchmarkRepository;
-import com.example.parser.service.parse.MultiThreadPageParser;
-import com.example.parser.service.parse.hotlinepageparser.impl.GpuPageParserImpl;
-import jakarta.annotation.PostConstruct;
+import com.example.parser.service.parse.MultiThreadPagesParser;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Log4j2
 public class GpuHotlineService {
-    private final MultiThreadPageParser<GpuHotLine> gpuPageParserImpl;
+    private final MultiThreadPagesParser<GpuHotLine> gpuPageParserImpl;
     private final GpuHotLineRepository gpuHotLineRepository;
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
 
@@ -35,7 +31,7 @@ public class GpuHotlineService {
     public List<GpuHotLine> parseThenCleanDbThenSaveNewItems() {
         try {
             log.info("Starting gpu data update process...");
-            List<GpuHotLine> gpusHotLine = gpuPageParserImpl.parseMultiThread();
+            List<GpuHotLine> gpusHotLine = gpuPageParserImpl.parseAllMultiThread();
 
             log.info("Parsed {} gpus.", gpusHotLine.size());
             gpuHotLineRepository.deleteAll();

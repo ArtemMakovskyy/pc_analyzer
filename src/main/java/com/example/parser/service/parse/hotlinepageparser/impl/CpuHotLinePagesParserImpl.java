@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Log4j2
 @Component
-public class CpuPageParserImpl extends HotLinePageParserAbstract<CpuHotLine> {
+public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHotLine> {
     private static final String BASE_URL = "https://hotline.ua/ua/computer/processory/?p=";
     private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
     private static final String PRICE_CSS_SELECTOR = "div.list-item__value-price";
@@ -28,7 +28,7 @@ public class CpuPageParserImpl extends HotLinePageParserAbstract<CpuHotLine> {
             + "list-item__value--full > div > div > div.m_b-10";
     private static final String DIGITS_REGEX = "\\d+";
 
-    public CpuPageParserImpl(HtmlDocumentFetcher htmlDocumentFetcher) {
+    public CpuHotLinePagesParserImpl(HtmlDocumentFetcher htmlDocumentFetcher) {
         super(htmlDocumentFetcher, BASE_URL);
     }
 

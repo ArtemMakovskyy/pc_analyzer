@@ -3,7 +3,7 @@ package com.example.parser.service.hotline;
 import com.example.parser.exseption.CustomServiceException;
 import com.example.parser.model.hotline.MotherBoardHotLine;
 import com.example.parser.repository.MotherBoardHotLineRepository;
-import com.example.parser.service.parse.MultiThreadPageParser;
+import com.example.parser.service.parse.MultiThreadPagesParser;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -15,14 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Log4j2
 public class MotherBoardHotlineService {
 
-    private final MultiThreadPageParser<MotherBoardHotLine> motherBoardPageParserImpl;
+    private final MultiThreadPagesParser<MotherBoardHotLine> motherBoardPageParserImpl;
     private final MotherBoardHotLineRepository motherBoardHotLineRepository;
 
     @Transactional
     public List<MotherBoardHotLine> parseThenCleanDbThenSaveNewItems() {
         try {
             log.info("Starting motherboard data update process...");
-            List<MotherBoardHotLine> motherBoards = motherBoardPageParserImpl.parseMultiThread();
+            List<MotherBoardHotLine> motherBoards = motherBoardPageParserImpl.parseAllMultiThread();
 
             log.info("Parsed {} motherboards.", motherBoards.size());
             motherBoardHotLineRepository.deleteAll();

@@ -1,20 +1,12 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
 import com.example.parser.model.hotline.GpuHotLine;
-import com.example.parser.model.hotline.GpuHotLine;
-import com.example.parser.service.parse.PageParser;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.service.parse.utils.ParseUtil;
-import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -23,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Log4j2
-public class GpuPageParserImpl extends HotLinePageParserAbstract<GpuHotLine> {
+public class GpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<GpuHotLine> {
     private static final String BASE_URL = "https://hotline.ua/ua/computer/videokarty/?p=";
     private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
     private static final String NO_ELEMENT_CSS_SELECTOR
@@ -36,7 +28,7 @@ public class GpuPageParserImpl extends HotLinePageParserAbstract<GpuHotLine> {
     private static final String LINK_CSS_SELECTOR = "a.item-title.link--black";
     private static final String DIGITS_REGEX = "\\d+";
 
-    public GpuPageParserImpl(HtmlDocumentFetcher htmlDocumentFetcher) {
+    public GpuHotLinePagesParserImpl(HtmlDocumentFetcher htmlDocumentFetcher) {
         super(htmlDocumentFetcher, BASE_URL);
     }
 

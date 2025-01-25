@@ -1,20 +1,13 @@
 package com.example.parser.service.hotline;
 
-import com.example.parser.model.hotline.CpuHotLine;
-import com.example.parser.model.hotline.GpuHotLine;
-import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
-import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.repository.CpuHotLineRepository;
 import com.example.parser.repository.CpuUserBenchmarkRepository;
 import com.example.parser.repository.GpuHotLineRepository;
 import com.example.parser.repository.GpuUserBenchmarkRepository;
-import com.example.parser.service.parse.hotlinepageparser.impl.CpuPageParserImpl;
-import com.example.parser.service.parse.hotlinepageparser.impl.GpuPageParserImpl;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+import com.example.parser.service.parse.hotlinepageparser.impl.CpuHotLinePagesParserImpl;
+import com.example.parser.service.parse.hotlinepageparser.impl.GpuHotLinePagesParserImpl;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -25,11 +18,11 @@ import org.springframework.stereotype.Service;
 public class HotlineUpdaterService {
     private static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
     private static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
-    private final CpuPageParserImpl hotlineCpuPageParserImpl;
+    private final CpuHotLinePagesParserImpl hotlineCpuHotLinePageParserImpl;
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
     private final GpuHotLineRepository gpuHotLineRepository;
-    private final GpuPageParserImpl hotlineGpuPageParserImpl;
+    private final GpuHotLinePagesParserImpl hotlineGpuHotLinePageParserImpl;
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
 
 //    public void parseAllMT() {

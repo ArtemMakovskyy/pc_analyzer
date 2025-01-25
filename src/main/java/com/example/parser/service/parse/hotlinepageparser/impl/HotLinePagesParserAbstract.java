@@ -1,7 +1,7 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
 import com.example.parser.service.parse.HtmlDocumentFetcher;
-import com.example.parser.service.parse.MultiThreadPageParser;
+import com.example.parser.service.parse.MultiThreadPagesParser;
 import com.example.parser.service.parse.utils.ParseUtil;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +16,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 @Log4j2
-public abstract class HotLinePageParserAbstract<T> implements MultiThreadPageParser<T> {
+public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesParser<T> {
     protected static final String DOMAIN_LINK = "https://hotline.ua";
     protected static final String PAGES_CSS_SELECTOR = "a.page";
     protected static final String TABLE_CSS_SELECTOR = "div.list-body__content.content.flex-wrap > div";
@@ -25,13 +25,13 @@ public abstract class HotLinePageParserAbstract<T> implements MultiThreadPagePar
     protected final HtmlDocumentFetcher htmlDocumentFetcher;
     protected final String baseUrl;
 
-    public HotLinePageParserAbstract(HtmlDocumentFetcher htmlDocumentFetcher, String baseUrl) {
+    public HotLinePagesParserAbstract(HtmlDocumentFetcher htmlDocumentFetcher, String baseUrl) {
         this.htmlDocumentFetcher = htmlDocumentFetcher;
         this.baseUrl = baseUrl;
     }
 
     @Override
-    public List<T> parseMultiThread() {
+    public List<T> parseAllMultiThread() {
         int startPage = 1;
         int maxPage = findMaxPage(baseUrl + 1);
         List<T> parts = new ArrayList<>();
@@ -66,7 +66,7 @@ public abstract class HotLinePageParserAbstract<T> implements MultiThreadPagePar
     }
 
     @Override
-    public List<T> parse() {
+    public List<T> parseAll() {
         int startPage = 1;
         int maxPage = findMaxPage(baseUrl + 1);
         List<T> parts = new ArrayList<>();
@@ -86,6 +86,13 @@ public abstract class HotLinePageParserAbstract<T> implements MultiThreadPagePar
         return parts;
     }
 
+    @Override
+    public List<T> parsePage(
+            String url
+    ) {
+        Document htmlDocument = fetchHtmlDocumentWithRetries(url, true, true, 2, 4, false);
+        return parseData(htmlDocument);
+    }
     protected List<T> parsePage(
             String url,
             boolean useUserAgent,

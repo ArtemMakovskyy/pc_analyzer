@@ -5,7 +5,7 @@ import com.example.parser.model.hotline.CpuHotLine;
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.repository.CpuHotLineRepository;
 import com.example.parser.repository.CpuUserBenchmarkRepository;
-import com.example.parser.service.parse.MultiThreadPageParser;
+import com.example.parser.service.parse.MultiThreadPagesParser;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Log4j2
 public class CpuHotlineService {
-    private final MultiThreadPageParser<CpuHotLine> сpuPageParserImpl;
+    private final MultiThreadPagesParser<CpuHotLine> сpuPageParserImpl;
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
 
@@ -31,7 +31,7 @@ public class CpuHotlineService {
     public List<CpuHotLine> parseThenCleanDbThenSaveNewItems() {
         try {
             log.info("Starting cpu data update process...");
-            List<CpuHotLine> cpusHotLine = сpuPageParserImpl.parseMultiThread();
+            List<CpuHotLine> cpusHotLine = сpuPageParserImpl.parseAllMultiThread();
 
             log.info("Parsed {} cpus.", cpusHotLine.size());
             cpuHotLineRepository.deleteAll();

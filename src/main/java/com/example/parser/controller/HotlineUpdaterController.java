@@ -1,8 +1,7 @@
 package com.example.parser.controller;
 
-import com.example.parser.service.hotline.HotlineUpdaterService;
+import com.example.parser.service.hotline.HotlineDataUpdateCoordinatorService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -10,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class HotlineUpdaterController {
 
-    private final HotlineUpdaterService hotlineUpdaterService;
+    private final HotlineDataUpdateCoordinatorService hotlineDataUpdateCoordinatorService;
 
     /**
      * Initiates parsing and updates for both CPU and GPU using multithreading.

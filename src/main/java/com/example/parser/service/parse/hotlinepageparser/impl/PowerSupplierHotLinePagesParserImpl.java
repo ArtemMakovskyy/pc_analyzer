@@ -35,6 +35,11 @@ public class PowerSupplierHotLinePagesParserImpl
         super(htmlDocumentFetcher, BASE_URL);
     }
 
+//    @PostConstruct
+//    public void init(){
+//        parseAllMultiThread();
+//    }
+
     @Override
     protected List<PowerSupplierHotLine> parseData(Document htmlDocument) {
         Elements tableElements = htmlDocument.select(TABLE_CSS_SELECTOR);

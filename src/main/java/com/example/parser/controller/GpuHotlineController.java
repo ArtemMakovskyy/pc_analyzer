@@ -1,12 +1,7 @@
 package com.example.parser.controller;
 
-import com.example.parser.model.hotline.GpuHotLine;
-import com.example.parser.service.hotline.GpuHotlineService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/gpu-hotline")

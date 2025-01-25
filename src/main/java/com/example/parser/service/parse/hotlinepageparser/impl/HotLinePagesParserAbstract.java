@@ -61,7 +61,8 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
                 Thread.currentThread().interrupt();
             }
         }
-        shutdownExecutor();
+        //todo how correct do this
+//        shutdownExecutor();
         return parts;
     }
 
@@ -170,7 +171,7 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
         return maxPage;
     }
 
-    protected void shutdownExecutor() {
+    public static void shutdownExecutor() {
         executor.shutdown();
         try {
             if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {

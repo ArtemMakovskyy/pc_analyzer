@@ -12,9 +12,9 @@ import lombok.ToString;
 @Entity
 @Getter
 @Setter
-@Table(name = "ssd_hotline")
+@Table(name = "power_supplier_hotline")
 @ToString
-public class SsdHotLine {
+public class PowerSupplierHotLine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,11 +23,12 @@ public class SsdHotLine {
     private String prices;
     private Double avgPrice;
     private Integer propositionsQuantity;
-
     private String manufacturer;
+
     private String type;
-    private String capacity;
-    private String readingSpeed;
-    private String writingSpeed;
+    private String power;
+    private String standard;
+    private String motherboardConnection;
+    private String gpuConnection;
 
 }

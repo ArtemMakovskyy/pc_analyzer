@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Log4j2
 public class MotherBoardHotlineService {
-
     private final MultiThreadPagesParser<MotherBoardHotLine> motherBoardPageParserImpl;
     private final MotherBoardHotLineRepository motherBoardHotLineRepository;
 

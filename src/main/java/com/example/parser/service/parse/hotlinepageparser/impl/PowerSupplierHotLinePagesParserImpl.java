@@ -1,7 +1,6 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
-import com.example.parser.model.hotline.SsdHotLine;
-import com.example.parser.model.hotline.SsdHotLine;
+import com.example.parser.model.hotline.PowerSupplierHotLine;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.service.parse.utils.ParseUtil;
 import jakarta.annotation.PostConstruct;
@@ -17,8 +16,10 @@ import org.springframework.stereotype.Component;
 
 @Log4j2
 @Component
-public class SsdHotLinePagesParserImpl extends HotLinePagesParserAbstract<SsdHotLine> {
-    private static final String BASE_URL = "https://hotline.ua/ua/computer/diski-ssd/66705/?p=";
+public class PowerSupplierHotLinePagesParserImpl
+        extends HotLinePagesParserAbstract<PowerSupplierHotLine> {
+    private static final String BASE_URL
+            = "https://hotline.ua/ua/computer/bloki-pitaniya/296278-296291-296313-296359-296368/?p=";
     private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
     private static final String PRICE_CSS_SELECTOR = "div.list-item__value-price";
     private static final String NAME_CSS_SELECTOR = "div.list-item__title-container a";
@@ -30,33 +31,34 @@ public class SsdHotLinePagesParserImpl extends HotLinePagesParserAbstract<SsdHot
             + "list-item__value--full > div > div > div.m_b-10";
     private static final String DIGITS_REGEX = "\\d+";
 
-    public SsdHotLinePagesParserImpl(HtmlDocumentFetcher htmlDocumentFetcher) {
+    public PowerSupplierHotLinePagesParserImpl(HtmlDocumentFetcher htmlDocumentFetcher) {
         super(htmlDocumentFetcher, BASE_URL);
     }
 
     @Override
-    protected List<SsdHotLine> parseData(Document htmlDocument) {
+    protected List<PowerSupplierHotLine> parseData(Document htmlDocument) {
         Elements tableElements = htmlDocument.select(TABLE_CSS_SELECTOR);
-        List<SsdHotLine> motherBoards = new ArrayList<>();
+        List<PowerSupplierHotLine> powerSupplys = new ArrayList<>();
 
         for (Element itemBlock : tableElements) {
-            SsdHotLine ssd = new SsdHotLine();
-            setFields(ssd, itemBlock);
-            motherBoards.add(ssd);
+            PowerSupplierHotLine memory = new PowerSupplierHotLine();
+            setFields(memory, itemBlock);
+            powerSupplys.add(memory);
         }
-        return motherBoards;
+
+        return powerSupplys;
     }
 
-    private void setFields(SsdHotLine ssd, Element itemBlock) {
-        ssd.setUrl(DOMAIN_LINK + parseUrl(itemBlock));
-        ssd.setPropositionsQuantity(setPropositionQuantity(itemBlock));
-        parseAndSetManufacturerAndName(itemBlock, ssd);
+    private void setFields(PowerSupplierHotLine powerSupplierHotLine, Element itemBlock) {
+        powerSupplierHotLine.setUrl(DOMAIN_LINK + parseUrl(itemBlock));
+        powerSupplierHotLine.setPropositionsQuantity(setPropositionQuantity(itemBlock));
+        parseAndSetManufacturerAndName(itemBlock, powerSupplierHotLine);
         String prices = parsePrices(itemBlock);
-        ssd.setPrices(prices);
-        processTextToPriceAvg(prices, ssd);
+        powerSupplierHotLine.setPrices(prices);
+        processTextToPriceAvg(prices, powerSupplierHotLine);
         Element characteristicsBlock
                 = itemBlock.select(CHARACTERISTICS_BLOCK_CSS_SELECTOR).first();
-        parseDataFromCharacteristicsBlock(characteristicsBlock, ssd);
+        parseDataFromCharacteristicsBlock(characteristicsBlock, powerSupplierHotLine);
     }
 
     private int setPropositionQuantity(Element itemBlock) {
@@ -87,7 +89,7 @@ public class SsdHotLinePagesParserImpl extends HotLinePagesParserAbstract<SsdHot
         return itemBlock.select(PRICE_CSS_SELECTOR).text();
     }
 
-    public void processTextToPriceAvg(String input, SsdHotLine ssd) {
+    public void processTextToPriceAvg(String input, PowerSupplierHotLine powerSupplierHotLine) {
         input = input.replace("грн", "").trim();
         String[] parts = input.split("–");
         double num1;
@@ -96,23 +98,23 @@ public class SsdHotLinePagesParserImpl extends HotLinePagesParserAbstract<SsdHot
                     parts[0].trim().replace(" ", ""));
             double num2 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
                     parts[1].trim().replace(" ", ""));
-            ssd.setAvgPrice((num1 + num2) / 2);
+            powerSupplierHotLine.setAvgPrice((num1 + num2) / 2);
         } else if (parts.length == 1) {
             num1 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
                     parts[0].trim().replace(" ", ""));
-            ssd.setAvgPrice(num1);
+            powerSupplierHotLine.setAvgPrice(num1);
         } else {
-            ssd.setAvgPrice(0.00);
+            powerSupplierHotLine.setAvgPrice(0.00);
         }
     }
 
-    private void parseAndSetManufacturerAndName(Element itemBlock, SsdHotLine ssd) {
+    private void parseAndSetManufacturerAndName(Element itemBlock, PowerSupplierHotLine powerSupplierHotLine) {
         Element nameElement = itemBlock.select(NAME_CSS_SELECTOR).first();
         String text = nameElement != null ? nameElement.text().trim() : "Не найдено";
         String manufacturer = text.split(" ")[0];
         String name = text.substring(manufacturer.length()).trim();
-        ssd.setManufacturer(manufacturer);
-        ssd.setName(name);
+        powerSupplierHotLine.setManufacturer(manufacturer);
+        powerSupplierHotLine.setName(name);
     }
 
     private String parseUrl(Element itemBlock) {
@@ -125,7 +127,7 @@ public class SsdHotLinePagesParserImpl extends HotLinePagesParserAbstract<SsdHot
     }
 
     private void parseDataFromCharacteristicsBlock(
-            Element characteristicsBlock, SsdHotLine ssd) {
+            Element characteristicsBlock, PowerSupplierHotLine powerSupplierHotLine) {
         if (characteristicsBlock == null) {
             log.warn("Can't find span element to parse data");
         } else {
@@ -137,7 +139,7 @@ public class SsdHotLinePagesParserImpl extends HotLinePagesParserAbstract<SsdHot
             }
 
             for (Element position : positions) {
-                extractData(position.text(), ssd);
+                extractData(position.text(), powerSupplierHotLine);
             }
         }
     }
@@ -148,22 +150,26 @@ public class SsdHotLinePagesParserImpl extends HotLinePagesParserAbstract<SsdHot
         }
     }
 
-    private void extractData(String text, SsdHotLine ssd) {
-        if (text.contains(" ГБ")) {
-            ssd.setCapacity(
-                    splitAndExtractDataByIndex(text, 0)
+    private void extractData(String text, PowerSupplierHotLine powerSupplierHotLine) {
+        if (text.contains("ATX")) {
+            powerSupplierHotLine.setType(
+                    text
             );
-        } else if (text.contains("SSD ")) {
-            ssd.setType(
-                    "SSD"
+        } else if (text.contains("Потужність: ")) {
+            powerSupplierHotLine.setPower(
+                    splitAndExtractDataByIndex(text, 1)
             );
-        } else if (text.contains("Швидкість читання: ")) {
-            ssd.setReadingSpeed(
-                   text.replace("Швидкість читання: ","")
+        } else if (text.contains("Стандарт: ")) {
+            powerSupplierHotLine.setStandard(
+                    text.replace("Стандарт: ", "")
             );
-        } else if (text.contains("Швидкість запису: ")) {
-            ssd.setWritingSpeed(
-                    text.replace("Швидкість запису: ","")
+        } else if (text.contains("Підключення до материнської плати: ")) {
+            powerSupplierHotLine.setMotherboardConnection(
+                    text.replace("Підключення до материнської плати: ", "")
+            );
+        } else if (text.contains("Підключення відеокарт: ")) {
+            powerSupplierHotLine.setGpuConnection(
+                    text.replace("Підключення відеокарт: ", "")
             );
         }
 

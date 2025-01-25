@@ -17,7 +17,8 @@ import org.springframework.stereotype.Component;
 @Log4j2
 @Component
 public class MemoryHotLinePagesParserImpl extends HotLinePagesParserAbstract<MemoryHotLine> {
-    private static final String BASE_URL = "https://hotline.ua/ua/computer/materinskie-platy/?p=";
+    private static final String BASE_URL
+            = "https://hotline.ua/ua/computer/moduli-pamyati-dlya-pk-i-noutbukov/3102/?p=";
     private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
     private static final String PRICE_CSS_SELECTOR = "div.list-item__value-price";
     private static final String NAME_CSS_SELECTOR = "div.list-item__title-container a";
@@ -33,40 +34,34 @@ public class MemoryHotLinePagesParserImpl extends HotLinePagesParserAbstract<Mem
         super(htmlDocumentFetcher, BASE_URL);
     }
 
-//    @PostConstruct
-//    public void init() {
-//        final List<MemoryHotLine> memoryHotLines = parsePage("https://hotline.ua/ua/computer/moduli-pamyati-dlya-pk-i-noutbukov/3102-19139-98765/?sort=priceUp");
-//        memoryHotLines.forEach(System.out::println);
-//    }
-
     @Override
     protected List<MemoryHotLine> parseData(Document htmlDocument) {
         Elements tableElements = htmlDocument.select(TABLE_CSS_SELECTOR);
         List<MemoryHotLine> motherBoards = new ArrayList<>();
 
-        for (Element itememorylock : tableElements) {
+        for (Element itemBlock : tableElements) {
             MemoryHotLine memory = new MemoryHotLine();
-            setFields(memory, itememorylock);
+            setFields(memory, itemBlock);
             motherBoards.add(memory);
         }
 
         return motherBoards;
     }
 
-    private void setFields(MemoryHotLine memory, Element itememorylock) {
-        memory.setUrl(DOMAIN_LINK + parseUrl(itememorylock));
-        memory.setPropositionsQuantity(setPropositionQuantity(itememorylock));
-        parseAndSetManufacturerAndName(itememorylock, memory);
-        String prices = parsePrices(itememorylock);
+    private void setFields(MemoryHotLine memory, Element itemBlock) {
+        memory.setUrl(DOMAIN_LINK + parseUrl(itemBlock));
+        memory.setPropositionsQuantity(setPropositionQuantity(itemBlock));
+        parseAndSetManufacturerAndName(itemBlock, memory);
+        String prices = parsePrices(itemBlock);
         memory.setPrices(prices);
         processTextToPriceAvg(prices, memory);
         Element characteristicsBlock
-                = itememorylock.select(CHARACTERISTICS_BLOCK_CSS_SELECTOR).first();
+                = itemBlock.select(CHARACTERISTICS_BLOCK_CSS_SELECTOR).first();
         parseDataFromCharacteristicsBlock(characteristicsBlock, memory);
     }
 
-    private int setPropositionQuantity(Element itememorylock) {
-        Elements noElement = itememorylock.select(NO_ELEMENT_CSS_SELECTOR);
+    private int setPropositionQuantity(Element itemBlock) {
+        Elements noElement = itemBlock.select(NO_ELEMENT_CSS_SELECTOR);
         if (!noElement.isEmpty()) {
             String waitingText = noElement.text();
 
@@ -75,22 +70,22 @@ public class MemoryHotLinePagesParserImpl extends HotLinePagesParserAbstract<Mem
             }
         }
 
-        Elements propositionQuantityElement = itememorylock.select(PROPOSITION_QUANTITY_CSS_SELECTOR);
+        Elements propositionQuantityElement = itemBlock.select(PROPOSITION_QUANTITY_CSS_SELECTOR);
         if (!propositionQuantityElement.isEmpty()) {
             String text = propositionQuantityElement.text().trim();
             Pattern pattern = Pattern.compile(DIGITS_REGEX);
             Matcher matcher = pattern.matcher(text);
 
             if (matcher.find()) {
-                String numemoryer = matcher.group();
-                return ParseUtil.stringToIntIfErrorReturnMinusOne(numemoryer);
+                String quantity = matcher.group();
+                return ParseUtil.stringToIntIfErrorReturnMinusOne(quantity);
             }
         }
         return 1;
     }
 
-    private String parsePrices(Element itememorylock) {
-        return itememorylock.select(PRICE_CSS_SELECTOR).text();
+    private String parsePrices(Element itemBlock) {
+        return itemBlock.select(PRICE_CSS_SELECTOR).text();
     }
 
     public void processTextToPriceAvg(String input, MemoryHotLine memory) {
@@ -112,8 +107,8 @@ public class MemoryHotLinePagesParserImpl extends HotLinePagesParserAbstract<Mem
         }
     }
 
-    private void parseAndSetManufacturerAndName(Element itememorylock, MemoryHotLine memory) {
-        Element nameElement = itememorylock.select(NAME_CSS_SELECTOR).first();
+    private void parseAndSetManufacturerAndName(Element itemBlock, MemoryHotLine memory) {
+        Element nameElement = itemBlock.select(NAME_CSS_SELECTOR).first();
         String text = nameElement != null ? nameElement.text().trim() : "Не найдено";
         String manufacturer = text.split(" ")[0];
         String name = text.substring(manufacturer.length()).trim();
@@ -121,8 +116,8 @@ public class MemoryHotLinePagesParserImpl extends HotLinePagesParserAbstract<Mem
         memory.setName(name);
     }
 
-    private String parseUrl(Element itememorylock) {
-        Element linkElement = itememorylock.select(LINK_CSS_SELECTOR).first();
+    private String parseUrl(Element itemBlock) {
+        Element linkElement = itemBlock.select(LINK_CSS_SELECTOR).first();
         if (linkElement == null) {
             log.warn("Can't find url");
             return "";

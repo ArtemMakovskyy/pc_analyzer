@@ -2,11 +2,8 @@ package com.example.parser.service.hotline;
 
 import com.example.parser.exseption.CustomServiceException;
 import com.example.parser.model.hotline.SsdHotLine;
-import com.example.parser.model.hotline.SsdHotLine;
-import com.example.parser.repository.SsdHotLineRepository;
 import com.example.parser.repository.SsdHotLineRepository;
 import com.example.parser.service.parse.MultiThreadPagesParser;
-import jakarta.annotation.PostConstruct;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -17,22 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Log4j2
 public class SsdHotlineService {
-    private final static String MEMORY_PAGE_LINK_DDR4
+    private final static String SSD_PAGE_LINK
             = "https://hotline.ua/ua/computer/diski-ssd/66705-301666-301678-301686-608078-667303/";
 
     private final MultiThreadPagesParser<SsdHotLine> ssdHotlinePageParserImpl;
     private final SsdHotLineRepository ssdHotLineRepository;
 
-//    @PostConstruct
-//    public void init() {
-//        parseThenCleanDbThenSaveNewItems();
-//    }
-
     @Transactional
     public List<SsdHotLine> parseThenCleanDbThenSaveNewItems() {
         try {
             log.info("Starting ssd data update process...");
-            List<SsdHotLine> ssds = ssdHotlinePageParserImpl.parsePage(MEMORY_PAGE_LINK_DDR4);
+            List<SsdHotLine> ssds = ssdHotlinePageParserImpl.parsePage(SSD_PAGE_LINK);
 
             log.info("Parsed {} ssd.", ssds.size());
             ssdHotLineRepository.deleteAll();

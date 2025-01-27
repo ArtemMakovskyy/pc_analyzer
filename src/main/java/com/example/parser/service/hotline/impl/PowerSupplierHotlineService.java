@@ -5,8 +5,8 @@ import com.example.parser.model.hotline.PowerSupplierHotLine;
 import com.example.parser.repository.PowerSupplierHotLineRepository;
 import com.example.parser.service.hotline.DataUpdateService;
 import com.example.parser.service.parse.MultiThreadPagesParser;
-import jakarta.annotation.PostConstruct;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -20,17 +20,12 @@ public class PowerSupplierHotlineService implements DataUpdateService {
     private final MultiThreadPagesParser<PowerSupplierHotLine> powerSupplierMultiThreadPagesParser;
     private final PowerSupplierHotLineRepository powerSupplierHotLineRepository;
 
-//    @PostConstruct
-//    public void init() {
-//        refreshDatabaseWithParsedData();
-//    }
-
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
-    public void refreshDatabaseWithParsedData() {
+    public void refreshDatabaseWithParsedData(ExecutorService executor) {
         try {
             log.info("Starting power supplier data update process...");
-            List<PowerSupplierHotLine> items = powerSupplierMultiThreadPagesParser.parseAllMultiThread();
+            List<PowerSupplierHotLine> items = powerSupplierMultiThreadPagesParser.parseAllMultiThread(executor);
 
             log.info("Parsed {} power supplier.", items.size());
             powerSupplierHotLineRepository.deleteAll();

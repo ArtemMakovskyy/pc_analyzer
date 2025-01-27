@@ -20,8 +20,6 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
     protected static final String DOMAIN_LINK = "https://hotline.ua";
     protected static final String PAGES_CSS_SELECTOR = "a.page";
     protected static final String TABLE_CSS_SELECTOR = "div.list-body__content.content.flex-wrap > div";
-    protected static final int THREAD_POOL_SIZE = Runtime.getRuntime().availableProcessors();
-    protected static final ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
     protected final HtmlDocumentFetcher htmlDocumentFetcher;
     protected final String baseUrl;
 
@@ -31,7 +29,7 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
     }
 
     @Override
-    public List<T> parseAllMultiThread() {
+    public List<T> parseAllMultiThread(ExecutorService executor) {
         int startPage = 1;
         int maxPage = findMaxPage(baseUrl + 1);
         List<T> parts = new ArrayList<>();
@@ -169,21 +167,6 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
         }
         log.info("Pages quality: " + maxPage);
         return maxPage;
-    }
-
-    public static void shutdownExecutor() {
-        executor.shutdown();
-        try {
-            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
-                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                    log.error("Executor did not terminate");
-                }
-            }
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
     }
 
 }

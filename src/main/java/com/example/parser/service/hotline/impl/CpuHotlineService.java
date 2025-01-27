@@ -9,6 +9,7 @@ import com.example.parser.service.hotline.DataUpdateService;
 import com.example.parser.service.hotline.DatabaseSynchronizationService;
 import com.example.parser.service.parse.MultiThreadPagesParser;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -26,10 +27,10 @@ public class CpuHotlineService implements DataUpdateService, DatabaseSynchroniza
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
-    public void refreshDatabaseWithParsedData() {
+    public void refreshDatabaseWithParsedData(ExecutorService executor) {
         try {
             log.info("Starting cpu data update process...");
-            List<CpuHotLine> cpusHotLine = сpuPageParserImpl.parseAllMultiThread();
+            List<CpuHotLine> cpusHotLine = сpuPageParserImpl.parseAllMultiThread(executor);
 
             log.info("Parsed {} cpus.", cpusHotLine.size());
             cpuHotLineRepository.deleteAll();

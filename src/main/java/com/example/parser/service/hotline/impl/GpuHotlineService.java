@@ -8,8 +8,8 @@ import com.example.parser.repository.GpuUserBenchmarkRepository;
 import com.example.parser.service.hotline.DataUpdateService;
 import com.example.parser.service.hotline.DatabaseSynchronizationService;
 import com.example.parser.service.parse.MultiThreadPagesParser;
-import jakarta.annotation.PostConstruct;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -24,17 +24,12 @@ public class GpuHotlineService implements DataUpdateService, DatabaseSynchroniza
     private final GpuHotLineRepository gpuHotLineRepository;
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
 
-//        @PostConstruct
-//    public void init(){
-//            refreshDatabaseWithParsedData();
-//    }
-
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
-    public void refreshDatabaseWithParsedData() {
+    public void refreshDatabaseWithParsedData(ExecutorService executor) {
         try {
             log.info("Starting gpu data update process...");
-            List<GpuHotLine> gpusHotLine = gpuPageParserImpl.parseAllMultiThread();
+            List<GpuHotLine> gpusHotLine = gpuPageParserImpl.parseAllMultiThread(executor);
 
             log.info("Parsed {} gpus.", gpusHotLine.size());
             gpuHotLineRepository.deleteAll();

@@ -1,13 +1,11 @@
 package com.example.parser.service.hotline;
 
-import static com.example.parser.service.parse.hotlinepageparser.impl.HotLinePagesParserAbstract.shutdownExecutor;
-
 import jakarta.annotation.PostConstruct;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
@@ -18,26 +16,27 @@ public class HotlineDataUpdateCoordinatorService {
     private final List<DataUpdateService> dataUpdateServices;
     private final List<DatabaseSynchronizationService> databaseSynchronizationServices;
 
-    @PostConstruct
+        @PostConstruct
     public void init() {
         updateAllData();
     }
 
-    @SneakyThrows
     public void updateAllData() {
-        one();
-        two();
-        //todo how correct do this
-        Thread.sleep(3000);
-        shutdownExecutor();
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        ExecutorService executor = Executors.newFixedThreadPool(availableProcessors);
+
+        runAllDataUpdateServices(executor);
+        runAllDatabaseSynchronizationServices();
+
+        shutdownExecutor(executor);
     }
 
-    private void one() {
+    private void runAllDataUpdateServices(ExecutorService executor) {
         log.info("Начало процесса обновления данных для всех сервисов...");
 
         for (DataUpdateService service : dataUpdateServices) {
             try {
-                service.refreshDatabaseWithParsedData();
+                service.refreshDatabaseWithParsedData(executor);
             } catch (Exception e) {
                 log.error("Ошибка при обновлении данных в сервисе {}: {}", service.getClass().getSimpleName(), e.getMessage(), e);
             }
@@ -45,41 +44,34 @@ public class HotlineDataUpdateCoordinatorService {
         log.info("Завершено обновление данных для всех сервисов.");
     }
 
-    private void one2() {
+    private void runAllDatabaseSynchronizationServices() {
         log.info("Начало процесса обновления данных для всех сервисов...");
 
-        for (DataUpdateService service : dataUpdateServices) {
-            boolean success = false;
-            int attempts = 0;
-            while (!success && attempts < 3) {
-                try {
-                    service.refreshDatabaseWithParsedData();
-                    success = true;
-                } catch (Exception e) {
-                    attempts++;
-                    log.error("Ошибка при обновлении данных в сервисе {}: {}. Попытка {}/3",
-                            service.getClass().getSimpleName(), e.getMessage(), attempts, e);
-                    if (attempts >= 3) {
-                        log.error("Ошибка в сервисе {} после 3 попыток: {}",
-                                service.getClass().getSimpleName(), e.getMessage(), e);
-                    }
+        for (DatabaseSynchronizationService service : databaseSynchronizationServices) {
+            try {
+                service.synchronizeWithBenchmarkData();
+            } catch (Exception e) {
+                log.error("Ошибка при обновлении данных в сервисе {}: {}"
+                        , service.getClass().getSimpleName(), e.getMessage(), e);
+            }
+        }
+        log.info("Завершено обновление данных для всех сервисов.");
+
+    }
+
+    public void shutdownExecutor(ExecutorService executor) {
+        executor.shutdown();
+        try {
+            if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                    log.error("Executor did not terminate");
                 }
             }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
         }
-
-        log.info("Завершено обновление данных для всех сервисов.");
     }
 
-    private void two() {
-        log.info("Начало процесса обновления данных для всех сервисов...");
-
-        for (DataUpdateService service : dataUpdateServices) {
-            try {
-                service.refreshDatabaseWithParsedData();
-            } catch (Exception e) {
-                log.error("Ошибка при обновлении данных в сервисе {}: {}", service.getClass().getSimpleName(), e.getMessage(), e);
-            }
-        }
-        log.info("Завершено обновление данных для всех сервисов.");
-    }
 }

@@ -33,6 +33,7 @@ public class UserBenchmarkGpu {
     private Double avgBench;
     private Double price;
     private String urlOfGpu;
+    private Integer powerRequirement;
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;

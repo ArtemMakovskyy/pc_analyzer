@@ -8,6 +8,7 @@ import com.example.parser.repository.CpuUserBenchmarkRepository;
 import com.example.parser.service.hotline.DataUpdateService;
 import com.example.parser.service.hotline.DatabaseSynchronizationService;
 import com.example.parser.service.parse.MultiThreadPagesParser;
+import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,12 @@ public class CpuHotlineService implements DataUpdateService, DatabaseSynchroniza
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
 
+//    @PostConstruct
+//    public void aaa(){
+//        final List<CpuHotLine> minPriceGroupedByUserBenchmarkCpuId
+//                = cpuHotLineRepository.findMinPriceGroupedByUserBenchmarkCpuId();
+//        minPriceGroupedByUserBenchmarkCpuId.forEach(System.out::println);
+//    }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override

@@ -16,10 +16,10 @@ public class HotlineDataUpdateCoordinatorService {
     private final List<DataUpdateService> dataUpdateServices;
     private final List<DatabaseSynchronizationService> databaseSynchronizationServices;
 
-        @PostConstruct
-    public void init() {
-        updateAllData();
-    }
+//        @PostConstruct
+//    public void init() {
+//        updateAllData();
+//    }
 
     public void updateAllData() {
         int availableProcessors = Runtime.getRuntime().availableProcessors();

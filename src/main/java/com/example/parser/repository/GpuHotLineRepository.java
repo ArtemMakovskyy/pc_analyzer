@@ -31,10 +31,10 @@ public interface GpuHotLineRepository extends JpaRepository<GpuHotLine,Long> {
             "    SELECT *, " +
             "           ROW_NUMBER() OVER (PARTITION BY name, memory_size ORDER BY avg_price ASC) AS row_num " +
             "    FROM parser.gpus_hotline " +
-            "    WHERE propositions_quantity > 1 " +
+            "    WHERE propositions_quantity > :minPropositionQuantity " +
             "    AND user_benchmark_gpu_id IS NOT NULL " +
             ") AS grouped_data " +
             "WHERE row_num = 1 " +
             "ORDER BY name, memory_size", nativeQuery = true)
-    List<GpuHotLine> findGroupedGpusByMinAvgPrice();
+    List<GpuHotLine> findGroupedGpusByMinAvgPrice(@Param("minPropositionQuantity") int minPropositionQuantity);
 }

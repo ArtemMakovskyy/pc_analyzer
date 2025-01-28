@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -21,7 +22,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @Table(name = "pc")
-@ToString
+@EqualsAndHashCode
 public class Pc {
 
     @Id
@@ -39,7 +40,28 @@ public class Pc {
     private SsdHotLine ssd;
     @ManyToOne
     private PowerSupplierHotLine powerSupplier;
-
     private BigDecimal price;
 
+    private Double desktopScore;
+    private Double gamingScore;
+    private Double workstationScore;
+    private Double avgGpuBench;
+    private Integer predictionGpuFpsFHD;
+
+    @Override
+    public String toString() {
+        return "Pc{" +
+                "id=" + id +
+                " | " + cpu.getName() +
+                " | " + motherboard.getManufacturer() + " " + motherboard.getName() +
+                " | " + memory.getManufacturer() + " " + memory.getName() +
+                " | " + gpu.getManufacturer() + " " + gpu.getName() + " " + gpu.getMemorySize() +
+                " | " + ssd.getManufacturer() + " " + ssd.getName() +
+                " | " + powerSupplier.getManufacturer() + " " + powerSupplier.getName() + " " + powerSupplier.getPower() + "W" +
+                " | avgGpuBench: " + avgGpuBench +
+                " | gamingScore: " + gamingScore +
+                " | predictionFpsFHD: " + predictionGpuFpsFHD +
+                " | " + price +
+                '}';
+    }
 }

@@ -6,6 +6,8 @@ import com.example.parser.service.parse.utils.ParseUtil;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.extern.log4j.Log4j2;
@@ -36,9 +38,11 @@ public class PowerSupplierHotLinePagesParserImpl
     }
 
 //    @PostConstruct
-//    public void init(){
-//        parseAllMultiThread();
-//    }
+    public void init(){
+        int availableProcessors = Runtime.getRuntime().availableProcessors();
+        ExecutorService executor = Executors.newFixedThreadPool(availableProcessors);
+        parseAllMultiThread(executor );
+    }
 
     @Override
     protected List<PowerSupplierHotLine> parseData(Document htmlDocument) {
@@ -162,7 +166,9 @@ public class PowerSupplierHotLinePagesParserImpl
             );
         } else if (text.contains("Потужність: ")) {
             powerSupplierHotLine.setPower(
-                    splitAndExtractDataByIndex(text, 1)
+                    ParseUtil.stringToIntIfErrorReturnMinusOne(
+                            splitAndExtractDataByIndex(text, 1)
+                    )
             );
         } else if (text.contains("Стандарт: ")) {
             powerSupplierHotLine.setStandard(

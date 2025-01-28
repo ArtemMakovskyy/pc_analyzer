@@ -33,11 +33,11 @@ public interface CpuHotLineRepository extends JpaRepository<CpuHotLine, Long> {
      c.avg_price;
      */
     @Query("SELECT c FROM CpuHotLine c " +
-            "WHERE c.avgPrice > 0 AND c.propositionsQuantity > 5 AND " +
+            "WHERE c.avgPrice > 0 AND c.propositionsQuantity > :minPropositionQuantity AND " +
             "c.avgPrice = (SELECT MIN(c2.avgPrice) " +
             "             FROM CpuHotLine c2 " +
             "             WHERE c2.userBenchmarkCpu.id = c.userBenchmarkCpu.id AND c2.avgPrice > 0) " +
             "ORDER BY c.avgPrice")
-    List<CpuHotLine> findMinPriceGroupedByUserBenchmarkCpuId();
+    List<CpuHotLine> findMinPriceGroupedByUserBenchmarkCpuId(@Param("minPropositionQuantity") int minPropositionQuantity);
 
 }

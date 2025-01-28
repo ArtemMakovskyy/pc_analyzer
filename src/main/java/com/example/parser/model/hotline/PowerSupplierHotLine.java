@@ -26,7 +26,7 @@ public class PowerSupplierHotLine {
     private String manufacturer;
 
     private String type;
-    private String power;
+    private Integer power;
     private String standard;
     private String motherboardConnection;
     private String gpuConnection;

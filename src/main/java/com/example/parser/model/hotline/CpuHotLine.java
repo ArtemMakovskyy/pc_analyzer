@@ -24,6 +24,7 @@ public class CpuHotLine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String manufacturer;
     private String name;
     private String url;
     private String prices;

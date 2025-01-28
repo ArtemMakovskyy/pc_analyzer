@@ -43,7 +43,7 @@ public interface MotherBoardHotLineRepository extends JpaRepository<MotherBoardH
                 parser.mother_boards_hotline
             WHERE 
                 prices != 0 AND chipset IS NOT NULL 
-                AND propositions_quantity > 1 
+                AND propositions_quantity > :minPropositionQuantity 
                 AND socket_type IS NOT NULL 
                 AND case_type IS NOT NULL
             GROUP BY 
@@ -54,6 +54,6 @@ public interface MotherBoardHotLineRepository extends JpaRepository<MotherBoardH
         ORDER BY 
             m.chipset, m.avg_price
         """, nativeQuery = true)
-    List<MotherBoardHotLine> findMinPriceGroupedByChipsetWithConditions();
+    List<MotherBoardHotLine> findMinPriceGroupedByChipsetWithConditions(@Param("minPropositionQuantity") int minPropositionQuantity);
 
 }

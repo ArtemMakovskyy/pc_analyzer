@@ -1,6 +1,7 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
 import com.example.parser.model.hotline.CpuHotLine;
+import com.example.parser.model.hotline.MotherBoardHotLine;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.service.parse.utils.ParseUtil;
 import java.util.ArrayList;
@@ -49,13 +50,24 @@ public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHot
     private void setFields(CpuHotLine cpu, Element itemBlock) {
         cpu.setUrl(DOMAIN_LINK + parseUrl(itemBlock));
         cpu.setPropositionsQuantity(setPropositionQuantity(itemBlock));
-        cpu.setName(parseName(itemBlock));
+
+        parseAndSetManufacturerAndName(itemBlock, cpu);
+
         String prices = parsePrices(itemBlock);
         cpu.setPrices(prices);
         processTextToPriceAvg(prices, cpu);
         Element characteristicsBlock
                 = itemBlock.select(CHARACTERISTICS_BLOCK_CSS_SELECTOR).first();
         parseDataFromCharacteristicsBlock(characteristicsBlock, cpu);
+    }
+
+    private void parseAndSetManufacturerAndName(Element itemBlock, CpuHotLine cpu) {
+        Element nameElement = itemBlock.select(NAME_CSS_SELECTOR).first();
+        String text = nameElement != null ? nameElement.text().trim() : "Не найдено";
+        String manufacturer = text.split(" ")[0];
+        String name = text.substring(manufacturer.length()).trim();
+        cpu.setManufacturer(manufacturer);
+        cpu.setName(name);
     }
 
     private int setPropositionQuantity(Element itemBlock) {
@@ -103,11 +115,6 @@ public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHot
         } else {
             cpu.setAvgPrice(0.00);
         }
-    }
-
-    private String parseName(Element cpuBlock) {
-        Element nameElement = cpuBlock.select(NAME_CSS_SELECTOR).first();
-        return nameElement != null ? nameElement.text().trim() : "Не найдено";
     }
 
     private String parseUrl(Element cpuBlock) {

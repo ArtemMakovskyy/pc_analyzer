@@ -1,5 +1,6 @@
 package com.example.parser.service.hotline;
 
+import com.example.parser.repository.PcHotLineRepository;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -15,11 +16,13 @@ import org.springframework.stereotype.Service;
 public class HotlineDataUpdateCoordinatorService {
     private final List<DataUpdateService> dataUpdateServices;
     private final List<DatabaseSynchronizationService> databaseSynchronizationServices;
+    private final PcHotLineRepository pcHotLineRepository;
 
-//        @PostConstruct
-//    public void init() {
-//        updateAllData();
-//    }
+//    @PostConstruct
+    public void init() {
+        pcHotLineRepository.deleteAll();
+        updateAllData();
+    }
 
     public void updateAllData() {
         int availableProcessors = Runtime.getRuntime().availableProcessors();

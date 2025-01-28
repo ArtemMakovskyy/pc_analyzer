@@ -5,8 +5,10 @@ import com.example.parser.model.hotline.PowerSupplierHotLine;
 import com.example.parser.repository.PowerSupplierHotLineRepository;
 import com.example.parser.service.hotline.DataUpdateService;
 import com.example.parser.service.parse.MultiThreadPagesParser;
+import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class PowerSupplierHotlineService implements DataUpdateService {
     private final MultiThreadPagesParser<PowerSupplierHotLine> powerSupplierMultiThreadPagesParser;
     private final PowerSupplierHotLineRepository powerSupplierHotLineRepository;
+
+//    @PostConstruct
+//    public void init() {
+//        int availableProcessors = Runtime.getRuntime().availableProcessors();
+//        ExecutorService executor = Executors.newFixedThreadPool(availableProcessors);
+//        refreshDatabaseWithParsedData(executor);
+//    }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override

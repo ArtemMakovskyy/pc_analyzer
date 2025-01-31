@@ -24,7 +24,6 @@ public class PowerSupplierHotLine {
     private Double avgPrice;
     private Integer propositionsQuantity;
     private String manufacturer;
-
     private String type;
     private Integer power;
     private String standard;

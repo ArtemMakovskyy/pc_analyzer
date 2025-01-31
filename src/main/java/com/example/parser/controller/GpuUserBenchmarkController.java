@@ -18,11 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class GpuUserBenchmarkController {
     private final GpuUserBenchmarkService gpuUserBenchmarkService;
 
-//    @PostConstruct
-//    public void init(){
-//        loadAndSaveNewItems();
-//    }
-
     /**
      * Загружает и сохраняет новые записи GPU User Benchmark.
      * @return Список новых сохраненных записей.

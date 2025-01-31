@@ -26,19 +26,20 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserBenchmarkGpuPageParser {
     private static final int PARSE_ALL_PAGES_INDEX = -1;
-    private static final ParseUtil.DelayInSeconds SMALL_PAUSE =
-            new ParseUtil.DelayInSeconds(2, 4);
-    private static final ParseUtil.DelayInSeconds BIG_PAUSE =
-            new ParseUtil.DelayInSeconds(4, 10);
-    private static final String XPATH_BUTTON_PRICE_SORT =
-            "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th"
-                    + "[@data-mhth='MC_PRICE'][1]";
-    private static final String XPATH_LOCATOR_PAGE_QUANTITY =
-            "//*[@id='tableDataForm:mhtddyntac']/nav/ul/li[1]/a";
-    private static final String XPATH_NEXT_PAGE_BUTTON =
-            "//*[@id=\"tableDataForm:j_idt260\"]";
+    private static final ParseUtil.DelayInSeconds SMALL_PAUSE
+            = new ParseUtil.DelayInSeconds(2, 4);
+    private static final ParseUtil.DelayInSeconds BIG_PAUSE
+            = new ParseUtil.DelayInSeconds(4, 10);
+    private static final String XPATH_BUTTON_PRICE_SORT
+            = "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th"
+            + "[@data-mhth='MC_PRICE'][1]";
+    private static final String XPATH_LOCATOR_PAGE_QUANTITY
+            = "//*[@id='tableDataForm:mhtddyntac']/nav/ul/li[1]/a";
+    private static final String XPATH_NEXT_PAGE_BUTTON
+            = "//*[@id=\"tableDataForm:j_idt225\"]";
     private static final String XPATH_BUTTON_AGE_MONTH_SORT
-            = "//*[@id='tableDataForm:mhtddyntac']/table/thead/tr//th[@data-mhth='MC_RELEASEDATE'][1]";
+            = "/html/body/div[2]/div/div[6]/form/div[2]/table/thead/tr/th[7]";
+
     private static final String BASE_URL = "https://gpu.userbenchmark.com/";
     private static final String PAGE_QUANTITY_PATTERN = "Page \\d+ of (\\d+)";
     private static final String ONLY_DIGITS_PATTERN = "[^0-9]";
@@ -59,8 +60,8 @@ public class UserBenchmarkGpuPageParser {
     private final UserBenchmarkTestPage userBenchmarkTestPage;
     private final WebDriverFactory webDriverFactory;
 
-    public List<UserBenchmarkGpu> loadAndParse(boolean sortByAge,int pages) {
-        if (pages == 0 || pages < PARSE_ALL_PAGES_INDEX){
+    public List<UserBenchmarkGpu> loadAndParse(boolean sortByAge, int pages) {
+        if (pages == 0 || pages < PARSE_ALL_PAGES_INDEX) {
             throw new RuntimeException("Enter correct number of pages");
         }
         WebDriver driver = null;
@@ -75,11 +76,11 @@ public class UserBenchmarkGpuPageParser {
                 pages = findPageQuantity(driver);
             }
 
-            if (sortByAge){
+            if (sortByAge) {
                 sortByAgeMonthButton(driver);
-                ParseUtil.applyRandomDelay(BIG_PAUSE,true);
+                ParseUtil.applyRandomDelay(BIG_PAUSE, true);
                 sortByAgeMonthButton(driver);
-            }else {
+            } else {
                 sortByPriceButton(driver);
             }
             return parsePages(driver, pages);
@@ -99,7 +100,7 @@ public class UserBenchmarkGpuPageParser {
                     = parsePage(driver);
             gpuUserBenchmarks.addAll(gpusUserBenchmarksOnPage);
             log.info("Pause 3 in parsePages() before click on next page");
-            ParseUtil.applyRandomDelay(BIG_PAUSE,true);
+            ParseUtil.applyRandomDelay(BIG_PAUSE, true);
             currentPage++;
             if (currentPage < pages) {
                 clickNextPage(driver);
@@ -115,7 +116,7 @@ public class UserBenchmarkGpuPageParser {
                 = parsePageSource(currentHtmlPageSource);
 
         log.info("Pause 2 in parsePage()");
-        ParseUtil.applyRandomDelay(BIG_PAUSE,true);
+        ParseUtil.applyRandomDelay(BIG_PAUSE, true);
         return gpuUserBenchmarksOnPage;
     }
 
@@ -202,7 +203,7 @@ public class UserBenchmarkGpuPageParser {
             throw new RuntimeException("Price sort button is not visible.");
         }
         log.info("Pause 1, before click on price button");
-        ParseUtil.applyRandomDelay(SMALL_PAUSE,true);
+        ParseUtil.applyRandomDelay(SMALL_PAUSE, true);
         elementPriceButton.click();
     }
 
@@ -213,7 +214,7 @@ public class UserBenchmarkGpuPageParser {
             throw new RuntimeException("AgeMonthButton sort button is not visible.");
         }
         log.info("Pause 1, before click on price button");
-        ParseUtil.applyRandomDelay(SMALL_PAUSE,true);
+        ParseUtil.applyRandomDelay(SMALL_PAUSE, true);
         elementPriceButton.click();
     }
 
@@ -221,7 +222,7 @@ public class UserBenchmarkGpuPageParser {
         By xpathNextButton = By.xpath(XPATH_NEXT_PAGE_BUTTON);
         WebElement elementNextButton = driver.findElement(xpathNextButton);
         log.info("Pause 4 in clickNextPage click before click on next page");
-        ParseUtil.applyRandomDelay(SMALL_PAUSE,true);
+        ParseUtil.applyRandomDelay(SMALL_PAUSE, true);
         elementNextButton.click();
 
         userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);

@@ -12,12 +12,6 @@ import org.springframework.web.bind.annotation.*;
 public class CpuUserBenchmarkController {
     private final CpuUserBenchmarkService cpuUserBenchmarkService;
 
-    @PostConstruct
-    public void init(){
-//        updateAllCpus();
-        updateSpecifications();
-    }
-
     @PostMapping("/update-all")
     public ResponseEntity<String> updateAllCpus() {
         cpuUserBenchmarkService.loadAndSaveNewItems();

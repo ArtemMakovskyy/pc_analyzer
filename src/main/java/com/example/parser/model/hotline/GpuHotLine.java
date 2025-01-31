@@ -40,19 +40,4 @@ public class GpuHotLine {
     @ManyToOne
     private UserBenchmarkGpu userBenchmarkGpu;
 
-//    @Column(name = "is_deleted", nullable = false)
-//    private boolean isDeleted = false;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        GpuHotLine that = (GpuHotLine) o;
-        return Objects.equals(id, that.id) && Objects.equals(manufacturer, that.manufacturer) && Objects.equals(name, that.name) && Objects.equals(memoryType, that.memoryType) && Objects.equals(memorySize, that.memorySize) && Objects.equals(shina, that.shina) && Objects.equals(port, that.port) && Objects.equals(year, that.year) && Objects.equals(prices, that.prices) && Objects.equals(avgBenchUserBenchmark, that.avgBenchUserBenchmark);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, manufacturer, name, memoryType, memorySize, shina, port, year, prices, avgBenchUserBenchmark);
-    }
 }

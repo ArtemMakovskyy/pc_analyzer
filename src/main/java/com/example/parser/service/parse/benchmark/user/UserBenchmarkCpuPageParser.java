@@ -40,9 +40,9 @@ public class UserBenchmarkCpuPageParser {
     private static final ParseUtil.DelayInSeconds BIG_PAUSE
             = new ParseUtil.DelayInSeconds(4, 10);
     private static final String XPATH_NEXT_PAGE_BUTTON
-            = "//*[@id=\"tableDataForm:j_idt260\"]";
+            =  "//*[@id=\"tableDataForm:j_idt225\"]";
     private static final String XPATH_LOCATOR_PAGE_QUANTITY
-            = "//*[@id='tableDataForm:mhtddyntac']/nav/ul/li[1]/a";
+            = "/html/body/div[2]/div/div[6]/form/div[2]/nav/ul/li[1]/a";
     private static final String PAGE_QUANTITY_PATTERN = "Page \\d+ of (\\d+)";
     private static final String ONLY_DIGITS_PATTERN = "[^0-9]";
     private static final String XPATH_BUTTON_PRICE_SORT

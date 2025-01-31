@@ -23,7 +23,6 @@ public class MotherBoardHotLine {
     private String prices;
     private Double avgPrice;
     private Integer propositionsQuantity;
-
     private String manufacturer;
     private String socketType;
     private String chipset;

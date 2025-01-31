@@ -52,7 +52,8 @@ public class GpuUserBenchmarkService {
         return savedItems;
     }
 
-    //1/ todo add to the controller
+    //todo insert new data manually (PowerSupply)
+
     public void updateGpuPowerFromFile() {
         List<String> gpuPowerInfoFromFile = readFile(PATH);
         gpuPowerInfoFromFile.sort((s1, s2) -> Integer.compare(s2.length(), s1.length()));

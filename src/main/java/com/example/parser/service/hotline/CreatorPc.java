@@ -1,6 +1,7 @@
-package com.example.parser.service.pccreator;
+package com.example.parser.service.hotline;
 
 import com.example.parser.model.Pc;
+import com.example.parser.model.PcMarker;
 import com.example.parser.model.hotline.CpuHotLine;
 import com.example.parser.model.hotline.GpuHotLine;
 import com.example.parser.model.hotline.MemoryHotLine;
@@ -15,8 +16,11 @@ import com.example.parser.repository.PcHotLineRepository;
 import com.example.parser.repository.PowerSupplierHotLineRepository;
 import com.example.parser.repository.SsdHotLineRepository;
 import com.example.parser.service.ExcelExporter;
+import com.example.parser.service.userbenchmark.CpuUserBenchmarkService;
+import com.example.parser.service.userbenchmark.GpuUserBenchmarkService;
 import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,32 +49,75 @@ public class CreatorPc {
     private final PowerSupplierHotLineRepository powerSupplierHotLineRepository;
     private final PcHotLineRepository pcHotLineRepository;
     private final ExcelExporter excelExporter;
+    private final CpuUserBenchmarkService cpuUserBenchmarkService;
+    private final GpuUserBenchmarkService gpuUserBenchmarkService;
+    private final HotlineDataUpdateCoordinatorService hotlineDataUpdateCoordinatorService;
 
-    @PostConstruct
-    public void init(){
-        createFilterAndSaveOptimalPcList();
-//        exportToExcelPcList("pc_list");
-        final List<Pc> all = getAll();
-        all.forEach(System.out::println);
-        System.out.println(all.size());
-    }
     public List<Pc> getAll() {
         return pcHotLineRepository.findAll();
     }
 
-    public void exportToExcelPcList(String filePath) {
+    @PostConstruct
+    public void saveExel() {
+        exportToExcelPcList("pc_configuration");
+    }
+
+    public void getAllByBestPrice() {
+        final List<Pc> allByMarkerOrderByPredictionPrice = pcHotLineRepository
+                .findAllByMarkerOrderByPredictionPrice(PcMarker.BEST_PRICE);
+        allByMarkerOrderByPredictionPrice.forEach(System.out::println);
+    }
+
+    public boolean updateDataAndCreatePcList(
+            boolean updateUserBenchmarkCpu,
+            boolean updateUserBenchmarkGpu,
+            boolean updateHotline,
+            boolean createPcList) {
+        try {
+            log.info("Starting data update process ");
+
+            if (updateUserBenchmarkCpu) {
+                log.info("Updating CPU User Benchmark data...");
+                cpuUserBenchmarkService.loadAndSaveNewItems();
+            }
+
+            if (updateUserBenchmarkGpu) {
+                log.info("Updating GPU User Benchmark data...");
+                gpuUserBenchmarkService.loadAndSaveNewItems();
+            }
+
+            if (updateHotline) {
+                log.info("Updating Hotline data...");
+                pcHotLineRepository.deleteAll();
+                hotlineDataUpdateCoordinatorService.updateAllData();
+            }
+
+            if (createPcList) {
+                log.info("Creating and filtering PC list...");
+                createFilterAndSaveOptimalPcList();
+            }
+
+            log.info("Data update process completed successfully");
+        } catch (Exception e) {
+            log.error("An error occurred during the update process: ", e);
+            return false;
+        }
+        return true;
+    }
+
+    public void exportToExcelPcList(String fileName) {
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm");
         String formattedDate = now.format(formatter);
 
-        final List<Pc> pcList = pcHotLineRepository.findAll();
+        final List<Pc> pcList = pcHotLineRepository.findPcsWithNonZeroPriceForFpsOrdered();
 
         if (!pcList.isEmpty()) {
-            // Формируем путь к файлу
-            String fileName = "pc_list_" + formattedDate + ".xlsx";
-            String fullPath = Paths.get(filePath, fileName).toString();
+            String fulFileName = fileName + " " + formattedDate + ".xlsx";
+            String filePath = "src/main/resources";
+            String fullPath = Paths.get(filePath, fulFileName).toString();
 
-            // Экспортируем в Excel
+
             excelExporter.exportToExcel(pcList, fullPath);
             log.info("Экспорт списка ПК в Excel завершён. Файл сохранён по пути: {}", fullPath);
         } else {
@@ -78,39 +125,24 @@ public class CreatorPc {
         }
     }
 
-    public void createFilterAndSaveOptimalPcList() {
-        pcHotLineRepository.deleteAll();
-        final List<Pc> BigPcList = createPc();
-        final List<Pc> optimalPcList = removeItemsWithUncompetitivePrice(BigPcList);
-        pcHotLineRepository.saveAll(optimalPcList);
-    }
-
-    private List<Pc> removeItemsWithUncompetitivePrice(List<Pc> pcList) {
-        boolean process = true;
-
-        while (process) {
-            process = false;
-
-            for (int i = 0; i < pcList.size() - 1; i++) {
-                if (pcList.get(i).getPrice().compareTo(pcList.get(i + 1).getPrice()) > 0) {
-                    pcList.get(i).setPrice(BigDecimal.ZERO);
-                    process = true;
-                }
-            }
-
-            pcList.removeIf(pc -> pc.getPrice().compareTo(BigDecimal.ZERO) == 0);
+    private void createFilterAndSaveOptimalPcList() {
+        log.info("Start creating and filtering PC list");
+        try {
+            pcHotLineRepository.deleteAll();
+            List<Pc> allPcList = pcHotLineRepository.saveAll(createPc());
+            List<Pc> optimalPcList = removeItemsWithUncompetitivePrice(allPcList);
+            insertMarker(optimalPcList, PcMarker.BEST_PRICE);
+            pcHotLineRepository.saveAll(optimalPcList);
+        } catch (Exception e) {
+            log.error("Error occurred during the process: ", e);
         }
-
-        return pcList;
+        log.info("Finished creating and saving optimal PC list");
     }
 
-    private List<Pc> filterPc(List<Pc> pcList) {
-        return pcList.stream()
-                .sorted(
-                        Comparator
-                                .comparing(Pc::getPredictionGpuFpsFHD, Comparator.nullsLast(Comparator.naturalOrder()))
-                                .thenComparing(Pc::getPrice, Comparator.nullsLast(Comparator.naturalOrder()))
-                )
+
+    private void insertMarker(List<Pc> pcList, PcMarker marker) {
+        pcList.stream()
+                .peek(pc -> pc.setMarker(marker))
                 .collect(Collectors.toList());
     }
 
@@ -135,9 +167,38 @@ public class CreatorPc {
                 pcs.addAll(video(gpus, cpu, motherboard, memory, ssdFromDb, powerSupplierHotLines));
             }
         });
-
+        log.info("Pcs created");
         return filterPc(pcs);
     }
+
+
+    private List<Pc> removeItemsWithUncompetitivePrice(List<Pc> pcList) {
+        boolean process = true;
+
+        while (process) {
+            process = false;
+
+            for (int i = 0; i < pcList.size() - 1; i++) {
+                if (pcList.get(i).getPrice().compareTo(pcList.get(i + 1).getPrice()) > 0) {
+                    pcList.get(i).setPrice(BigDecimal.ZERO);
+                    process = true;
+                }
+            }
+            pcList.removeIf(pc -> pc.getPrice().compareTo(BigDecimal.ZERO) == 0);
+        }
+        return pcList;
+    }
+
+    private List<Pc> filterPc(List<Pc> pcList) {
+        return pcList.stream()
+                .sorted(
+                        Comparator
+                                .comparing(Pc::getPredictionGpuFpsFHD, Comparator.nullsLast(Comparator.naturalOrder()))
+                                .thenComparing(Pc::getPrice, Comparator.nullsLast(Comparator.naturalOrder()))
+                )
+                .collect(Collectors.toList());
+    }
+
 
     private void validateData(List<CpuHotLine> cpus, List<MotherBoardHotLine> motherBoards, List<MemoryHotLine> memories, List<GpuHotLine> gpus, SsdHotLine ssdFromDb, List<PowerSupplierHotLine> powerSupplierHotLines) {
         if (cpus.isEmpty() || motherBoards.isEmpty() || memories.isEmpty() || gpus.isEmpty() || ssdFromDb == null || powerSupplierHotLines.isEmpty()) {
@@ -175,6 +236,7 @@ public class CreatorPc {
                         gpu.getUserBenchmarkGpu().getAvgBench()
                 )
         );
+        pc.setPriceForFps(calculatePriceForFpc(pc));
     }
 
     private double calculatePrice(Pc pc) {
@@ -326,6 +388,16 @@ public class CreatorPc {
 
     private List<MotherBoardHotLine> updateMotherBoardsList(int propositionQuantityThreshold) {
         return motherBoardHotLineRepository.findMinPriceGroupedByChipsetWithConditions(propositionQuantityThreshold);
+    }
+
+    public Integer calculatePriceForFpc(Pc pc) {
+        BigDecimal someValue = pc.getPrice();
+        BigDecimal denominator = BigDecimal.valueOf(pc.getPredictionGpuFpsFHD());
+        if (denominator.compareTo(BigDecimal.ZERO) != 0) {
+            return someValue.divide(denominator, RoundingMode.HALF_UP).intValue();
+        } else {
+            return 0;
+        }
     }
 
 }

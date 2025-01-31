@@ -27,6 +27,8 @@ public class CpuUserBenchmarkService {
     private final CpuUserBenchmarkMapper cpuUserBenchmarkMapper;
     private final WebDriverFactory webDriverFactory;
 
+    //todo add anotherGpuTestData manually
+
     public List<UserBenchmarkCpu> loadAndSaveNewItems() {
 
         final List<CpuUserBenchmarkCreateDto> cpuUserBenchmarkCreateDtos =

@@ -7,6 +7,8 @@ import com.example.parser.model.hotline.MotherBoardHotLine;
 import com.example.parser.model.hotline.PowerSupplierHotLine;
 import com.example.parser.model.hotline.SsdHotLine;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -41,12 +43,14 @@ public class Pc {
     @ManyToOne
     private PowerSupplierHotLine powerSupplier;
     private BigDecimal price;
-
     private Double desktopScore;
     private Double gamingScore;
     private Double workstationScore;
     private Double avgGpuBench;
     private Integer predictionGpuFpsFHD;
+    private Integer priceForFps;
+    @Enumerated(EnumType.STRING)
+    private PcMarker marker;
 
     @Override
     public String toString() {
@@ -60,7 +64,7 @@ public class Pc {
                 " | " + powerSupplier.getManufacturer() + " " + powerSupplier.getName() + " " + powerSupplier.getPower() + "W" +
                 " | avgGpuBench: " + avgGpuBench +
                 " | gamingScore: " + gamingScore +
-                " | predictionFpsFHD: " + predictionGpuFpsFHD +
+                " | predictionFpsFHD: " + predictionGpuFpsFHD + ",  priceForFps: " + priceForFps +
                 " | " + price +
                 '}';
     }

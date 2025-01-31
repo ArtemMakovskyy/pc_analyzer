@@ -23,7 +23,6 @@ public class SsdHotLine {
     private String prices;
     private Double avgPrice;
     private Integer propositionsQuantity;
-
     private String manufacturer;
     private String type;
     private String capacity;

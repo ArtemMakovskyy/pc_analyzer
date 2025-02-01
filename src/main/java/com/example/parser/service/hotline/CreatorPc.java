@@ -53,76 +53,94 @@ public class CreatorPc {
     private final GpuUserBenchmarkService gpuUserBenchmarkService;
     private final HotlineDataUpdateCoordinatorService hotlineDataUpdateCoordinatorService;
 
-    public List<Pc> getAll() {
-        return pcHotLineRepository.findAll();
-    }
-
     @PostConstruct
-    public void saveExel() {
-        exportToExcelPcList("pc_configuration");
+    public void init(){
+//        updateDataAndCreatePcList(
+//                false,
+//                false,
+//                false,
+//                true,
+//                false
+//        );
+
+        exportToExcelPcList("getAll",getAll());
+        exportToExcelPcList("getAllByBestPrice",getAllByBestPrice());
     }
 
-    public void getAllByBestPrice() {
+    public List<Pc> getAll() {
+        return pcHotLineRepository.findPcListWithNonZeroPriceForFpsOrdered();
+    }
+
+    public List<Pc> getAllByBestPrice() {
         final List<Pc> allByMarkerOrderByPredictionPrice = pcHotLineRepository
                 .findAllByMarkerOrderByPredictionPrice(PcMarker.BEST_PRICE);
-        allByMarkerOrderByPredictionPrice.forEach(System.out::println);
+//        allByMarkerOrderByPredictionPrice.forEach(System.out::println);
+        return allByMarkerOrderByPredictionPrice;
     }
 
     public boolean updateDataAndCreatePcList(
             boolean updateUserBenchmarkCpu,
             boolean updateUserBenchmarkGpu,
             boolean updateHotline,
-            boolean createPcList) {
+            boolean createPcList,
+            boolean saveReportToExel) {
         try {
             log.info("Starting data update process ");
 
             if (updateUserBenchmarkCpu) {
-                log.info("Updating CPU User Benchmark data...");
                 cpuUserBenchmarkService.loadAndSaveNewItems();
             }
 
             if (updateUserBenchmarkGpu) {
-                log.info("Updating GPU User Benchmark data...");
                 gpuUserBenchmarkService.loadAndSaveNewItems();
             }
 
             if (updateHotline) {
-                log.info("Updating Hotline data...");
-                pcHotLineRepository.deleteAll();
                 hotlineDataUpdateCoordinatorService.updateAllData();
             }
 
             if (createPcList) {
-                log.info("Creating and filtering PC list...");
                 createFilterAndSaveOptimalPcList();
             }
 
+            if (saveReportToExel) {
+                exportToExcelPcList("pc_configuration",
+                        pcHotLineRepository.findPcListWithNonZeroPriceForFpsOrdered());
+            }
+
             log.info("Data update process completed successfully");
+
         } catch (Exception e) {
             log.error("An error occurred during the update process: ", e);
             return false;
         }
+
         return true;
     }
 
-    public void exportToExcelPcList(String fileName) {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm");
-        String formattedDate = now.format(formatter);
+    public void exportToExcelPcList(String fileName, List<Pc> pcList) {
+        log.info("Start save file to Excel");
 
-        final List<Pc> pcList = pcHotLineRepository.findPcsWithNonZeroPriceForFpsOrdered();
+        long executionTime = measureExecutionTime(() -> {
 
-        if (!pcList.isEmpty()) {
-            String fulFileName = fileName + " " + formattedDate + ".xlsx";
-            String filePath = "src/main/resources";
-            String fullPath = Paths.get(filePath, fulFileName).toString();
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm");
+            String formattedDate = now.format(formatter);
 
+            if (!pcList.isEmpty()) {
+                String fulFileName = fileName + " " + formattedDate + ".xlsx";
+                String filePath = "src/main/resources";
+                String fullPath = Paths.get(filePath, fulFileName).toString();
 
-            excelExporter.exportToExcel(pcList, fullPath);
-            log.info("Экспорт списка ПК в Excel завершён. Файл сохранён по пути: {}", fullPath);
-        } else {
-            log.warn("Список ПК пуст, экспорт не выполнен.");
-        }
+                excelExporter.exportToExcelPcConfiguration(pcList, fullPath);
+                log.info("Экспорт списка ПК в Excel завершён. Файл сохранён по пути: {}", fullPath);
+            } else {
+                log.warn("Список ПК пуст, экспорт не выполнен.");
+            }
+
+        });
+
+        log.info("Время выполнения экспорта в Excel: {} мс", executionTime);
     }
 
     private void createFilterAndSaveOptimalPcList() {
@@ -147,8 +165,9 @@ public class CreatorPc {
     }
 
     private List<Pc> createPc() {
+        //todo there are no 3600
         pcHotLineRepository.deleteAll();
-        List<CpuHotLine> cpus = cpuHotLineRepository.findMinPriceGroupedByUserBenchmarkCpuId(MIN_PROPOSITION_QUANTITY_DEFAULT);
+        List<CpuHotLine> cpus = cpuHotLineRepository.findCpusWithMinPropositions(MIN_PROPOSITION_QUANTITY_DEFAULT);
         List<MotherBoardHotLine> motherBoards = motherBoardHotLineRepository.findMinPriceGroupedByChipsetWithConditions(MIN_PROPOSITION_QUANTITY_DEFAULT);
         List<MemoryHotLine> memories = memoryHotLineRepository.findMinPriceGroupedByTypeWithConditions(MIN_PROPOSITION_QUANTITY_DEFAULT);
         List<GpuHotLine> gpus = gpuHotLineRepository.findGroupedGpusByMinAvgPrice(MIN_PROPOSITION_QUANTITY_DEFAULT);
@@ -398,6 +417,13 @@ public class CreatorPc {
         } else {
             return 0;
         }
+    }
+
+    private long measureExecutionTime(Runnable task) {
+        long start = System.currentTimeMillis();
+        task.run();
+        long end = System.currentTimeMillis();
+        return end - start;
     }
 
 }

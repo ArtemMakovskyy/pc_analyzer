@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ExcelExporter {
-    public void exportToExcel(List<Pc> pcList, String filePath) {
+    public void exportToExcelPcConfiguration(List<Pc> pcList, String filePath) {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("PC List");
 

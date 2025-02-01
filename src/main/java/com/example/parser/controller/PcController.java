@@ -27,8 +27,16 @@ public class PcController {
             @RequestParam boolean updateUserBenchmarkCpu,
             @RequestParam boolean updateUserBenchmarkGpu,
             @RequestParam boolean updateHotline,
-            @RequestParam boolean createPcList) {
-        creatorPc.updateDataAndCreatePcList(updateUserBenchmarkCpu, updateUserBenchmarkGpu, updateHotline, createPcList);
+            @RequestParam boolean createPcList,
+            @RequestParam boolean saveReportToExel
+
+    ) {
+        creatorPc.updateDataAndCreatePcList(
+                updateUserBenchmarkCpu,
+                updateUserBenchmarkGpu,
+                updateHotline,
+                createPcList,
+                saveReportToExel);
     return true;
     }
 

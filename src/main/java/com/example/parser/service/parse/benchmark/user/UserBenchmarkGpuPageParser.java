@@ -1,5 +1,6 @@
 package com.example.parser.service.parse.benchmark.user;
 
+import com.example.parser.dto.userbenchmark.GpuUserBenchmarkParserDto;
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.service.parse.WebDriverFactory;
 import com.example.parser.service.parse.utils.ParseUtil;
@@ -19,12 +20,16 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 @Log4j2
 @RequiredArgsConstructor
 public class UserBenchmarkGpuPageParser {
+    private final static int TIMEOUT_SECONDS = 10;
+    @Value("${show.web.windows.from.selenium}")
+    private boolean showWebGraphicInterfaceFromSelenium;
     private static final int PARSE_ALL_PAGES_INDEX = -1;
     private static final ParseUtil.DelayInSeconds SMALL_PAUSE
             = new ParseUtil.DelayInSeconds(2, 4);
@@ -60,7 +65,7 @@ public class UserBenchmarkGpuPageParser {
     private final UserBenchmarkTestPage userBenchmarkTestPage;
     private final WebDriverFactory webDriverFactory;
 
-    public List<UserBenchmarkGpu> loadAndParse(boolean sortByAge, int pages) {
+    public List<GpuUserBenchmarkParserDto> loadAndParse(boolean sortByAge, int pages) {
         if (pages == 0 || pages < PARSE_ALL_PAGES_INDEX) {
             throw new RuntimeException("Enter correct number of pages");
         }
@@ -68,8 +73,8 @@ public class UserBenchmarkGpuPageParser {
         try {
             driver = webDriverFactory.setUpWebDriver(
                     BASE_URL,
-                    true,
-                    10);
+                    showWebGraphicInterfaceFromSelenium,
+                    TIMEOUT_SECONDS);
 
             userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);
             if (pages == PARSE_ALL_PAGES_INDEX) {
@@ -89,14 +94,14 @@ public class UserBenchmarkGpuPageParser {
         }
     }
 
-    private List<UserBenchmarkGpu> parsePages(WebDriver driver, int pages) {
+    private List<GpuUserBenchmarkParserDto> parsePages(WebDriver driver, int pages) {
 
         log.info("Start open pages. Total quality is: " + pages);
-        List<UserBenchmarkGpu> gpuUserBenchmarks = new ArrayList<>();
+        List<GpuUserBenchmarkParserDto> gpuUserBenchmarks = new ArrayList<>();
         int currentPage = 1;
         do {
             log.info("Current page is " + currentPage + " from " + pages + ".");
-            final List<UserBenchmarkGpu> gpusUserBenchmarksOnPage
+            final List<GpuUserBenchmarkParserDto> gpusUserBenchmarksOnPage
                     = parsePage(driver);
             gpuUserBenchmarks.addAll(gpusUserBenchmarksOnPage);
             log.info("Pause 3 in parsePages() before click on next page");
@@ -110,9 +115,9 @@ public class UserBenchmarkGpuPageParser {
         return gpuUserBenchmarks;
     }
 
-    private List<UserBenchmarkGpu> parsePage(WebDriver driver) {
+    private List<GpuUserBenchmarkParserDto> parsePage(WebDriver driver) {
         String currentHtmlPageSource = driver.getPageSource();
-        List<UserBenchmarkGpu> gpuUserBenchmarksOnPage
+        List<GpuUserBenchmarkParserDto> gpuUserBenchmarksOnPage
                 = parsePageSource(currentHtmlPageSource);
 
         log.info("Pause 2 in parsePage()");
@@ -120,11 +125,11 @@ public class UserBenchmarkGpuPageParser {
         return gpuUserBenchmarksOnPage;
     }
 
-    private List<UserBenchmarkGpu> parsePageSource(String pageSource) {
+    private List<GpuUserBenchmarkParserDto> parsePageSource(String pageSource) {
         Document htmlDocument = Jsoup.parse(pageSource);
         Elements rows = htmlDocument.select(TABLE_ROW_CSS_SELECTOR);
-        UserBenchmarkGpu item;
-        List<UserBenchmarkGpu> items = new ArrayList<>();
+        GpuUserBenchmarkParserDto item;
+        List<GpuUserBenchmarkParserDto> items = new ArrayList<>();
         for (Element row : rows) {
             item = rowToGpu(row);
             items.add(item);
@@ -132,8 +137,8 @@ public class UserBenchmarkGpuPageParser {
         return items;
     }
 
-    private UserBenchmarkGpu rowToGpu(Element row) {
-        UserBenchmarkGpu item = new UserBenchmarkGpu();
+    private GpuUserBenchmarkParserDto rowToGpu(Element row) {
+        GpuUserBenchmarkParserDto item = new GpuUserBenchmarkParserDto();
         item.setModel(getElementText(row, MODEL_CSS_SELECTOR));
         item.setModelHl(formatHlGpuName(item.getModel()));
         item.setManufacturer(getElementText(row, MANUFACTURER_CSS_SELECTOR));

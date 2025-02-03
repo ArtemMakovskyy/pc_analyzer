@@ -1,4 +1,4 @@
-package com.example.parser.exseption;
+package com.example.parser.exсeption;
 
 public class CustomServiceException extends RuntimeException {
     public CustomServiceException(String message) {

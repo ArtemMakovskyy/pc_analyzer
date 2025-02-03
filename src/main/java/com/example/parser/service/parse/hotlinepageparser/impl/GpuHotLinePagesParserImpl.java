@@ -1,5 +1,6 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
+import com.example.parser.dto.hotline.GpuHotLineParserDto;
 import com.example.parser.model.hotline.GpuHotLine;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.service.parse.utils.ParseUtil;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Log4j2
-public class GpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<GpuHotLine> {
+public class GpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<GpuHotLineParserDto> {
     private static final String BASE_URL = "https://hotline.ua/ua/computer/videokarty/?p=";
     private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
     private static final String NO_ELEMENT_CSS_SELECTOR
@@ -33,19 +34,19 @@ public class GpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<GpuHot
     }
 
     @Override
-    protected List<GpuHotLine> parseData(Document htmlDocument) {
+    protected List<GpuHotLineParserDto> parseData(Document htmlDocument) {
         Elements tableElements = htmlDocument.select(TABLE_CSS_SELECTOR);
-        List<GpuHotLine> gpus = new ArrayList<>();
+        List<GpuHotLineParserDto> gpus = new ArrayList<>();
 
         for (Element itemBlock : tableElements) {
-            GpuHotLine gpu = new GpuHotLine();
+            GpuHotLineParserDto gpu = new GpuHotLineParserDto();
             setFields(gpu, itemBlock);
             gpus.add(gpu);
         }
         return gpus;
     }
 
-    private void setFields(GpuHotLine gpu, Element itemBlock) {
+    private void setFields(GpuHotLineParserDto gpu, Element itemBlock) {
         gpu.setUrl(DOMAIN_LINK + parseUrl(itemBlock));
         gpu.setPropositionsQuantity(setPropositionQuantity(itemBlock));
         gpu.setName(parseName(itemBlock));
@@ -99,7 +100,7 @@ public class GpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<GpuHot
         return nameElement != null ? nameElement.text().trim() : "Не найдено";
     }
 
-    private void parseDataFromCharacteristicsBlock(Element characteristicsBlock, GpuHotLine gpu) {
+    private void parseDataFromCharacteristicsBlock(Element characteristicsBlock, GpuHotLineParserDto gpu) {
         if (characteristicsBlock == null) {
             log.warn("Can't find span element to parse data");
         } else {
@@ -123,7 +124,7 @@ public class GpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<GpuHot
         }
     }
 
-    public void processTextToPriceAvg(String input, GpuHotLine gpu) {
+    public void processTextToPriceAvg(String input, GpuHotLineParserDto gpu) {
         input = input.replace("грн", "").trim();
         String[] parts = input.split("–");
         double num1;
@@ -143,7 +144,7 @@ public class GpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<GpuHot
 
     }
 
-    private void extractData(String text, GpuHotLine gpu) {
+    private void extractData(String text, GpuHotLineParserDto gpu) {
         String textUpperCase = text.trim().toUpperCase();
         if (textUpperCase.contains("NVIDIA")
                 || textUpperCase.contains("INTEL")

@@ -1,5 +1,6 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
+import com.example.parser.dto.hotline.PowerSupplierHotLineParserDto;
 import com.example.parser.model.hotline.PowerSupplierHotLine;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.service.parse.utils.ParseUtil;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Log4j2
 @Component
 public class PowerSupplierHotLinePagesParserImpl
-        extends HotLinePagesParserAbstract<PowerSupplierHotLine> {
+        extends HotLinePagesParserAbstract<PowerSupplierHotLineParserDto> {
     private static final String BASE_URL
             = "https://hotline.ua/ua/computer/bloki-pitaniya/296278-296291-296313-296359-296368/?p=";
     private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
@@ -45,20 +46,20 @@ public class PowerSupplierHotLinePagesParserImpl
     }
 
     @Override
-    protected List<PowerSupplierHotLine> parseData(Document htmlDocument) {
+    protected List<PowerSupplierHotLineParserDto> parseData(Document htmlDocument) {
         Elements tableElements = htmlDocument.select(TABLE_CSS_SELECTOR);
-        List<PowerSupplierHotLine> powerSupplys = new ArrayList<>();
+        List<PowerSupplierHotLineParserDto> powerSuppliersList = new ArrayList<>();
 
         for (Element itemBlock : tableElements) {
-            PowerSupplierHotLine memory = new PowerSupplierHotLine();
-            setFields(memory, itemBlock);
-            powerSupplys.add(memory);
+            PowerSupplierHotLineParserDto ps = new PowerSupplierHotLineParserDto();
+            setFields(ps, itemBlock);
+            powerSuppliersList.add(ps);
         }
 
-        return powerSupplys;
+        return powerSuppliersList;
     }
 
-    private void setFields(PowerSupplierHotLine powerSupplierHotLine, Element itemBlock) {
+    private void setFields(PowerSupplierHotLineParserDto powerSupplierHotLine, Element itemBlock) {
         powerSupplierHotLine.setUrl(DOMAIN_LINK + parseUrl(itemBlock));
         powerSupplierHotLine.setPropositionsQuantity(setPropositionQuantity(itemBlock));
         parseAndSetManufacturerAndName(itemBlock, powerSupplierHotLine);
@@ -98,7 +99,7 @@ public class PowerSupplierHotLinePagesParserImpl
         return itemBlock.select(PRICE_CSS_SELECTOR).text();
     }
 
-    public void processTextToPriceAvg(String input, PowerSupplierHotLine powerSupplierHotLine) {
+    public void processTextToPriceAvg(String input, PowerSupplierHotLineParserDto powerSupplierHotLine) {
         input = input.replace("грн", "").trim();
         String[] parts = input.split("–");
         double num1;
@@ -117,7 +118,7 @@ public class PowerSupplierHotLinePagesParserImpl
         }
     }
 
-    private void parseAndSetManufacturerAndName(Element itemBlock, PowerSupplierHotLine powerSupplierHotLine) {
+    private void parseAndSetManufacturerAndName(Element itemBlock, PowerSupplierHotLineParserDto powerSupplierHotLine) {
         Element nameElement = itemBlock.select(NAME_CSS_SELECTOR).first();
         String text = nameElement != null ? nameElement.text().trim() : "Не найдено";
         String manufacturer = text.split(" ")[0];
@@ -136,7 +137,7 @@ public class PowerSupplierHotLinePagesParserImpl
     }
 
     private void parseDataFromCharacteristicsBlock(
-            Element characteristicsBlock, PowerSupplierHotLine powerSupplierHotLine) {
+            Element characteristicsBlock, PowerSupplierHotLineParserDto powerSupplierHotLine) {
         if (characteristicsBlock == null) {
             log.warn("Can't find span element to parse data");
         } else {
@@ -159,7 +160,7 @@ public class PowerSupplierHotLinePagesParserImpl
         }
     }
 
-    private void extractData(String text, PowerSupplierHotLine powerSupplierHotLine) {
+    private void extractData(String text, PowerSupplierHotLineParserDto powerSupplierHotLine) {
         if (text.contains("ATX")) {
             powerSupplierHotLine.setType(
                     text

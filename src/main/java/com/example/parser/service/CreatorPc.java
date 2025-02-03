@@ -1,4 +1,4 @@
-package com.example.parser.service.hotline;
+package com.example.parser.service;
 
 import com.example.parser.model.Pc;
 import com.example.parser.model.PcMarker;
@@ -16,6 +16,7 @@ import com.example.parser.repository.PcHotLineRepository;
 import com.example.parser.repository.PowerSupplierHotLineRepository;
 import com.example.parser.repository.SsdHotLineRepository;
 import com.example.parser.service.ExcelExporter;
+import com.example.parser.service.hotline.HotlineDataUpdateCoordinatorService;
 import com.example.parser.service.userbenchmark.CpuUserBenchmarkService;
 import com.example.parser.service.userbenchmark.GpuUserBenchmarkService;
 import jakarta.annotation.PostConstruct;
@@ -53,20 +54,6 @@ public class CreatorPc {
     private final GpuUserBenchmarkService gpuUserBenchmarkService;
     private final HotlineDataUpdateCoordinatorService hotlineDataUpdateCoordinatorService;
 
-    @PostConstruct
-    public void init(){
-//        updateDataAndCreatePcList(
-//                false,
-//                false,
-//                false,
-//                true,
-//                false
-//        );
-
-        exportToExcelPcList("getAll",getAll());
-        exportToExcelPcList("getAllByBestPrice",getAllByBestPrice());
-    }
-
     public List<Pc> getAll() {
         return pcHotLineRepository.findPcListWithNonZeroPriceForFpsOrdered();
     }
@@ -74,7 +61,6 @@ public class CreatorPc {
     public List<Pc> getAllByBestPrice() {
         final List<Pc> allByMarkerOrderByPredictionPrice = pcHotLineRepository
                 .findAllByMarkerOrderByPredictionPrice(PcMarker.BEST_PRICE);
-//        allByMarkerOrderByPredictionPrice.forEach(System.out::println);
         return allByMarkerOrderByPredictionPrice;
     }
 
@@ -165,7 +151,6 @@ public class CreatorPc {
     }
 
     private List<Pc> createPc() {
-        //todo there are no 3600
         pcHotLineRepository.deleteAll();
         List<CpuHotLine> cpus = cpuHotLineRepository.findCpusWithMinPropositions(MIN_PROPOSITION_QUANTITY_DEFAULT);
         List<MotherBoardHotLine> motherBoards = motherBoardHotLineRepository.findMinPriceGroupedByChipsetWithConditions(MIN_PROPOSITION_QUANTITY_DEFAULT);
@@ -186,7 +171,7 @@ public class CreatorPc {
                 pcs.addAll(video(gpus, cpu, motherboard, memory, ssdFromDb, powerSupplierHotLines));
             }
         });
-        log.info("Pcs created");
+        log.info("Computer configurations were successfully assembled");
         return filterPc(pcs);
     }
 

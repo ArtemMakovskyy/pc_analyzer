@@ -37,4 +37,5 @@ public class UserBenchmarkGpu {
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
+
 }

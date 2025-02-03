@@ -3,7 +3,7 @@ package com.example.parser.dto.userbenchmark;
 import lombok.Data;
 
 @Data
-public class GpuUserBenchmarkCreateDto {
+public class GpuUserBenchmarkParserDto {
     private String model;
     private String modelHl;
     private String manufacturer;
@@ -12,4 +12,6 @@ public class GpuUserBenchmarkCreateDto {
     private Double avgBench;
     private Double price;
     private String urlOfGpu;
+    private Integer powerRequirement;
+
 }

@@ -35,17 +35,7 @@ public class CpuHotLine {
     private String cores;
     private String threads;
     private String packageType;
-    private String releaseDate;
     private Integer propositionsQuantity;
-    private String brand;
-    private String type;
-    private Double baseFrequency;
-    private Double maxFrequency;
-    private String coreName;
-    private Integer coreCount;
-    private Integer threadCount;
-    private Double avgBenchUserBenchmark;
-
     @ManyToOne
     private UserBenchmarkCpu userBenchmarkCpu;
 

@@ -1,6 +1,6 @@
 package com.example.parser.service.parse.benchmark.user;
 
-import com.example.parser.dto.userbenchmark.CpuUserBenchmarkCreateDto;
+import com.example.parser.dto.userbenchmark.CpuUserBenchmarkParserDto;
 import com.example.parser.service.parse.WebDriverFactory;
 import com.example.parser.service.parse.utils.ParseUtil;
 import java.time.Duration;
@@ -19,12 +19,16 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 @Log4j2
 @RequiredArgsConstructor
 public class UserBenchmarkCpuPageParser {
+    private final static int TIMEOUT_SECONDS = 10;
+    @Value("${show.web.windows.from.selenium}")
+    private boolean showWebGraphicInterfaceFromSelenium;
     private static final int PARSE_ALL_PAGES_INDEX = -1;
     private static final String CSS_SELECTOR_TABLE_ROW = "tr.hovertarget";
     private static final String CSS_SELECTOR_MANUFACTURER = "td:nth-child(2) span.semi-strongs";
@@ -53,16 +57,12 @@ public class UserBenchmarkCpuPageParser {
     private final UserBenchmarkTestPage userBenchmarkTestPage;
     private final WebDriverFactory webDriverFactory;
 
-    public List<CpuUserBenchmarkCreateDto> loadAndParse(boolean sortByAge) {
+    public List<CpuUserBenchmarkParserDto> loadAndParse(boolean sortByAge) {
        return loadAndParse(sortByAge,PARSE_ALL_PAGES_INDEX);
     }
 
-    /**
-     * Load and parse all cpu items from UserBenchmark without scores
-     *
-     * @return List<CpuUserBenchmarkCreateDto>
-     */
-    public List<CpuUserBenchmarkCreateDto> loadAndParse(boolean sortByAge,int pages) {
+
+    public List<CpuUserBenchmarkParserDto> loadAndParse(boolean sortByAge, int pages) {
         if (pages == 0 || pages < PARSE_ALL_PAGES_INDEX){
             throw new RuntimeException("Enter correct number of pages");
         }
@@ -70,8 +70,8 @@ public class UserBenchmarkCpuPageParser {
         try {
             driver = webDriverFactory.setUpWebDriver(
                     BASE_URL,
-                    true,
-                    10);
+                    showWebGraphicInterfaceFromSelenium,
+                    TIMEOUT_SECONDS);
 
             userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);
             if (pages == PARSE_ALL_PAGES_INDEX){
@@ -91,13 +91,12 @@ public class UserBenchmarkCpuPageParser {
         }
     }
 
-    private List<CpuUserBenchmarkCreateDto> parsePages(WebDriver driver, int pages) {
-        //todo why don't opened last page
-        List<CpuUserBenchmarkCreateDto> cpuUserBenchmarks = new ArrayList<>();
+    private List<CpuUserBenchmarkParserDto> parsePages(WebDriver driver, int pages) {
+        List<CpuUserBenchmarkParserDto> cpuUserBenchmarks = new ArrayList<>();
         int currentPage = 1;
         do {
             log.info("Current page is " + currentPage + " from " + pages + ".");
-            final List<CpuUserBenchmarkCreateDto> cpusUserBenchmarksOnPage = parsePage(driver);
+            final List<CpuUserBenchmarkParserDto> cpusUserBenchmarksOnPage = parsePage(driver);
             cpuUserBenchmarks.addAll(cpusUserBenchmarksOnPage);
 
             if (currentPage != pages) {
@@ -112,9 +111,9 @@ public class UserBenchmarkCpuPageParser {
         return cpuUserBenchmarks;
     }
 
-    private List<CpuUserBenchmarkCreateDto> parsePage(WebDriver driver) {
+    private List<CpuUserBenchmarkParserDto> parsePage(WebDriver driver) {
         String currentHtmlPageSource = driver.getPageSource();
-        List<CpuUserBenchmarkCreateDto> cpuUserBenchmarksOnPage
+        List<CpuUserBenchmarkParserDto> cpuUserBenchmarksOnPage
                 = pursePageSource(currentHtmlPageSource);
 
         log.info("Pause 2 in parsePage()");
@@ -123,12 +122,12 @@ public class UserBenchmarkCpuPageParser {
         return cpuUserBenchmarksOnPage;
     }
 
-    private List<CpuUserBenchmarkCreateDto> pursePageSource(String pageSource) {
+    private List<CpuUserBenchmarkParserDto> pursePageSource(String pageSource) {
         Document htmlDocument = Jsoup.parse(pageSource);
 
         Elements rows = htmlDocument.select(CSS_SELECTOR_TABLE_ROW);
-        CpuUserBenchmarkCreateDto item;
-        List<CpuUserBenchmarkCreateDto> items = new ArrayList<>();
+        CpuUserBenchmarkParserDto item;
+        List<CpuUserBenchmarkParserDto> items = new ArrayList<>();
         for (Element row : rows) {
             item = rowToCpu(row);
             items.add(item);
@@ -137,7 +136,7 @@ public class UserBenchmarkCpuPageParser {
         return items;
     }
 
-    private CpuUserBenchmarkCreateDto rowToCpu(Element row) {
+    private CpuUserBenchmarkParserDto rowToCpu(Element row) {
         String manufacturer = row.select(CSS_SELECTOR_MANUFACTURER).first().ownText().trim();
         String model = row.select(CSS_SELECTOR_MODEL).text().trim();
         String userRating = row.select(CSS_SELECTOR_USER_RATING).first().text()
@@ -148,7 +147,7 @@ public class UserBenchmarkCpuPageParser {
         String price = row.select(CSS_SELECTOR_PRICE).text()
                 .replaceAll(ONLY_DIGITS_PATTERN, "");
 
-        CpuUserBenchmarkCreateDto cpu = new CpuUserBenchmarkCreateDto();
+        CpuUserBenchmarkParserDto cpu = new CpuUserBenchmarkParserDto();
         cpu.setModel(model);
         cpu.setModel(formatHlCpuName(model));
         cpu.setManufacturer(manufacturer);

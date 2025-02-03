@@ -1,5 +1,6 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
+import com.example.parser.dto.hotline.MotherBoardHotLineParserDto;
 import com.example.parser.model.hotline.MotherBoardHotLine;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.service.parse.utils.ParseUtil;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 
 @Log4j2
 @Component
-public class MotherBoardHotLinePagesParserImpl extends HotLinePagesParserAbstract<MotherBoardHotLine> {
+public class MotherBoardHotLinePagesParserImpl extends HotLinePagesParserAbstract<MotherBoardHotLineParserDto> {
     private static final String BASE_URL = "https://hotline.ua/ua/computer/materinskie-platy/?p=";
     private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
     private static final String PRICE_CSS_SELECTOR = "div.list-item__value-price";
@@ -33,12 +34,12 @@ public class MotherBoardHotLinePagesParserImpl extends HotLinePagesParserAbstrac
     }
 
     @Override
-    protected List<MotherBoardHotLine> parseData(Document htmlDocument) {
+    protected List<MotherBoardHotLineParserDto> parseData(Document htmlDocument) {
         Elements tableElements = htmlDocument.select(TABLE_CSS_SELECTOR);
-        List<MotherBoardHotLine> motherBoards = new ArrayList<>();
+        List<MotherBoardHotLineParserDto> motherBoards = new ArrayList<>();
 
         for (Element itemBlock : tableElements) {
-            MotherBoardHotLine mb = new MotherBoardHotLine();
+            MotherBoardHotLineParserDto mb = new MotherBoardHotLineParserDto();
             setFields(mb, itemBlock);
             motherBoards.add(mb);
         }
@@ -46,7 +47,7 @@ public class MotherBoardHotLinePagesParserImpl extends HotLinePagesParserAbstrac
         return motherBoards;
     }
 
-    private void setFields(MotherBoardHotLine mb, Element itemBlock) {
+    private void setFields(MotherBoardHotLineParserDto mb, Element itemBlock) {
         mb.setUrl(DOMAIN_LINK + parseUrl(itemBlock));
         mb.setPropositionsQuantity(setPropositionQuantity(itemBlock));
         parseAndSetManufacturerAndName(itemBlock, mb);
@@ -86,7 +87,7 @@ public class MotherBoardHotLinePagesParserImpl extends HotLinePagesParserAbstrac
         return itemBlock.select(PRICE_CSS_SELECTOR).text();
     }
 
-    public void processTextToPriceAvg(String input, MotherBoardHotLine mb) {
+    public void processTextToPriceAvg(String input, MotherBoardHotLineParserDto mb) {
         input = input.replace("грн", "").trim();
         String[] parts = input.split("–");
         double num1;
@@ -105,7 +106,7 @@ public class MotherBoardHotLinePagesParserImpl extends HotLinePagesParserAbstrac
         }
     }
 
-    private void parseAndSetManufacturerAndName(Element itemBlock, MotherBoardHotLine mb) {
+    private void parseAndSetManufacturerAndName(Element itemBlock, MotherBoardHotLineParserDto mb) {
         Element nameElement = itemBlock.select(NAME_CSS_SELECTOR).first();
         String text = nameElement != null ? nameElement.text().trim() : "Не найдено";
         String manufacturer = text.split(" ")[0];
@@ -124,7 +125,7 @@ public class MotherBoardHotLinePagesParserImpl extends HotLinePagesParserAbstrac
     }
 
     private void parseDataFromCharacteristicsBlock(
-            Element characteristicsBlock, MotherBoardHotLine mb) {
+            Element characteristicsBlock, MotherBoardHotLineParserDto mb) {
         if (characteristicsBlock == null) {
             log.warn("Can't find span element to parse data");
         } else {
@@ -147,7 +148,7 @@ public class MotherBoardHotLinePagesParserImpl extends HotLinePagesParserAbstrac
         }
     }
 
-    private void extractData(String text, MotherBoardHotLine mb) {
+    private void extractData(String text, MotherBoardHotLineParserDto mb) {
 
         if (text.contains("Socket ")) {
             mb.setSocketType(

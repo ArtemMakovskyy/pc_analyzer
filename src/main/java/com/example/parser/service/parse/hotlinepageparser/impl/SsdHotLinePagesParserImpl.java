@@ -1,5 +1,6 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
+import com.example.parser.dto.hotline.SsdHotLineParserDto;
 import com.example.parser.model.hotline.SsdHotLine;
 import com.example.parser.model.hotline.SsdHotLine;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 @Log4j2
 @Component
-public class SsdHotLinePagesParserImpl extends HotLinePagesParserAbstract<SsdHotLine> {
+public class SsdHotLinePagesParserImpl extends HotLinePagesParserAbstract<SsdHotLineParserDto> {
     private static final String BASE_URL = "https://hotline.ua/ua/computer/diski-ssd/66705/?p=";
     private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
     private static final String PRICE_CSS_SELECTOR = "div.list-item__value-price";
@@ -35,19 +36,19 @@ public class SsdHotLinePagesParserImpl extends HotLinePagesParserAbstract<SsdHot
     }
 
     @Override
-    protected List<SsdHotLine> parseData(Document htmlDocument) {
+    protected List<SsdHotLineParserDto> parseData(Document htmlDocument) {
         Elements tableElements = htmlDocument.select(TABLE_CSS_SELECTOR);
-        List<SsdHotLine> motherBoards = new ArrayList<>();
+        List<SsdHotLineParserDto> ssdList = new ArrayList<>();
 
         for (Element itemBlock : tableElements) {
-            SsdHotLine ssd = new SsdHotLine();
+            SsdHotLineParserDto ssd = new SsdHotLineParserDto();
             setFields(ssd, itemBlock);
-            motherBoards.add(ssd);
+            ssdList.add(ssd);
         }
-        return motherBoards;
+        return ssdList;
     }
 
-    private void setFields(SsdHotLine ssd, Element itemBlock) {
+    private void setFields(SsdHotLineParserDto ssd, Element itemBlock) {
         ssd.setUrl(DOMAIN_LINK + parseUrl(itemBlock));
         ssd.setPropositionsQuantity(setPropositionQuantity(itemBlock));
         parseAndSetManufacturerAndName(itemBlock, ssd);
@@ -87,7 +88,7 @@ public class SsdHotLinePagesParserImpl extends HotLinePagesParserAbstract<SsdHot
         return itemBlock.select(PRICE_CSS_SELECTOR).text();
     }
 
-    public void processTextToPriceAvg(String input, SsdHotLine ssd) {
+    public void processTextToPriceAvg(String input, SsdHotLineParserDto ssd) {
         input = input.replace("грн", "").trim();
         String[] parts = input.split("–");
         double num1;
@@ -106,7 +107,7 @@ public class SsdHotLinePagesParserImpl extends HotLinePagesParserAbstract<SsdHot
         }
     }
 
-    private void parseAndSetManufacturerAndName(Element itemBlock, SsdHotLine ssd) {
+    private void parseAndSetManufacturerAndName(Element itemBlock, SsdHotLineParserDto ssd) {
         Element nameElement = itemBlock.select(NAME_CSS_SELECTOR).first();
         String text = nameElement != null ? nameElement.text().trim() : "Не найдено";
         String manufacturer = text.split(" ")[0];
@@ -125,7 +126,7 @@ public class SsdHotLinePagesParserImpl extends HotLinePagesParserAbstract<SsdHot
     }
 
     private void parseDataFromCharacteristicsBlock(
-            Element characteristicsBlock, SsdHotLine ssd) {
+            Element characteristicsBlock, SsdHotLineParserDto ssd) {
         if (characteristicsBlock == null) {
             log.warn("Can't find span element to parse data");
         } else {
@@ -148,7 +149,7 @@ public class SsdHotLinePagesParserImpl extends HotLinePagesParserAbstract<SsdHot
         }
     }
 
-    private void extractData(String text, SsdHotLine ssd) {
+    private void extractData(String text, SsdHotLineParserDto ssd) {
         if (text.contains(" ГБ")) {
             ssd.setCapacity(
                     splitAndExtractDataByIndex(text, 0)

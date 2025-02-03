@@ -1,6 +1,8 @@
 package com.example.parser.service.hotline.impl;
 
-import com.example.parser.exseption.CustomServiceException;
+import com.example.parser.dto.hotline.MotherBoardHotLineParserDto;
+import com.example.parser.dto.mapper.MotherBoardHotLineMapper;
+import com.example.parser.exсeption.CustomServiceException;
 import com.example.parser.model.hotline.MotherBoardHotLine;
 import com.example.parser.repository.MotherBoardHotLineRepository;
 import com.example.parser.service.hotline.DataUpdateService;
@@ -17,23 +19,29 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Log4j2
 public class MotherBoardHotlineService implements DataUpdateService {
-    private final MultiThreadPagesParser<MotherBoardHotLine> motherBoardPageParserImpl;
+    private final MultiThreadPagesParser<MotherBoardHotLineParserDto> motherBoardPageParserImpl;
     private final MotherBoardHotLineRepository motherBoardHotLineRepository;
+    private final MotherBoardHotLineMapper motherBoardHotLineMapper;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public void refreshDatabaseWithParsedData(ExecutorService executor) {
         try {
             log.info("Starting motherboard data update process...");
-            List<MotherBoardHotLine> motherBoards
+            List<MotherBoardHotLineParserDto> motherBoards
                     = motherBoardPageParserImpl.parseAllMultiThread(executor);
 
             log.info("Parsed {} motherboards.", motherBoards.size());
             motherBoardHotLineRepository.deleteAll();
             log.info("Deleted old motherboard data.");
 
-            final List<MotherBoardHotLine> motherBoardHotLinesFromDb
-                    = motherBoardHotLineRepository.saveAll(motherBoards);
+            List<MotherBoardHotLine> mBlist = motherBoards.stream()
+                    .map(motherBoardHotLineMapper::toEntity)
+                    .toList();
+
+            List<MotherBoardHotLine> motherBoardHotLinesFromDb
+                    = motherBoardHotLineRepository.saveAll(mBlist);
+
             log.info("Saved {} new motherboard records.",
                     motherBoardHotLinesFromDb.size());
         } catch (Exception e) {

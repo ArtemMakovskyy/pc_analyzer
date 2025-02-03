@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Управление операциями</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h2>Запуск операций</h2>
+<form action="/operations/execute" method="post">
+    <label><input type="checkbox" name="updateUserBenchmarkCpu"> Обновить CPU Benchmark</label><br>
+    <label><input type="checkbox" name="updateUserBenchmarkGpu"> Обновить GPU Benchmark</label><br>
+    <label><input type="checkbox" name="updateHotline"> Обновить Hotline</label><br>
+    <label><input type="checkbox" name="createPcList"> Создать список ПК</label><br>
+    <label><input type="checkbox" name="saveReportToExcel"> Сохранить отчет в Excel</label><br>
+    <button type="submit">Запустить</button>
+</form>
+<p th:text="${message}"></p>
+</body>
+</html>

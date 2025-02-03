@@ -1,6 +1,9 @@
 package com.example.parser.service.hotline.impl;
 
-import com.example.parser.exseption.CustomServiceException;
+import com.example.parser.dto.hotline.GpuHotLineParserDto;
+import com.example.parser.dto.mapper.GpuHotLineMapper;
+import com.example.parser.dto.mapper.GpuUserBenchmarkMapper;
+import com.example.parser.exсeption.CustomServiceException;
 import com.example.parser.model.hotline.GpuHotLine;
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.repository.GpuHotLineRepository;
@@ -20,22 +23,27 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Log4j2
 public class GpuHotlineService implements DataUpdateService, DatabaseSynchronizationService {
-    private final MultiThreadPagesParser<GpuHotLine> gpuPageParserImpl;
+    private final MultiThreadPagesParser<GpuHotLineParserDto> gpuPageParserImpl;
     private final GpuHotLineRepository gpuHotLineRepository;
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
+    private final GpuHotLineMapper gpuHotLineMapper;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public void refreshDatabaseWithParsedData(ExecutorService executor) {
         try {
             log.info("Starting gpu data update process...");
-            List<GpuHotLine> gpusHotLine = gpuPageParserImpl.parseAllMultiThread(executor);
+            List<GpuHotLineParserDto> gpusHotLine = gpuPageParserImpl.parseAllMultiThread(executor);
 
             log.info("Parsed {} gpus.", gpusHotLine.size());
             gpuHotLineRepository.deleteAll();
             log.info("Deleted old gpu data.");
 
-            final List<GpuHotLine> gpuHotLinesFromDb = gpuHotLineRepository.saveAll(gpusHotLine);
+            final List<GpuHotLine> gpuHotLines = gpusHotLine.stream()
+                    .map(gpuHotLineMapper::toEntity)
+                    .toList();
+
+            final List<GpuHotLine> gpuHotLinesFromDb = gpuHotLineRepository.saveAll(gpuHotLines);
             log.info("Saved {} new gpu records.", gpuHotLinesFromDb.size());
 
         } catch (Exception e) {

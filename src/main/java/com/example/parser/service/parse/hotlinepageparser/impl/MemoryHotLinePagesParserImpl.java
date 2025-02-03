@@ -1,5 +1,6 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
+import com.example.parser.dto.hotline.MemoryHotLineParserDto;
 import com.example.parser.model.hotline.MemoryHotLine;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.service.parse.utils.ParseUtil;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Log4j2
 @Component
-public class MemoryHotLinePagesParserImpl extends HotLinePagesParserAbstract<MemoryHotLine> {
+public class MemoryHotLinePagesParserImpl extends HotLinePagesParserAbstract<MemoryHotLineParserDto> {
     private static final String BASE_URL
             = "https://hotline.ua/ua/computer/moduli-pamyati-dlya-pk-i-noutbukov/3102/?p=";
     private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
@@ -35,20 +36,20 @@ public class MemoryHotLinePagesParserImpl extends HotLinePagesParserAbstract<Mem
     }
 
     @Override
-    protected List<MemoryHotLine> parseData(Document htmlDocument) {
+    protected List<MemoryHotLineParserDto> parseData(Document htmlDocument) {
         Elements tableElements = htmlDocument.select(TABLE_CSS_SELECTOR);
-        List<MemoryHotLine> motherBoards = new ArrayList<>();
+        List<MemoryHotLineParserDto> memories = new ArrayList<>();
 
         for (Element itemBlock : tableElements) {
-            MemoryHotLine memory = new MemoryHotLine();
+            MemoryHotLineParserDto memory = new MemoryHotLineParserDto();
             setFields(memory, itemBlock);
-            motherBoards.add(memory);
+            memories.add(memory);
         }
 
-        return motherBoards;
+        return memories;
     }
 
-    private void setFields(MemoryHotLine memory, Element itemBlock) {
+    private void setFields(MemoryHotLineParserDto memory, Element itemBlock) {
         memory.setUrl(DOMAIN_LINK + parseUrl(itemBlock));
         memory.setPropositionsQuantity(setPropositionQuantity(itemBlock));
         parseAndSetManufacturerAndName(itemBlock, memory);
@@ -88,7 +89,7 @@ public class MemoryHotLinePagesParserImpl extends HotLinePagesParserAbstract<Mem
         return itemBlock.select(PRICE_CSS_SELECTOR).text();
     }
 
-    public void processTextToPriceAvg(String input, MemoryHotLine memory) {
+    public void processTextToPriceAvg(String input, MemoryHotLineParserDto memory) {
         input = input.replace("грн", "").trim();
         String[] parts = input.split("–");
         double num1;
@@ -107,7 +108,7 @@ public class MemoryHotLinePagesParserImpl extends HotLinePagesParserAbstract<Mem
         }
     }
 
-    private void parseAndSetManufacturerAndName(Element itemBlock, MemoryHotLine memory) {
+    private void parseAndSetManufacturerAndName(Element itemBlock, MemoryHotLineParserDto memory) {
         Element nameElement = itemBlock.select(NAME_CSS_SELECTOR).first();
         String text = nameElement != null ? nameElement.text().trim() : "Не найдено";
         String manufacturer = text.split(" ")[0];
@@ -126,7 +127,7 @@ public class MemoryHotLinePagesParserImpl extends HotLinePagesParserAbstract<Mem
     }
 
     private void parseDataFromCharacteristicsBlock(
-            Element characteristicsBlock, MemoryHotLine memory) {
+            Element characteristicsBlock, MemoryHotLineParserDto memory) {
         if (characteristicsBlock == null) {
             log.warn("Can't find span element to parse data");
         } else {
@@ -149,7 +150,7 @@ public class MemoryHotLinePagesParserImpl extends HotLinePagesParserAbstract<Mem
         }
     }
 
-    private void extractData(String text, MemoryHotLine memory) {
+    private void extractData(String text, MemoryHotLineParserDto memory) {
         if (text.contains(" ГБ")) {
             memory.setCapacity(
                     splitAndExtractDataByIndex(text, 0)

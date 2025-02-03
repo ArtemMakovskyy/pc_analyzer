@@ -1,7 +1,7 @@
 package com.example.parser.service.userbenchmark;
 
 import com.example.parser.dto.mapper.CpuUserBenchmarkMapper;
-import com.example.parser.dto.userbenchmark.CpuUserBenchmarkCreateDto;
+import com.example.parser.dto.userbenchmark.CpuUserBenchmarkParserDto;
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.repository.CpuUserBenchmarkRepository;
 import com.example.parser.service.parse.WebDriverFactory;
@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.WebDriver;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,22 +21,28 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CpuUserBenchmarkService {
     private final static int FAILURE_VALUE = -1;
-    private final static int PROCESS_ALL_PAGES_VALUE = -1;
+    private final static int PROCESS_ALL_PAGES_VALUE_DEFAULT = -1;
+    private final static int TIMEOUT_SECONDS = 10;
+    @Value("${parse.pages.quantity.cpu.user.benchmark}")
+    private int parsePagesQuantity;
+    @Value("${show.web.windows.from.selenium}")
+    private boolean showWebGraphicInterfaceFromSelenium;
+    @Value("${sort.by.age.selenium}")
+    private boolean sortByAge;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
     private final UserBenchmarkCpuPageParser userBenchmarkCpuPageParser;
     private final UserBenchmarkCpuDetailsPageParser userBenchmarkCpuDetailsPageParser;
     private final CpuUserBenchmarkMapper cpuUserBenchmarkMapper;
     private final WebDriverFactory webDriverFactory;
 
-    //todo add anotherGpuTestData manually
-
     public List<UserBenchmarkCpu> loadAndSaveNewItems() {
+        int parsePages = parsePagesQuantity != 0 ? parsePagesQuantity : PROCESS_ALL_PAGES_VALUE_DEFAULT;
 
-        final List<CpuUserBenchmarkCreateDto> cpuUserBenchmarkCreateDtos =
-                userBenchmarkCpuPageParser.loadAndParse(true, PROCESS_ALL_PAGES_VALUE);
+        final List<CpuUserBenchmarkParserDto> cpuUserBenchmarkParserDtos =
+                userBenchmarkCpuPageParser.loadAndParse(sortByAge, parsePages);
 
         final List<UserBenchmarkCpu> newItems = filterNewItems(cpuUserBenchmarkRepository.findAll(),
-                cpuUserBenchmarkCreateDtos
+                cpuUserBenchmarkParserDtos
                         .stream()
                         .map(d -> cpuUserBenchmarkMapper.toEntity(d))
                         .toList());
@@ -56,7 +63,7 @@ public class CpuUserBenchmarkService {
         final List<UserBenchmarkCpu> byCpuSpecificationIsNull
                 = cpuUserBenchmarkRepository.findByCpuSpecificationIsNull();
 
-        WebDriver driver = webDriverFactory.setUpWebDriver(true, 10);
+        WebDriver driver = webDriverFactory.setUpWebDriver(showWebGraphicInterfaceFromSelenium, TIMEOUT_SECONDS);
         int updated = 0;
         int notUpdated = 0;
         int progress = 0;
@@ -82,7 +89,7 @@ public class CpuUserBenchmarkService {
         }
     }
 
-    private List<UserBenchmarkCpu> saveAllToDb(List<CpuUserBenchmarkCreateDto> createDto) {
+    private List<UserBenchmarkCpu> saveAllToDb(List<CpuUserBenchmarkParserDto> createDto) {
         return cpuUserBenchmarkRepository.saveAll(
                 createDto.stream()
                         .map(cpuUserBenchmarkMapper::toEntity).toList()

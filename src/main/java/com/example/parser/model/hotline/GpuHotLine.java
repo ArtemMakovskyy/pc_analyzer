@@ -31,12 +31,9 @@ public class GpuHotLine {
     private String memorySize;
     private String shina;
     private String port;
-    private String year;
     private String prices;
     private Double avgPrice;
     private Integer propositionsQuantity;
-    private Double avgBenchUserBenchmark;
-
     @ManyToOne
     private UserBenchmarkGpu userBenchmarkGpu;
 

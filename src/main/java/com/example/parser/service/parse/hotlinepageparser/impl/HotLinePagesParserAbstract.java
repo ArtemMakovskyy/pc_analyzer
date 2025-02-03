@@ -7,16 +7,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Value;
 
 @Log4j2
 public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesParser<T> {
+    @Value("${hotline.delay.from}")
+    private int delayFrom;
+    @Value("${hotline.delay.to}")
+    private int delayTo;
+        private final static int SLEEP_FOR_RETRY_DELAY_FROM = 3;
+    private final static int SLEEP_FOR_RETRY_DELAY_TO = 6;
+    private final static int MAX_RETRIES = 5;
     protected static final String DOMAIN_LINK = "https://hotline.ua";
     protected static final String PAGES_CSS_SELECTOR = "a.page";
     protected static final String TABLE_CSS_SELECTOR = "div.list-body__content.content.flex-wrap > div";
@@ -42,8 +48,8 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
                         baseUrl + pageIndex,
                         true,
                         true,
-                        4,
-                        8,
+                        delayFrom,
+                        delayTo,
                         false);
                 log.info("... parsed page: " + pageIndex + " from: " + maxPage);
                 return parse;
@@ -59,8 +65,6 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
                 Thread.currentThread().interrupt();
             }
         }
-        //todo how correct do this
-//        shutdownExecutor();
         return parts;
     }
 
@@ -76,8 +80,8 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
                     baseUrl + pageIndex,
                     true,
                     true,
-                    2,
-                    4,
+                    delayFrom,
+                    delayTo,
                     false);
             parts.addAll(parse);
             log.info("... parsed page: " + i + " from: " + maxPage);
@@ -112,7 +116,7 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
             int delayTo,
             boolean isPrintDocumentToConsole
     ) {
-        int maxRetries = 5;
+        int maxRetries = MAX_RETRIES;
         int attempt = 0;
         Document htmlDocument = null;
 
@@ -137,7 +141,7 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
                 log.error("Error fetching page: " + url + " (Attempt " + attempt + ")", e);
             }
             //sleepForRetry
-            ParseUtil.applyRandomDelay(3, 6, useDelay);
+            ParseUtil.applyRandomDelay(SLEEP_FOR_RETRY_DELAY_FROM, SLEEP_FOR_RETRY_DELAY_TO, useDelay);
         }
 
         log.error("Failed to load page after " + maxRetries + " attempts: " + url);

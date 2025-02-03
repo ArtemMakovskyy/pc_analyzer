@@ -1,6 +1,8 @@
 package com.example.parser.service.hotline.impl;
 
-import com.example.parser.exseption.CustomServiceException;
+import com.example.parser.dto.hotline.CpuHotLineParserDto;
+import com.example.parser.dto.mapper.CpuHotLineMapper;
+import com.example.parser.exсeption.CustomServiceException;
 import com.example.parser.model.hotline.CpuHotLine;
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.repository.CpuHotLineRepository;
@@ -8,7 +10,6 @@ import com.example.parser.repository.CpuUserBenchmarkRepository;
 import com.example.parser.service.hotline.DataUpdateService;
 import com.example.parser.service.hotline.DatabaseSynchronizationService;
 import com.example.parser.service.parse.MultiThreadPagesParser;
-import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import lombok.RequiredArgsConstructor;
@@ -21,22 +22,27 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Log4j2
 public class CpuHotlineService implements DataUpdateService, DatabaseSynchronizationService {
-    private final MultiThreadPagesParser<CpuHotLine> сpuPageParserImpl;
+    private final MultiThreadPagesParser<CpuHotLineParserDto> сpuPageParserImpl;
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
+    private final CpuHotLineMapper cpuHotLineMapper;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public void refreshDatabaseWithParsedData(ExecutorService executor) {
         try {
             log.info("Starting cpu data update process...");
-            List<CpuHotLine> cpusHotLine = сpuPageParserImpl.parseAllMultiThread(executor);
+            List<CpuHotLineParserDto> cpusHotLine = сpuPageParserImpl.parseAllMultiThread(executor);
 
             log.info("Parsed {} cpus.", cpusHotLine.size());
             cpuHotLineRepository.deleteAll();
             log.info("Deleted old cpu data.");
 
-            final List<CpuHotLine> cpuHotLinesFromDb = cpuHotLineRepository.saveAll(cpusHotLine);
+            final List<CpuHotLine> cpuHotLineList = cpusHotLine.stream()
+                    .map(cpuHotLineMapper::toEntity)
+                    .toList();
+
+            final List<CpuHotLine> cpuHotLinesFromDb = cpuHotLineRepository.saveAll(cpuHotLineList);
             log.info("Saved {} new cpu records.", cpuHotLinesFromDb.size());
 
         } catch (Exception e) {

@@ -1,6 +1,8 @@
 package com.example.parser.service.hotline.impl;
 
-import com.example.parser.exseption.CustomServiceException;
+import com.example.parser.dto.hotline.MemoryHotLineParserDto;
+import com.example.parser.dto.mapper.MemoryHotLineMapper;
+import com.example.parser.exсeption.CustomServiceException;
 import com.example.parser.model.hotline.MemoryHotLine;
 import com.example.parser.repository.MemoryHotLineRepository;
 import com.example.parser.service.hotline.DataUpdateService;
@@ -23,15 +25,17 @@ public class MemoryHotlineService implements DataUpdateService {
     private final static String MEMORY_PAGE_LINK_DDR5 =
             "https://hotline.ua/ua/computer/moduli-pamyati-dlya-pk-i-noutbukov"
                     + "/3102-19139-672508/?sort=priceUp";
-    private final MultiThreadPagesParser<MemoryHotLine> memoryPageParserImpl;
+    private final MultiThreadPagesParser<MemoryHotLineParserDto> memoryPageParserImpl;
     private final MemoryHotLineRepository memoryHotLineRepository;
+    private final MemoryHotLineMapper memoryHotLineMapper;
+
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public void refreshDatabaseWithParsedData(ExecutorService executor) {
         try {
             log.info("Starting memory data update process...");
-            List<MemoryHotLine> memories = memoryPageParserImpl
+            List<MemoryHotLineParserDto> memories = memoryPageParserImpl
                     .parsePage(MEMORY_PAGE_LINK_DDR4);
             memories.addAll(memoryPageParserImpl
                     .parsePage(MEMORY_PAGE_LINK_DDR5));
@@ -40,8 +44,12 @@ public class MemoryHotlineService implements DataUpdateService {
             memoryHotLineRepository.deleteAll();
             log.info("Deleted old memory data.");
 
-            final List<MemoryHotLine> memoryHotLinesFromDb
-                    = memoryHotLineRepository.saveAll(memories);
+            List<MemoryHotLine> MemoryHotLineList = memories.stream()
+                    .map(memoryHotLineMapper::toEntity)
+                    .toList();
+
+            List<MemoryHotLine> memoryHotLinesFromDb
+                    = memoryHotLineRepository.saveAll(MemoryHotLineList);
             log.info("Saved {} new memory records.", memoryHotLinesFromDb.size());
         } catch (Exception e) {
             log.error("Error occurred during memory data update process: {}"

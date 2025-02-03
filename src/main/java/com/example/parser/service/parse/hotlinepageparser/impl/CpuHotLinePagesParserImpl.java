@@ -1,5 +1,6 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
+import com.example.parser.dto.hotline.CpuHotLineParserDto;
 import com.example.parser.model.hotline.CpuHotLine;
 import com.example.parser.model.hotline.MotherBoardHotLine;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Log4j2
 @Component
-public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHotLine> {
+public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHotLineParserDto> {
     private static final String BASE_URL = "https://hotline.ua/ua/computer/processory/?p=";
     private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
     private static final String PRICE_CSS_SELECTOR = "div.list-item__value-price";
@@ -34,12 +35,12 @@ public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHot
     }
 
     @Override
-    protected List<CpuHotLine> parseData(Document htmlDocument) {
+    protected List<CpuHotLineParserDto> parseData(Document htmlDocument) {
         Elements tableElements = htmlDocument.select(TABLE_CSS_SELECTOR);
-        List<CpuHotLine> cpus = new ArrayList<>();
+        List<CpuHotLineParserDto> cpus = new ArrayList<>();
 
         for (Element itemBlock : tableElements) {
-            CpuHotLine cpu = new CpuHotLine();
+            CpuHotLineParserDto cpu = new CpuHotLineParserDto();
             setFields(cpu, itemBlock);
             cpus.add(cpu);
         }
@@ -47,7 +48,7 @@ public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHot
         return cpus;
     }
 
-    private void setFields(CpuHotLine cpu, Element itemBlock) {
+    private void setFields(CpuHotLineParserDto cpu, Element itemBlock) {
         cpu.setUrl(DOMAIN_LINK + parseUrl(itemBlock));
         cpu.setPropositionsQuantity(setPropositionQuantity(itemBlock));
 
@@ -61,7 +62,7 @@ public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHot
         parseDataFromCharacteristicsBlock(characteristicsBlock, cpu);
     }
 
-    private void parseAndSetManufacturerAndName(Element itemBlock, CpuHotLine cpu) {
+    private void parseAndSetManufacturerAndName(Element itemBlock, CpuHotLineParserDto cpu) {
         Element nameElement = itemBlock.select(NAME_CSS_SELECTOR).first();
         String text = nameElement != null ? nameElement.text().trim() : "Не найдено";
         String manufacturer = text.split(" ")[0];
@@ -98,7 +99,7 @@ public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHot
         return cpuBlock.select(PRICE_CSS_SELECTOR).text();
     }
 
-    public void processTextToPriceAvg(String input, CpuHotLine cpu) {
+    public void processTextToPriceAvg(String input, CpuHotLineParserDto cpu) {
         input = input.replace("грн", "").trim();
         String[] parts = input.split("–");
         double num1;
@@ -126,7 +127,7 @@ public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHot
         return linkElement.attr("href");
     }
 
-    private void parseDataFromCharacteristicsBlock(Element characteristicsBlock, CpuHotLine cpu) {
+    private void parseDataFromCharacteristicsBlock(Element characteristicsBlock, CpuHotLineParserDto cpu) {
         if (characteristicsBlock == null) {
             log.warn("Can't find span element to parse data");
         } else {
@@ -137,7 +138,7 @@ public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHot
         }
     }
 
-    private void extractData(String text, CpuHotLine cpu) {
+    private void extractData(String text, CpuHotLineParserDto cpu) {
 
         if (text.contains("Роз'єм: Socket ")) {
             cpu.setSocketType(

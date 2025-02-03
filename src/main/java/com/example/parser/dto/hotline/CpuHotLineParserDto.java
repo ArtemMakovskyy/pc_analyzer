@@ -3,23 +3,18 @@ package com.example.parser.dto.hotline;
 import lombok.Data;
 
 @Data
-public class CpuHotLineCreateDto {
+public class CpuHotLineParserDto {
+    private String manufacturer;
     private String name;
     private String url;
     private String prices;
+    private Double avgPrice;
     private String socketType;
     private String frequency;
     private String l3Cache;
     private String cores;
     private String threads;
     private String packageType;
-    private String releaseDate;
-    private String brand;
-    private String type;
-    private double baseFrequency;
-    private double maxFrequency;
-    private String coreName;
-    private int coreCount;
-    private int threadCount;
-    private Double avgBenchUserBenchmark;
+    private Integer propositionsQuantity;
+    private UserBenchmarkParserCpuDto userBenchmarkParserCpuDto;
 }

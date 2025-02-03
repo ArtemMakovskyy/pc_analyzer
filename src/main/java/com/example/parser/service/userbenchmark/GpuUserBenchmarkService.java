@@ -1,10 +1,11 @@
 package com.example.parser.service.userbenchmark;
 
 
+import com.example.parser.dto.mapper.GpuUserBenchmarkMapper;
+import com.example.parser.dto.userbenchmark.GpuUserBenchmarkParserDto;
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.repository.GpuUserBenchmarkRepository;
 import com.example.parser.service.parse.benchmark.user.UserBenchmarkGpuPageParser;
-import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +18,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,35 +26,42 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class GpuUserBenchmarkService {
     private final static String PATH = "C:\\Users\\Artem\\Documents\\Java\\UltimateJetBrains\\tutorials\\ms1\\parser\\parser\\src\\main\\resources\\static\\gpu_power_requirements.txt";
-    private static final int PARSE_ALL_PAGES_INDEX = -1;
+    private static final int PROCESS_ALL_PAGES_VALUE_DEFAULT = -1;
+    private static final int DEFAULT_POWER = 300;
+    @Value("${parse.pages.quantity.gpu.user.benchmark}")
+    private int parsePagesQuantity;
+    @Value("${sort.by.age.selenium}")
+    private boolean sortByAge;
     private static final String REGEX_FIND_POWER = "(\\d+)W";
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
     private final UserBenchmarkGpuPageParser userBenchmarkGpuPageParser;
+    private final GpuUserBenchmarkMapper gpuUserBenchmarkMapper;
 
-    /**
-     * Загружает новые данные, фильтрует уже существующие записи и сохраняет новые записи в базу данных.
-     *
-     * @return Список новых сохраненных записей.
-     */
     public List<UserBenchmarkGpu> loadAndSaveNewItems() {
-        log.info("Начинаем загрузку и сохранение новых записей GPU User Benchmark.");
+        int parsePages = parsePagesQuantity != 0 ? parsePagesQuantity : PROCESS_ALL_PAGES_VALUE_DEFAULT;
 
-        List<UserBenchmarkGpu> parsedGpuList = userBenchmarkGpuPageParser.loadAndParse(true, PARSE_ALL_PAGES_INDEX);
-        log.info("Загружено {} записей из источника.", parsedGpuList.size());
+        log.info("Starting the loading and saving of new GPU User Benchmark records.");
+
+        List<GpuUserBenchmarkParserDto> parsedGpuList = userBenchmarkGpuPageParser
+                .loadAndParse(sortByAge, parsePages);
+        log.info("Loaded {} records from the source.", parsedGpuList.size());
 
         List<UserBenchmarkGpu> existingGpuList = gpuUserBenchmarkRepository.findAll();
-        log.info("Найдено {} записей в базе данных.", existingGpuList.size());
+        log.info("Found {} records in the database.", existingGpuList.size());
 
-        List<UserBenchmarkGpu> newItems = filterNewItems(existingGpuList, parsedGpuList);
-        log.info("Обнаружено {} новых записей для сохранения.", newItems.size());
+        List<UserBenchmarkGpu> userBenchmarkGpus = parsedGpuList.stream()
+                .map(gpuUserBenchmarkMapper::toEntity)
+                .toList();
+
+        List<UserBenchmarkGpu> newItems = filterNewItems(existingGpuList, userBenchmarkGpus);
+        log.info("Detected {} new records for saving.", newItems.size());
 
         List<UserBenchmarkGpu> savedItems = gpuUserBenchmarkRepository.saveAll(newItems);
-        log.info("Сохранено {} новых записей в базу данных.", savedItems.size());
+        log.info("Saved {} new records to the database.", savedItems.size());
 
         return savedItems;
     }
 
-    //todo insert new data manually (PowerSupply)
 
     public void updateGpuPowerFromFile() {
         List<String> gpuPowerInfoFromFile = readFile(PATH);
@@ -70,7 +79,7 @@ public class GpuUserBenchmarkService {
                         gpusToUpdate.add(gpu);
                         log.info("Updated GPU: " + gpu.getModel() + " with power requirement: " + powerRequirement);
                     } else if (gpuPowerInfo.contains("Интегрированное решение")) {
-                        gpu.setPowerRequirement(300);
+                        gpu.setPowerRequirement(DEFAULT_POWER);
                         gpusToUpdate.add(gpu);
                         log.info("Updated GPU: " + gpu.getModel() + " with power requirement: 300 (Интегрированное решение)");
                     }
@@ -84,13 +93,6 @@ public class GpuUserBenchmarkService {
 
     }
 
-    /**
-     * Фильтрует новые записи, которые ещё отсутствуют в базе данных.
-     *
-     * @param existingList Список существующих записей.
-     * @param parsedList   Список загруженных записей.
-     * @return Список новых записей.
-     */
     private static List<UserBenchmarkGpu> filterNewItems(List<UserBenchmarkGpu> existingList, List<UserBenchmarkGpu> parsedList) {
         Set<String> existingModels = existingList.stream()
                 .map(UserBenchmarkGpu::getModel)

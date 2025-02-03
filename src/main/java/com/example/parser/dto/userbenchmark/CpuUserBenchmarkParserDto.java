@@ -3,7 +3,7 @@ package com.example.parser.dto.userbenchmark;
 import lombok.Data;
 
 @Data
-public class CpuUserBenchmarkCreateDto {
+public class CpuUserBenchmarkParserDto {
     private String model;
     private String modelHl;
     private String manufacturer;

@@ -3,7 +3,7 @@ package com.example.parser.dto.hotline;
 import lombok.Data;
 
 @Data
-public class UserBenchmarkShortCpuInfoDto {
+public class UserBenchmarkParserGpuDto {
     private String socketType;
     private String frequency;
     private String l3Cache;
@@ -11,4 +11,5 @@ public class UserBenchmarkShortCpuInfoDto {
     private String threads;
     private String packageType;
     private String releaseDate;
+
 }

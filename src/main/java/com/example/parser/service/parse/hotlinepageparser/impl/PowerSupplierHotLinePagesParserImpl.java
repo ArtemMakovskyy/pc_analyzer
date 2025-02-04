@@ -1,16 +1,12 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
 import com.example.parser.dto.hotline.PowerSupplierHotLineParserDto;
-import com.example.parser.model.hotline.PowerSupplierHotLine;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.service.parse.utils.ParseUtil;
-import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -27,12 +23,12 @@ public class PowerSupplierHotLinePagesParserImpl
     private static final String PRICE_CSS_SELECTOR = "div.list-item__value-price";
     private static final String NAME_CSS_SELECTOR = "div.list-item__title-container a";
     private static final String LINK_CSS_SELECTOR = "a.item-title.link--black";
-    private static final String PROPOSITION_QUANTITY_CSS_SELECTOR
-            = "a.link.link--black.text-sm.m_b-5";
-    private static final String NO_ELEMENT_CSS_SELECTOR
-            = "div.list-item__value > div.list-item__value--overlay."
-            + "list-item__value--full > div > div > div.m_b-10";
-    private static final String DIGITS_REGEX = "\\d+";
+//    private static final String PROPOSITION_QUANTITY_CSS_SELECTOR
+//            = "a.link.link--black.text-sm.m_b-5";
+//    private static final String NO_ELEMENT_CSS_SELECTOR
+//            = "div.list-item__value > div.list-item__value--overlay."
+//            + "list-item__value--full > div > div > div.m_b-10";
+//    private static final String DIGITS_REGEX = "\\d+";
 
     public PowerSupplierHotLinePagesParserImpl(HtmlDocumentFetcher htmlDocumentFetcher) {
         super(htmlDocumentFetcher, BASE_URL);
@@ -71,35 +67,35 @@ public class PowerSupplierHotLinePagesParserImpl
         parseDataFromCharacteristicsBlock(characteristicsBlock, powerSupplierHotLine);
     }
 
-    private int setPropositionQuantity(Element itemBlock) {
-        Elements noElement = itemBlock.select(NO_ELEMENT_CSS_SELECTOR);
-        if (!noElement.isEmpty()) {
-            String waitingText = noElement.text();
-
-            if (waitingText.contains("Очікується в продажу")) {
-                return 0;
-            }
-        }
-
-        Elements propositionQuantityElement = itemBlock.select(PROPOSITION_QUANTITY_CSS_SELECTOR);
-        if (!propositionQuantityElement.isEmpty()) {
-            String text = propositionQuantityElement.text().trim();
-            Pattern pattern = Pattern.compile(DIGITS_REGEX);
-            Matcher matcher = pattern.matcher(text);
-
-            if (matcher.find()) {
-                String quantity = matcher.group();
-                return ParseUtil.stringToIntIfErrorReturnMinusOne(quantity);
-            }
-        }
-        return 1;
-    }
+//    private int setPropositionQuantity(Element itemBlock) {
+//        Elements noElement = itemBlock.select(NO_ELEMENT_CSS_SELECTOR);
+//        if (!noElement.isEmpty()) {
+//            String waitingText = noElement.text();
+//
+//            if (waitingText.contains("Очікується в продажу")) {
+//                return 0;
+//            }
+//        }
+//
+//        Elements propositionQuantityElement = itemBlock.select(PROPOSITION_QUANTITY_CSS_SELECTOR);
+//        if (!propositionQuantityElement.isEmpty()) {
+//            String text = propositionQuantityElement.text().trim();
+//            Pattern pattern = Pattern.compile(DIGITS_REGEX);
+//            Matcher matcher = pattern.matcher(text);
+//
+//            if (matcher.find()) {
+//                String quantity = matcher.group();
+//                return ParseUtil.stringToIntIfErrorReturnMinusOne(quantity);
+//            }
+//        }
+//        return 1;
+//    }
 
     private String parsePrices(Element itemBlock) {
         return itemBlock.select(PRICE_CSS_SELECTOR).text();
     }
 
-    public void processTextToPriceAvg(String input, PowerSupplierHotLineParserDto powerSupplierHotLine) {
+    private void processTextToPriceAvg(String input, PowerSupplierHotLineParserDto powerSupplierHotLine) {
         input = input.replace("грн", "").trim();
         String[] parts = input.split("–");
         double num1;
@@ -108,7 +104,7 @@ public class PowerSupplierHotLinePagesParserImpl
                     parts[0].trim().replace(" ", ""));
             double num2 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
                     parts[1].trim().replace(" ", ""));
-            powerSupplierHotLine.setAvgPrice((num1 + num2) / 2);
+            powerSupplierHotLine.setAvgPrice(calculateBestAvgPrice(num1, num2));
         } else if (parts.length == 1) {
             num1 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
                     parts[0].trim().replace(" ", ""));
@@ -187,14 +183,14 @@ public class PowerSupplierHotLinePagesParserImpl
 
     }
 
-    private String splitAndExtractDataByIndex(String text, int index) {
-        String[] textArray = text.split(" ");
-        if (textArray.length < index) {
-            log.warn(this.getClass() + ": Invalid index "
-                    + index + ". Text array length is " + textArray.length);
-            return "";
-        }
-        return textArray[index];
-    }
+//    private String splitAndExtractDataByIndex(String text, int index) {
+//        String[] textArray = text.split(" ");
+//        if (textArray.length < index) {
+//            log.warn(this.getClass() + ": Invalid index "
+//                    + index + ". Text array length is " + textArray.length);
+//            return "";
+//        }
+//        return textArray[index];
+//    }
 
 }

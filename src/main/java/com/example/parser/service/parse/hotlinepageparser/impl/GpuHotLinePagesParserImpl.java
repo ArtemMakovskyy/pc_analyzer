@@ -1,13 +1,10 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
 import com.example.parser.dto.hotline.GpuHotLineParserDto;
-import com.example.parser.model.hotline.GpuHotLine;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.service.parse.utils.ParseUtil;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -67,29 +64,29 @@ public class GpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<GpuHot
         return linkElement.attr("href");
     }
 
-    private int setPropositionQuantity(Element itemBlock) {
-        Elements noElement = itemBlock.select(NO_ELEMENT_CSS_SELECTOR);
-        if (!noElement.isEmpty()) {
-            String waitingText = noElement.text();
-
-            if (waitingText.contains("Очікується в продажу")) {
-                return 0;
-            }
-        }
-
-        Elements propositionQuantityElement = itemBlock.select(PROPOSITION_QUANTITY_CSS_SELECTOR);
-        if (!propositionQuantityElement.isEmpty()) {
-            String text = propositionQuantityElement.text().trim();
-            Pattern pattern = Pattern.compile(DIGITS_REGEX);
-            Matcher matcher = pattern.matcher(text);
-
-            if (matcher.find()) {
-                String number = matcher.group();
-                return ParseUtil.stringToIntIfErrorReturnMinusOne(number);
-            }
-        }
-        return 1;
-    }
+//    private int setPropositionQuantity(Element itemBlock) {
+//        Elements noElement = itemBlock.select(NO_ELEMENT_CSS_SELECTOR);
+//        if (!noElement.isEmpty()) {
+//            String waitingText = noElement.text();
+//
+//            if (waitingText.contains("Очікується в продажу")) {
+//                return 0;
+//            }
+//        }
+//
+//        Elements propositionQuantityElement = itemBlock.select(PROPOSITION_QUANTITY_CSS_SELECTOR);
+//        if (!propositionQuantityElement.isEmpty()) {
+//            String text = propositionQuantityElement.text().trim();
+//            Pattern pattern = Pattern.compile(DIGITS_REGEX);
+//            Matcher matcher = pattern.matcher(text);
+//
+//            if (matcher.find()) {
+//                String number = matcher.group();
+//                return ParseUtil.stringToIntIfErrorReturnMinusOne(number);
+//            }
+//        }
+//        return 1;
+//    }
 
     private String parsePrices(Element itemBlock) {
         return itemBlock.select(PRICE_CSS_SELECTOR).text();
@@ -124,7 +121,7 @@ public class GpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<GpuHot
         }
     }
 
-    public void processTextToPriceAvg(String input, GpuHotLineParserDto gpu) {
+    private void processTextToPriceAvg(String input, GpuHotLineParserDto gpu) {
         input = input.replace("грн", "").trim();
         String[] parts = input.split("–");
         double num1;
@@ -133,7 +130,7 @@ public class GpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<GpuHot
                     parts[0].trim().replace(" ", ""));
             double num2 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
                     parts[1].trim().replace(" ", ""));
-            gpu.setAvgPrice((num1 + num2) / 2);
+            gpu.setAvgPrice(calculateBestAvgPrice(num1, num2));
         } else if (parts.length == 1) {
             num1 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
                     parts[0].trim().replace(" ", ""));
@@ -174,14 +171,14 @@ public class GpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<GpuHot
 
     }
 
-    private String splitAndExtractDataByIndex(String text, int index) {
-        String[] textArray = text.split(" ");
-        if (textArray.length < index) {
-            log.warn(this.getClass() + ": Invalid index "
-                    + index + ". Text array length is " + textArray.length);
-            return "";
-        }
-        return textArray[index];
-    }
+//    private String splitAndExtractDataByIndex(String text, int index) {
+//        String[] textArray = text.split(" ");
+//        if (textArray.length < index) {
+//            log.warn(this.getClass() + ": Invalid index "
+//                    + index + ". Text array length is " + textArray.length);
+//            return "";
+//        }
+//        return textArray[index];
+//    }
 
 }

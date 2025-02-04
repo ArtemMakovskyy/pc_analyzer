@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.extern.log4j.Log4j2;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,7 +22,13 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
     private int delayFrom;
     @Value("${hotline.delay.to}")
     private int delayTo;
-        private final static int SLEEP_FOR_RETRY_DELAY_FROM = 3;
+    protected static final String NO_ELEMENT_CSS_SELECTOR
+            = "div.list-item__value > div.list-item__value--overlay."
+            + "list-item__value--full > div > div > div.m_b-10";
+    protected static final String DIGITS_REGEX = "\\d+";
+    protected static final String PROPOSITION_QUANTITY_CSS_SELECTOR
+            = "a.link.link--black.text-sm.m_b-5";
+    private final static int SLEEP_FOR_RETRY_DELAY_FROM = 3;
     private final static int SLEEP_FOR_RETRY_DELAY_TO = 6;
     private final static int MAX_RETRIES = 5;
     protected static final String DOMAIN_LINK = "https://hotline.ua";
@@ -96,6 +104,7 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
         Document htmlDocument = fetchHtmlDocumentWithRetries(url, true, true, 2, 4, false);
         return parseData(htmlDocument);
     }
+
     protected List<T> parsePage(
             String url,
             boolean useUserAgent,
@@ -171,6 +180,47 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
         }
         log.info("Pages quality: " + maxPage);
         return maxPage;
+    }
+
+    protected int setPropositionQuantity(Element itemBlock) {
+        Elements noElement = itemBlock.select(NO_ELEMENT_CSS_SELECTOR);
+        if (!noElement.isEmpty()) {
+            String waitingText = noElement.text();
+
+            if (waitingText.contains("Очікується в продажу")) {
+                return 0;
+            }
+        }
+
+        Elements propositionQuantityElement = itemBlock.select(PROPOSITION_QUANTITY_CSS_SELECTOR);
+        if (!propositionQuantityElement.isEmpty()) {
+            String text = propositionQuantityElement.text().trim();
+            Pattern pattern = Pattern.compile(DIGITS_REGEX);
+            Matcher matcher = pattern.matcher(text);
+
+            if (matcher.find()) {
+                String number = matcher.group();
+                return ParseUtil.stringToIntIfErrorReturnMinusOne(number);
+            }
+        }
+        return 1;
+    }
+
+    protected String splitAndExtractDataByIndex(String text, int index) {
+        String[] textArray = text.split(" ");
+        if (textArray.length < index) {
+            log.warn(this.getClass() + ": Invalid index "
+                    + index + ". Text array length is " + textArray.length);
+            return "";
+        }
+        return textArray[index];
+    }
+
+    protected double calculateBestAvgPrice(double minPrice, double maxPrice) {
+        double avgPrice = (minPrice + maxPrice) / 2;
+        double optimalPrice = minPrice * 1.15;
+        double min = Math.min(avgPrice, optimalPrice);
+        return Math.round(min * 100.0) / 100.0;
     }
 
 }

@@ -108,6 +108,7 @@ public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHot
                     parts[0].trim().replace(" ", ""));
             double num2 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
                     parts[1].trim().replace(" ", ""));
+
             cpu.setAvgPrice((num1 + num2) / 2);
         } else if (parts.length == 1) {
             num1 = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
@@ -161,6 +162,10 @@ public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHot
                     splitAndExtractDataByIndex(text, 2)
             );
         } else if (text.contains("Комплектація: Tray")) {
+            cpu.setPackageType(
+                    "Tray"
+            );
+        } else if (text.contains("Комплектація: MPK")) {
             cpu.setPackageType(
                     "Tray"
             );

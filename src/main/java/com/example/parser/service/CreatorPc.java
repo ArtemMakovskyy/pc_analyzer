@@ -75,6 +75,7 @@ public class CreatorPc {
 
             if (updateUserBenchmarkCpu) {
                 cpuUserBenchmarkService.loadAndSaveNewItems();
+                cpuUserBenchmarkService.updateMissingSpecifications();
             }
 
             if (updateUserBenchmarkGpu) {

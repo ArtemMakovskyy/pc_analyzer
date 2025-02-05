@@ -2,30 +2,22 @@ package com.example.parser.controller;
 
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.repository.GpuUserBenchmarkRepository;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.List;
-
 @Controller
+@RequiredArgsConstructor
 public class GpuController {
-
-    @Autowired
-    private GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
-
-    @PostConstruct
-    public List<UserBenchmarkGpu> getAllWherePowerRequirementIsNull() {
-        return gpuUserBenchmarkRepository.findAllByPowerRequirementIsNull();
-    }
+    private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
 
     @GetMapping("/gpus")
     public String listGpus(Model model) {
-        List<UserBenchmarkGpu> gpus = getAllWherePowerRequirementIsNull();
+        List<UserBenchmarkGpu> gpus = gpuUserBenchmarkRepository.findAllByPowerRequirementIsNull();
         model.addAttribute("gpus", gpus);
         return "gpus";
     }

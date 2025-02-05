@@ -6,6 +6,7 @@ import com.example.parser.dto.userbenchmark.GpuUserBenchmarkParserDto;
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.repository.GpuUserBenchmarkRepository;
 import com.example.parser.service.parse.benchmark.user.UserBenchmarkGpuPageParser;
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -27,15 +28,25 @@ import org.springframework.stereotype.Service;
 public class GpuUserBenchmarkService {
 //    private final static String PATH = "C:\\Users\\Artem\\Documents\\Java\\UltimateJetBrains\\tutorials\\ms1\\parser\\parser\\src\\main\\resources\\static\\gpu_power_requirements.txt";
     private static final int PROCESS_ALL_PAGES_VALUE_DEFAULT = -1;
-    private static final int DEFAULT_POWER = 300;
+//    private static final int DEFAULT_POWER = 300;
     @Value("${parse.pages.quantity.gpu.user.benchmark}")
     private int parsePagesQuantity;
     @Value("${sort.by.age.selenium}")
     private boolean sortByAge;
-    private static final String REGEX_FIND_POWER = "(\\d+)W";
+//    private static final String REGEX_FIND_POWER = "(\\d+)W";
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
     private final UserBenchmarkGpuPageParser userBenchmarkGpuPageParser;
     private final GpuUserBenchmarkMapper gpuUserBenchmarkMapper;
+
+    @PostConstruct
+    public List<UserBenchmarkGpu> getAllWerePowerRequirementIsNull(){
+        final List<UserBenchmarkGpu> allOrderByModelLengthDesc
+                = gpuUserBenchmarkRepository.findAllByPowerRequirementIsNull();
+        allOrderByModelLengthDesc.forEach(System.out::println);
+        return allOrderByModelLengthDesc;
+    }
+
+
 
     public List<UserBenchmarkGpu> loadAndSaveNewItems() {
         int parsePages = parsePagesQuantity != 0 ? parsePagesQuantity : PROCESS_ALL_PAGES_VALUE_DEFAULT;

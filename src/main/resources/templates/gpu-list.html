@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>GPU Power Requirement Update</title>
+</head>
+<body>
+<h2>Обновление Power Requirement для GPU</h2>
+<form th:each="gpu : ${gpus}" th:action="@{/gpus/update}" method="post">
+    <input type="hidden" name="id" th:value="${gpu.id}"/>
+
+    <label>Model:</label>
+    <input type="text" th:value="${gpu.model}" readonly/>
+
+    <label>Power Requirement:</label>
+    <input type="number" name="powerRequirement" th:value="${gpu.powerRequirement}" required/>
+
+    <button type="submit">Сохранить</button>
+</form>
+</body>
+</html>

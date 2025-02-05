@@ -10,7 +10,7 @@
 <div th:replace="fragments/header :: header"></div>
 
 <h2>Запуск операций</h2>
-<p id="statusMessage" style="color: red;"></p> <!-- Контейнер для сообщений -->
+<p id="statusMessage" style="color: red;"></p>
 
 <form id="operationsForm">
     <label><input type="checkbox" name="updateUserBenchmarkCpu"> Обновить CPU Benchmark</label><br>
@@ -27,7 +27,6 @@
         let form = document.getElementById("operationsForm");
         let formData = new FormData(form);
 
-        // Показываем сообщение "ЖДИТЕ ОКОНЧАНИЯ."
         let statusMessage = document.getElementById("statusMessage");
         statusMessage.innerText = "ЖДИТЕ ОКОНЧАНИЯ.";
         statusMessage.style.color = "red";

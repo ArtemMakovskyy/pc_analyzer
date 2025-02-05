@@ -8,7 +8,7 @@
 <body>
 <div th:replace="fragments/header :: header"></div>
 <h1>GPUs List</h1>
-<form action="/saveGpus" method="post">
+<form action="/saveGpus" method="post" onsubmit="return validateForm()">
     <table>
         <tr>
             <th>Model</th>
@@ -18,11 +18,24 @@
             <td th:text="${gpu.model}"></td>
             <td>
                 <input type="hidden" name="gpuId" th:value="${gpu.id}"/>
-                <input type="text" name="powerRequirement" th:value="${gpu.powerRequirement}"/>
+                <input type="number" name="powerRequirement" th:value="${gpu.powerRequirement}" required/>
             </td>
         </tr>
     </table>
     <button type="submit">Save</button>
 </form>
+
+<script>
+    function validateForm() {
+        const powerRequirements = document.getElementsByName('powerRequirement');
+        for (let i = 0; i < powerRequirements.length; i++) {
+            if (!Number.isInteger(parseFloat(powerRequirements[i].value))) {
+                alert('Please enter a valid integer for power requirement.');
+                return false;
+            }
+        }
+        return true;
+    }
+</script>
 </body>
 </html>

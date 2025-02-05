@@ -4,7 +4,7 @@ body {
     color: #333;
     margin: 0;
     padding: 0;
-    text-align: center; /* Центровка текста на странице */
+    text-align: center;
 }
 
 header {
@@ -18,7 +18,7 @@ header a {
     color: white;
     text-decoration: none;
     font-size: 18px;
-    margin: 0 15px; /* Расстояние между ссылками */
+    margin: 0 15px;
 }
 
 .container {

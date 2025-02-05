@@ -35,12 +35,8 @@ public class GpuUserBenchmarkService {
     private final UserBenchmarkGpuPageParser userBenchmarkGpuPageParser;
     private final GpuUserBenchmarkMapper gpuUserBenchmarkMapper;
 
-    @PostConstruct
     public List<UserBenchmarkGpu> getAllWerePowerRequirementIsNull(){
-        final List<UserBenchmarkGpu> allOrderByModelLengthDesc
-                = gpuUserBenchmarkRepository.findAllByPowerRequirementIsNull();
-        allOrderByModelLengthDesc.forEach(System.out::println);
-        return allOrderByModelLengthDesc;
+        return gpuUserBenchmarkRepository.findAllByPowerRequirementIsNull();
     }
 
     public List<UserBenchmarkGpu> loadAndSaveNewItems() {

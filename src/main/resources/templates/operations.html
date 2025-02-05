@@ -34,9 +34,9 @@
 
         fetch("/operations/execute", {
             method: "POST",
-            body: new URLSearchParams(new FormData(form)) // Преобразуем FormData в URL-кодированную строку
+            body: new URLSearchParams(new FormData(form))
         })
-            .then(response => response.json()) // Ожидаем JSON-ответ
+            .then(response => response.json())
             .then(data => {
                 statusMessage.innerText = data.message;
                 statusMessage.style.color = data.success ? "green" : "red";

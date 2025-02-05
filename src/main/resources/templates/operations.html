@@ -6,18 +6,47 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
+
 <div th:replace="fragments/header :: header"></div>
+
 <h2>Запуск операций</h2>
-<form action="/operations/execute" method="post">
+<p id="statusMessage" style="color: red;"></p> <!-- Контейнер для сообщений -->
+
+<form id="operationsForm">
     <label><input type="checkbox" name="updateUserBenchmarkCpu"> Обновить CPU Benchmark</label><br>
     <label><input type="checkbox" name="updateUserBenchmarkGpu"> Обновить GPU Benchmark</label><br>
     <button type="button" onclick="location.href='/gpus'">Обновить данные мощности блоков питания</button><br><br>
     <label><input type="checkbox" name="updateHotline"> Обновить Hotline</label><br>
     <label><input type="checkbox" name="createPcList"> Создать список ПК</label><br>
     <label><input type="checkbox" name="saveReportToExcel"> Сохранить отчет в Excel</label><br>
-    <button type="submit">Запустить</button>
+    <button type="button" onclick="executeOperation()">Запустить</button>
 </form>
-<p th:text="${message}"></p>
-<br>
+
+<script>
+    function executeOperation() {
+        let form = document.getElementById("operationsForm");
+        let formData = new FormData(form);
+
+        // Показываем сообщение "ЖДИТЕ ОКОНЧАНИЯ."
+        let statusMessage = document.getElementById("statusMessage");
+        statusMessage.innerText = "ЖДИТЕ ОКОНЧАНИЯ.";
+        statusMessage.style.color = "red";
+
+        fetch("/operations/execute", {
+            method: "POST",
+            body: new URLSearchParams(new FormData(form)) // Преобразуем FormData в URL-кодированную строку
+        })
+            .then(response => response.json()) // Ожидаем JSON-ответ
+            .then(data => {
+                statusMessage.innerText = data.message;
+                statusMessage.style.color = data.success ? "green" : "red";
+            })
+            .catch(error => {
+                statusMessage.innerText = "Ошибка: " + error;
+                statusMessage.style.color = "red";
+            });
+    }
+</script>
+
 </body>
 </html>

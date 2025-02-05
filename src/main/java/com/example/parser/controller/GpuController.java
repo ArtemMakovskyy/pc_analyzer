@@ -19,13 +19,13 @@ public class GpuController {
     private GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
 
     @PostConstruct
-    public List<UserBenchmarkGpu> getAllWerePowerRequirementIsNull() {
+    public List<UserBenchmarkGpu> getAllWherePowerRequirementIsNull() {
         return gpuUserBenchmarkRepository.findAllByPowerRequirementIsNull();
     }
 
     @GetMapping("/gpus")
     public String listGpus(Model model) {
-        List<UserBenchmarkGpu> gpus = getAllWerePowerRequirementIsNull();
+        List<UserBenchmarkGpu> gpus = getAllWherePowerRequirementIsNull();
         model.addAttribute("gpus", gpus);
         return "gpus";
     }

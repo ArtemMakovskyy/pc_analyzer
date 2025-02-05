@@ -35,8 +35,18 @@ public class GpuUserBenchmarkService {
     private final UserBenchmarkGpuPageParser userBenchmarkGpuPageParser;
     private final GpuUserBenchmarkMapper gpuUserBenchmarkMapper;
 
-    public List<UserBenchmarkGpu> getAllWerePowerRequirementIsNull(){
+    public List<UserBenchmarkGpu> getAllWerePowerRequirementIsNull() {
         return gpuUserBenchmarkRepository.findAllByPowerRequirementIsNull();
+    }
+
+    public void updateGpusPowerRequirement(List<Long> gpuIds, List<Integer> powerRequirements) {
+        for (int i = 0; i < gpuIds.size(); i++) {
+            UserBenchmarkGpu gpu = gpuUserBenchmarkRepository.findById(gpuIds.get(i)).orElse(null);
+            if (gpu != null) {
+                gpu.setPowerRequirement(powerRequirements.get(i));
+                gpuUserBenchmarkRepository.save(gpu);
+            }
+        }
     }
 
     public List<UserBenchmarkGpu> loadAndSaveNewItems() {

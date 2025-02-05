@@ -15,11 +15,10 @@ import com.example.parser.repository.MotherBoardHotLineRepository;
 import com.example.parser.repository.PcHotLineRepository;
 import com.example.parser.repository.PowerSupplierHotLineRepository;
 import com.example.parser.repository.SsdHotLineRepository;
-import com.example.parser.service.ExcelExporter;
 import com.example.parser.service.hotline.HotlineDataUpdateCoordinatorService;
 import com.example.parser.service.userbenchmark.CpuUserBenchmarkService;
 import com.example.parser.service.userbenchmark.GpuUserBenchmarkService;
-import jakarta.annotation.PostConstruct;
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Paths;
@@ -37,7 +36,7 @@ import org.springframework.stereotype.Service;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-public class CreatorPc {
+public class CreatorPcService {
     private final static int MIN_PROPOSITION_QUANTITY_DEFAULT = 5;
     private final static double CASE_PRICE_MIN = 15.0;
     private final static double CASE_PRICE_AVG = 25.0;
@@ -115,9 +114,9 @@ public class CreatorPc {
             String formattedDate = now.format(formatter);
 
             if (!pcList.isEmpty()) {
+                String documentsPath = System.getProperty("user.home") + File.separator + "Documents";
                 String fulFileName = fileName + " " + formattedDate + ".xlsx";
-                String filePath = "src/main/resources";
-                String fullPath = Paths.get(filePath, fulFileName).toString();
+                String fullPath = Paths.get(documentsPath, fulFileName).toString();
 
                 excelExporter.exportToExcelPcConfiguration(pcList, fullPath);
                 log.info("Экспорт списка ПК в Excel завершён. Файл сохранён по пути: {}", fullPath);
@@ -314,7 +313,6 @@ public class CreatorPc {
     }
 
     private int calculationPredictionGpuFpsHd(double cpuGamingScore, double avgGpuBench) {
-//        return (int) ((1.25 * gamingScore) + 78.2);
         return (int) (cpuGamingScore * avgGpuBench / 100);
     }
 

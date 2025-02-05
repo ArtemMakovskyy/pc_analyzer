@@ -1,6 +1,6 @@
 package com.example.parser.controller;
 
-import com.example.parser.service.CreatorPc;
+import com.example.parser.service.CreatorPcService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PcOperationsController {
 
-    private final CreatorPc creatorPc;
+    private final CreatorPcService creatorPcService;
 
     @GetMapping("/")
     public String showIndexPage() {
@@ -34,7 +34,7 @@ public class PcOperationsController {
                                                 @RequestParam(name = "saveReportToExcel", required = false) boolean saveReportToExcel) {
         Map<String, Object> response = new HashMap<>();
         try {
-            boolean result = creatorPc.updateDataAndCreatePcList(
+            boolean result = creatorPcService.updateDataAndCreatePcList(
                     updateUserBenchmarkCpu,
                     updateUserBenchmarkGpu,
                     updateHotline,

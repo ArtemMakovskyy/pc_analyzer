@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Управление операциями</title>
+    <title>Управління опараціями</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/css/styles.css">
 </head>
@@ -9,18 +9,19 @@
 
 <div th:replace="fragments/header :: header"></div>
 
-<h2>Запуск операций</h2>
+<h2>Запуск операцій</h2>
 <p id="statusMessage" style="color: red;"></p>
 
 <form id="operationsForm">
-    <label><input type="checkbox" name="updateUserBenchmarkCpu"> Обновить CPU Benchmark</label><br>
-    <label><input type="checkbox" name="updateUserBenchmarkGpu"> Обновить GPU Benchmark</label><br>
-    <button type="button" onclick="location.href='/gpus'">Обновить данные мощности блоков питания</button><br><br>
-    <label><input type="checkbox" name="updateHotline"> Обновить Hotline</label><br>
-    <label><input type="checkbox" name="createPcList"> Создать список ПК</label><br>
-    <label><input type="checkbox" name="saveReportToExcel"> Сохранить отчет в Excel</label><br>
-    <button type="button" onclick="executeOperation()">Запустить</button>
+    <label><input type="checkbox" name="updateUserBenchmarkCpu"> Оновити CPU Benchmark</label><br>
+    <label><input type="checkbox" name="updateUserBenchmarkGpu"> Оновити GPU Benchmark</label><br>
+    <button type="button" onclick="location.href='/gpus'">Оновити дані потужності блоків живлення</button><br><br>
+    <label><input type="checkbox" name="updateHotline"> Оновити Hotline</label><br>
+    <label><input type="checkbox" name="createPcList"> Створити список ПК</label><br>
+    <label><input type="checkbox" name="saveReportToExcel"> Зберегти звіт в Excel</label><br>
+    <button type="button" onclick="executeOperation()">Запустити</button>
 </form>
+
 
 <script>
     function executeOperation() {
@@ -28,7 +29,7 @@
         let formData = new FormData(form);
 
         let statusMessage = document.getElementById("statusMessage");
-        statusMessage.innerText = "ЖДИТЕ ОКОНЧАНИЯ.";
+        statusMessage.innerText = "ЧЕКАЙТЕ ЗАКІНЧЕННЯ.";
         statusMessage.style.color = "red";
 
         fetch("/operations/execute", {
@@ -41,7 +42,7 @@
                 statusMessage.style.color = data.success ? "green" : "red";
             })
             .catch(error => {
-                statusMessage.innerText = "Ошибка: " + error;
+                statusMessage.innerText = "ПОМИЛКА: " + error;
                 statusMessage.style.color = "red";
             });
     }

@@ -7,7 +7,7 @@
 </head>
 <body>
 <div th:replace="fragments/header :: header"></div>
-<h1>GPUs List</h1>
+<h1>Список відеокарт для додавання потужності блоків живлення</h1>
 
 <div th:if="${gpus.size() > 0}">
     <form action="/saveGpus" method="post" onsubmit="return validateForm()">
@@ -24,12 +24,12 @@
                 </td>
             </tr>
         </table>
-        <button type="submit">Save</button>
+        <button type="submit">Оновити</button>
     </form>
 </div>
 <div th:if="${gpus.size() == 0}">
-    <p>Нет данных для исправления.</p>
-    <p>Все данные внесены.</p>
+    <p style="text-align: center;">Немає даних для виправлення.</p>
+    <p style="text-align: center;">Усі дані внесені.</p>
 </div>
 
 <script>

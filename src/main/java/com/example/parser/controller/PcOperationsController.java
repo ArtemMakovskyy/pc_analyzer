@@ -41,10 +41,10 @@ public class PcOperationsController {
                     createPcList,
                     saveReportToExcel);
 
-            response.put("message", result ? "Операция выполнена успешно!" : "Ошибка выполнения операции!");
+            response.put("message", result ? "Операція виконана успішно!" : "Помилка виконання операції!");
             response.put("success", result);
         } catch (Exception e) {
-            response.put("message", "Произошла ошибка: " + e.getMessage());
+            response.put("message", "Виникла помилка: " + e.getMessage());
             response.put("success", false);
         }
         return response;

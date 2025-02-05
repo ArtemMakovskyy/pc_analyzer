@@ -2,16 +2,17 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Главная</title>
+    <title>Головна</title>
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
 <div th:replace="fragments/header :: header"></div>
 <div class="container">
-    <h1>Добро пожаловать!</h1>
-    <h2>Информация</h2>
-    <p>Это пример текста на главной странице. Здесь вы можете добавить любую информацию, которая вам необходима.</p>
-    <button type="button" onclick="location.href='/operations'">Перейти к операциям</button>
+    <h1>Ласкаво просимо!</h1>
+    <h2>Інформація</h2>
+    <p style="text-align: left;">Це приклад тексту на головній сторінці. Тут ви можете додати будь-яку інформацію, яка вам потрібна.</p>
+    <p style="text-align: left;">При натисканні кнопки "Перейти до операцій" будуть доступні такі команди:</p>
+    <button type="button" onclick="location.href='/operations'">Перейти до операцій</button>
 </div>
 </body>
 </html>

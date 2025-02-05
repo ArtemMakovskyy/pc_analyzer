@@ -2,13 +2,13 @@ package com.example.parser.service.hotline.impl;
 
 import com.example.parser.dto.hotline.CpuHotLineParserDto;
 import com.example.parser.dto.mapper.CpuHotLineMapper;
-import com.example.parser.exсeption.CustomServiceException;
+import com.example.parser.exception.CustomServiceException;
 import com.example.parser.model.hotline.CpuHotLine;
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.repository.CpuHotLineRepository;
 import com.example.parser.repository.CpuUserBenchmarkRepository;
-import com.example.parser.service.hotline.DataUpdateService;
-import com.example.parser.service.hotline.DatabaseSynchronizationService;
+import com.example.parser.service.hotline.HotlineDataUpdateService;
+import com.example.parser.service.hotline.HotlineDatabaseSynchronizationService;
 import com.example.parser.service.parse.MultiThreadPagesParser;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -21,8 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class CpuHotlineService implements DataUpdateService, DatabaseSynchronizationService {
-    private final MultiThreadPagesParser<CpuHotLineParserDto> сpuPageParserImpl;
+public class CpuHotlineServiceHotlineHotline
+        implements HotlineDataUpdateService, HotlineDatabaseSynchronizationService {
+    private final MultiThreadPagesParser<CpuHotLineParserDto> cpuPageParser;
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
     private final CpuHotLineMapper cpuHotLineMapper;
@@ -32,7 +33,7 @@ public class CpuHotlineService implements DataUpdateService, DatabaseSynchroniza
     public void refreshDatabaseWithParsedData(ExecutorService executor) {
         try {
             log.info("Starting cpu data update process...");
-            List<CpuHotLineParserDto> cpusHotLine = сpuPageParserImpl.parseAllMultiThread(executor);
+            List<CpuHotLineParserDto> cpusHotLine = cpuPageParser.parseAllMultiThread(executor);
 
             log.info("Parsed {} cpus.", cpusHotLine.size());
             cpuHotLineRepository.deleteAll();
@@ -50,7 +51,6 @@ public class CpuHotlineService implements DataUpdateService, DatabaseSynchroniza
             throw new CustomServiceException("Failed to process cpu data", e);
         }
     }
-
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override

@@ -125,11 +125,11 @@ public class SsdHotLinePagesParserImpl extends HotLinePagesParserAbstract<SsdHot
             );
         } else if (text.contains("Швидкість читання: ")) {
             ssd.setReadingSpeed(
-                   text.replace("Швидкість читання: ","")
+                    text.replace("Швидкість читання: ", "")
             );
         } else if (text.contains("Швидкість запису: ")) {
             ssd.setWritingSpeed(
-                    text.replace("Швидкість запису: ","")
+                    text.replace("Швидкість запису: ", "")
             );
         }
 

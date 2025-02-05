@@ -1,6 +1,6 @@
 package com.example.parser.service.parse;
 
-import com.example.parser.exсeption.DocumentFetchException;
+import com.example.parser.exception.DocumentFetchException;
 import com.example.parser.service.parse.utils.ParseUtil;
 import com.example.parser.service.parse.utils.UserAgentProvider;
 import java.io.File;
@@ -16,10 +16,12 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class HtmlDocumentFetcher implements DocumentFetcher {
-    private final static int DELAY_FROM_SECONDS_BY_DEFAULT = 2;
-    private final static int DELAY_TO_SECONDS_BY_DEFAULT = 5;
-    private final static int MAX_BODY_SIZE_NO_LIMIT = 0;
-    private final static int TIMEOUT_CONNECTION = 60 * 1000;
+
+    private static final int DELAY_FROM_SECONDS_BY_DEFAULT = 2;
+    private static final int DELAY_TO_SECONDS_BY_DEFAULT = 5;
+    private static final int MAX_BODY_SIZE_NO_LIMIT = 0;
+    private static final int TIMEOUT_CONNECTION = 60 * 1000;
+
     private final UserAgentProvider userAgentProvider;
 
     @Override
@@ -82,7 +84,7 @@ public class HtmlDocumentFetcher implements DocumentFetcher {
         try {
             Document htmlDocument = Jsoup.parse(file, "UTF-8");
             if (isPrintDocumentToConsole) {
-                log.info(htmlDocument);
+                log.info(htmlDocument.toString());
             }
             log.info("Document successfully parsed.");
             return htmlDocument;

@@ -1,7 +1,6 @@
 package com.example.parser.service.parse.benchmark.user;
 
 import com.example.parser.dto.userbenchmark.GpuUserBenchmarkParserDto;
-import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.service.parse.WebDriverFactory;
 import com.example.parser.service.parse.utils.ParseUtil;
 import java.time.Duration;
@@ -27,23 +26,22 @@ import org.springframework.stereotype.Component;
 @Log4j2
 @RequiredArgsConstructor
 public class UserBenchmarkGpuPageParser {
-    private final static int TIMEOUT_SECONDS = 10;
-    @Value("${show.web.windows.from.selenium}")
-    private boolean showWebGraphicInterfaceFromSelenium;
+    private static final int TIMEOUT_SECONDS = 10;
     private static final int PARSE_ALL_PAGES_INDEX = -1;
-    private static final ParseUtil.DelayInSeconds SMALL_PAUSE
-            = new ParseUtil.DelayInSeconds(2, 4);
-    private static final ParseUtil.DelayInSeconds BIG_PAUSE
-            = new ParseUtil.DelayInSeconds(4, 10);
-    private static final String XPATH_BUTTON_PRICE_SORT
-            = "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th"
-            + "[@data-mhth='MC_PRICE'][1]";
-    private static final String XPATH_LOCATOR_PAGE_QUANTITY
-            = "//*[@id='tableDataForm:mhtddyntac']/nav/ul/li[1]/a";
-    private static final String XPATH_NEXT_PAGE_BUTTON
-            = "//*[@id=\"tableDataForm:j_idt225\"]";
-    private static final String XPATH_BUTTON_AGE_MONTH_SORT
-            = "/html/body/div[2]/div/div[6]/form/div[2]/table/thead/tr/th[7]";
+    private static final ParseUtil.DelayInSeconds SMALL_PAUSE =
+            new ParseUtil.DelayInSeconds(2, 4);
+    private static final ParseUtil.DelayInSeconds BIG_PAUSE =
+            new ParseUtil.DelayInSeconds(4, 10);
+
+    private static final String XPATH_BUTTON_PRICE_SORT =
+            "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th"
+                    + "[@data-mhth='MC_PRICE'][1]";
+    private static final String XPATH_LOCATOR_PAGE_QUANTITY =
+            "//*[@id='tableDataForm:mhtddyntac']/nav/ul/li[1]/a";
+    private static final String XPATH_NEXT_PAGE_BUTTON =
+            "//*[@id=\"tableDataForm:j_idt225\"]";
+    private static final String XPATH_BUTTON_AGE_MONTH_SORT =
+            "/html/body/div[2]/div/div[6]/form/div[2]/table/thead/tr/th[7]";
 
     private static final String BASE_URL = "https://gpu.userbenchmark.com/";
     private static final String PAGE_QUANTITY_PATTERN = "Page \\d+ of (\\d+)";
@@ -62,6 +60,9 @@ public class UserBenchmarkGpuPageParser {
     private static final String PRICE_CSS_SELECTOR =
             "td:nth-child(8) div.mh-tc";
     private static final String URL_CSS_SELECTOR = "td a.nodec";
+
+    @Value("${show.web.windows.from.selenium}")
+    private boolean showWebGraphicInterfaceFromSelenium;
     private final UserBenchmarkTestPage userBenchmarkTestPage;
     private final WebDriverFactory webDriverFactory;
 
@@ -149,7 +150,8 @@ public class UserBenchmarkGpuPageParser {
                 getElementText(row, VALUE_PERCENTS_CSS_SELECTOR)));
         item.setAvgBench(ParseUtil.stringToDoubleIfErrorReturnMinusOne(
                 getElementText(row, AVG_BENCH_CSS_SELECTOR).split(" ")[0]));
-        item.setPrice(ParseUtil.stringToDoubleIfErrorReturnMinusOne(getElementText(row, PRICE_CSS_SELECTOR)
+        item.setPrice(ParseUtil.stringToDoubleIfErrorReturnMinusOne(
+                getElementText(row, PRICE_CSS_SELECTOR)
                 .replaceAll(ONLY_DIGITS_PATTERN, "")));
         item.setUrlOfGpu(row.select(URL_CSS_SELECTOR).attr("href"));
         return item;
@@ -183,7 +185,8 @@ public class UserBenchmarkGpuPageParser {
         WebDriverWait wait2
                 = new WebDriverWait(driver, Duration.ofSeconds(10));
         WebElement pageInfoElement
-                = wait2.until(ExpectedConditions.visibilityOfElementLocated(pageInfoLocator));
+                = wait2.until(ExpectedConditions
+                .visibilityOfElementLocated(pageInfoLocator));
 
         String pageInfoText = pageInfoElement.getText();
 

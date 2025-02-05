@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PowerSupplierHotLinePagesParserImpl
         extends HotLinePagesParserAbstract<PowerSupplierHotLineParserDto> {
+
     private static final String BASE_URL
             = "https://hotline.ua/ua/computer/bloki-pitaniya/296278-296291-296313-296359-296368/?p=";
     private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
@@ -28,11 +29,11 @@ public class PowerSupplierHotLinePagesParserImpl
         super(htmlDocumentFetcher, BASE_URL);
     }
 
-//    @PostConstruct
-    public void init(){
+    //    @PostConstruct
+    public void init() {
         int availableProcessors = Runtime.getRuntime().availableProcessors();
         ExecutorService executor = Executors.newFixedThreadPool(availableProcessors);
-        parseAllMultiThread(executor );
+        parseAllMultiThread(executor);
     }
 
     @Override
@@ -65,7 +66,8 @@ public class PowerSupplierHotLinePagesParserImpl
         return itemBlock.select(PRICE_CSS_SELECTOR).text();
     }
 
-    private void processTextToPriceAvg(String input, PowerSupplierHotLineParserDto powerSupplierHotLine) {
+    private void processTextToPriceAvg(
+            String input, PowerSupplierHotLineParserDto powerSupplierHotLine) {
         input = input.replace("грн", "").trim();
         String[] parts = input.split("–");
         double num1;
@@ -84,7 +86,8 @@ public class PowerSupplierHotLinePagesParserImpl
         }
     }
 
-    private void parseAndSetManufacturerAndName(Element itemBlock, PowerSupplierHotLineParserDto powerSupplierHotLine) {
+    private void parseAndSetManufacturerAndName(
+            Element itemBlock, PowerSupplierHotLineParserDto powerSupplierHotLine) {
         Element nameElement = itemBlock.select(NAME_CSS_SELECTOR).first();
         String text = nameElement != null ? nameElement.text().trim() : "Не найдено";
         String manufacturer = text.split(" ")[0];
@@ -150,7 +153,6 @@ public class PowerSupplierHotLinePagesParserImpl
                     text.replace("Підключення відеокарт: ", "")
             );
         }
-
     }
 
 }

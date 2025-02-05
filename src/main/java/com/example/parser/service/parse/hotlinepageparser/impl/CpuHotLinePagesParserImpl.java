@@ -94,7 +94,8 @@ public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHot
         return linkElement.attr("href");
     }
 
-    private void parseDataFromCharacteristicsBlock(Element characteristicsBlock, CpuHotLineParserDto cpu) {
+    private void parseDataFromCharacteristicsBlock(
+            Element characteristicsBlock, CpuHotLineParserDto cpu) {
         if (characteristicsBlock == null) {
             log.warn("Can't find span element to parse data");
         } else {

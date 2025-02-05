@@ -1,21 +1,12 @@
 package com.example.parser.service.userbenchmark;
 
-
 import com.example.parser.dto.mapper.GpuUserBenchmarkMapper;
 import com.example.parser.dto.userbenchmark.GpuUserBenchmarkParserDto;
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.repository.GpuUserBenchmarkRepository;
 import com.example.parser.service.parse.benchmark.user.UserBenchmarkGpuPageParser;
-import jakarta.annotation.PostConstruct;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -35,16 +26,24 @@ public class GpuUserBenchmarkService {
     private final UserBenchmarkGpuPageParser userBenchmarkGpuPageParser;
     private final GpuUserBenchmarkMapper gpuUserBenchmarkMapper;
 
-    @PostConstruct
-    public List<UserBenchmarkGpu> getAllWerePowerRequirementIsNull(){
-        final List<UserBenchmarkGpu> allOrderByModelLengthDesc
-                = gpuUserBenchmarkRepository.findAllByPowerRequirementIsNull();
-        allOrderByModelLengthDesc.forEach(System.out::println);
-        return allOrderByModelLengthDesc;
+    public List<UserBenchmarkGpu> getAllWerePowerRequirementIsNull() {
+        return gpuUserBenchmarkRepository.findAllByPowerRequirementIsNull();
+    }
+
+    public void updateGpusPowerRequirement(List<Long> gpuIds, List<Integer> powerRequirements) {
+        for (int i = 0; i < gpuIds.size(); i++) {
+            UserBenchmarkGpu gpu = gpuUserBenchmarkRepository.findById(gpuIds.get(i)).orElse(null);
+            if (gpu != null) {
+                gpu.setPowerRequirement(powerRequirements.get(i));
+                gpuUserBenchmarkRepository.save(gpu);
+            }
+        }
     }
 
     public List<UserBenchmarkGpu> loadAndSaveNewItems() {
-        int parsePages = parsePagesQuantity != 0 ? parsePagesQuantity : PROCESS_ALL_PAGES_VALUE_DEFAULT;
+        int parsePages = parsePagesQuantity != 0
+                ? parsePagesQuantity
+                : PROCESS_ALL_PAGES_VALUE_DEFAULT;
         log.info("Starting the loading and saving of new GPU User Benchmark records.");
 
         List<GpuUserBenchmarkParserDto> parsedGpuList = userBenchmarkGpuPageParser
@@ -67,7 +66,9 @@ public class GpuUserBenchmarkService {
         return savedItems;
     }
 
-    private static List<UserBenchmarkGpu> filterNewItems(List<UserBenchmarkGpu> existingList, List<UserBenchmarkGpu> parsedList) {
+    private static List<UserBenchmarkGpu> filterNewItems(
+            List<UserBenchmarkGpu> existingList,
+            List<UserBenchmarkGpu> parsedList) {
         Set<String> existingModels = existingList.stream()
                 .map(UserBenchmarkGpu::getModel)
                 .collect(Collectors.toSet());

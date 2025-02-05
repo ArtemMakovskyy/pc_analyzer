@@ -18,24 +18,33 @@ import org.springframework.beans.factory.annotation.Value;
 
 @Log4j2
 public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesParser<T> {
-    @Value("${hotline.delay.from}")
-    private int delayFrom;
-    @Value("${hotline.delay.to}")
-    private int delayTo;
+
     protected static final String NO_ELEMENT_CSS_SELECTOR
             = "div.list-item__value > div.list-item__value--overlay."
             + "list-item__value--full > div > div > div.m_b-10";
     protected static final String DIGITS_REGEX = "\\d+";
     protected static final String PROPOSITION_QUANTITY_CSS_SELECTOR
             = "a.link.link--black.text-sm.m_b-5";
-    private final static int SLEEP_FOR_RETRY_DELAY_FROM = 3;
-    private final static int SLEEP_FOR_RETRY_DELAY_TO = 6;
-    private final static int MAX_RETRIES = 5;
     protected static final String DOMAIN_LINK = "https://hotline.ua";
     protected static final String PAGES_CSS_SELECTOR = "a.page";
-    protected static final String TABLE_CSS_SELECTOR = "div.list-body__content.content.flex-wrap > div";
+    protected static final String TABLE_CSS_SELECTOR
+            = "div.list-body__content.content.flex-wrap > div";
+
+    private static final int SLEEP_FOR_RETRY_DELAY_FROM = 3;
+    private static final int SLEEP_FOR_RETRY_DELAY_TO = 6;
+    private static final int MAX_RETRIES = 5;
+
     protected final HtmlDocumentFetcher htmlDocumentFetcher;
     protected final String baseUrl;
+
+    @Value("${hotline.delay.from}")
+    private int delayFrom;
+
+    @Value("${hotline.delay.to}")
+    private int delayTo;
+
+    @Value("${hotline.delay.use.gelay}")
+    private boolean useDelay;
 
     public HotLinePagesParserAbstract(HtmlDocumentFetcher htmlDocumentFetcher, String baseUrl) {
         this.htmlDocumentFetcher = htmlDocumentFetcher;
@@ -98,10 +107,9 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
     }
 
     @Override
-    public List<T> parsePage(
-            String url
-    ) {
-        Document htmlDocument = fetchHtmlDocumentWithRetries(url, true, true, 2, 4, false);
+    public List<T> parsePage(String url) {
+        Document htmlDocument = fetchHtmlDocumentWithRetries(
+                url, true, useDelay, delayFrom, delayTo, false);
         return parseData(htmlDocument);
     }
 
@@ -111,9 +119,9 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
             boolean useDelay,
             int delayFrom,
             int delayTo,
-            boolean isPrintDocumentToConsole
-    ) {
-        Document htmlDocument = fetchHtmlDocumentWithRetries(url, useUserAgent, useDelay, delayFrom, delayTo, isPrintDocumentToConsole);
+            boolean isPrintDocumentToConsole) {
+        Document htmlDocument = fetchHtmlDocumentWithRetries(
+                url, useUserAgent, useDelay, delayFrom, delayTo, isPrintDocumentToConsole);
         return parseData(htmlDocument);
     }
 
@@ -123,8 +131,7 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
             boolean useDelay,
             int delayFrom,
             int delayTo,
-            boolean isPrintDocumentToConsole
-    ) {
+            boolean isPrintDocumentToConsole) {
         int maxRetries = MAX_RETRIES;
         int attempt = 0;
         Document htmlDocument = null;
@@ -149,8 +156,9 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
             } catch (Exception e) {
                 log.error("Error fetching page: " + url + " (Attempt " + attempt + ")", e);
             }
-            //sleepForRetry
-            ParseUtil.applyRandomDelay(SLEEP_FOR_RETRY_DELAY_FROM, SLEEP_FOR_RETRY_DELAY_TO, useDelay);
+            // sleepForRetry
+            ParseUtil.applyRandomDelay(
+                    SLEEP_FOR_RETRY_DELAY_FROM, SLEEP_FOR_RETRY_DELAY_TO, useDelay);
         }
 
         log.error("Failed to load page after " + maxRetries + " attempts: " + url);
@@ -222,5 +230,4 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
         double min = Math.min(avgPrice, optimalPrice);
         return Math.round(min * 100.0) / 100.0;
     }
-
 }

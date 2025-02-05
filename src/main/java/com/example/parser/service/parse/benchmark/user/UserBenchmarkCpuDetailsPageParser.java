@@ -16,9 +16,7 @@ import org.springframework.stereotype.Component;
 @Log4j2
 @RequiredArgsConstructor
 public class UserBenchmarkCpuDetailsPageParser {
-    private final static String HTML_PATH_GENERAL = "C:\\Users\\Artem\\Documents\\Java\\UltimateJetBrains\\tutorials\\ms1\\parser\\parser\\src\\main\\java\\com\\example\\parser\\service\\parse\\benchmark\\user\\other\\";
-    private final static String HTML_PATH_PENTIUM_DUAL_T_3200 = HTML_PATH_GENERAL + "InnerrPagePentiumDualT3200.html";
-    private final static int FAILURE_VALUE = -1;
+    private static final int FAILURE_VALUE = -1;
     private static final int GAMING_SCORE_INDEX1 = 1;
     private static final int DESKTOP_SCORE_INDEX3 = 3;
     private static final int DESKTOP_SCORE_INDEX4 = 4;
@@ -30,7 +28,8 @@ public class UserBenchmarkCpuDetailsPageParser {
     private static final int CPU_QUANTITY_THREADS_INDEX2 = 2;
     private static final String CPU_SPECIFICATION_CSS_SELECTOR1 = "p.cmp-cpt";
     private static final String CPU_TABLE_SCORE_SELECTOR2
-            = "div.v-center:nth-child(1) > table:nth-child(2) > tbody:nth-child(1) > tr:nth-child(1)";
+            = "div.v-center:nth-child(1) > table:nth-child(2) "
+            + "> tbody:nth-child(1) > tr:nth-child(1)";
     private static final String CPU_SCORE_ELEMENTS2 = "div.semi-strong";
     private static final String CPU_SCORE_ELEMENTS3 = "td .bsc-w > div:first-child";
     private static final String REGEX_REMOVE_NON_DIGITS = "\\D";
@@ -56,11 +55,11 @@ public class UserBenchmarkCpuDetailsPageParser {
 
     }
 
-    public void parseFromFile() {
+    public void parseFromFile(String pathToFile) {
         UserBenchmarkCpu cpu = new UserBenchmarkCpu();
         Document document = null;
         try {
-            document = Jsoup.parse(new File(HTML_PATH_PENTIUM_DUAL_T_3200));
+            document = Jsoup.parse(new File(pathToFile));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -235,7 +234,6 @@ public class UserBenchmarkCpuDetailsPageParser {
         return true;
     }
 
-
     private boolean isGetCpuSpecificationData(UserBenchmarkCpu cpu) {
         if (cpu.getCoresQuantity() == null || cpu.getCoresQuantity() == FAILURE_VALUE
                 || cpu.getThreadsQuantity() == null || cpu.getThreadsQuantity() == FAILURE_VALUE
@@ -248,7 +246,7 @@ public class UserBenchmarkCpuDetailsPageParser {
 
     private Document getDocument(WebDriver driver) {
         userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);
-        ParseUtil.applyRandomDelay(DELAY_IN_SECONDS,true);
+        ParseUtil.applyRandomDelay(DELAY_IN_SECONDS, true);
         return Jsoup.parse(driver.getPageSource());
     }
 

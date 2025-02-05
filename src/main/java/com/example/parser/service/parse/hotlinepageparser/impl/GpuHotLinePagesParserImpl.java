@@ -67,7 +67,8 @@ public class GpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<GpuHot
         return nameElement != null ? nameElement.text().trim() : "Не найдено";
     }
 
-    private void parseDataFromCharacteristicsBlock(Element characteristicsBlock, GpuHotLineParserDto gpu) {
+    private void parseDataFromCharacteristicsBlock(
+            Element characteristicsBlock, GpuHotLineParserDto gpu) {
         if (characteristicsBlock == null) {
             log.warn("Can't find span element to parse data");
         } else {

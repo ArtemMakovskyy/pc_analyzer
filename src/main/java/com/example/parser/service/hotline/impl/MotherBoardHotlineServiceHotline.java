@@ -2,10 +2,10 @@ package com.example.parser.service.hotline.impl;
 
 import com.example.parser.dto.hotline.MotherBoardHotLineParserDto;
 import com.example.parser.dto.mapper.MotherBoardHotLineMapper;
-import com.example.parser.exсeption.CustomServiceException;
+import com.example.parser.exception.CustomServiceException;
 import com.example.parser.model.hotline.MotherBoardHotLine;
 import com.example.parser.repository.MotherBoardHotLineRepository;
-import com.example.parser.service.hotline.DataUpdateService;
+import com.example.parser.service.hotline.HotlineDataUpdateService;
 import com.example.parser.service.parse.MultiThreadPagesParser;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class MotherBoardHotlineService implements DataUpdateService {
+public class MotherBoardHotlineServiceHotline implements HotlineDataUpdateService {
     private final MultiThreadPagesParser<MotherBoardHotLineParserDto> motherBoardPageParserImpl;
     private final MotherBoardHotLineRepository motherBoardHotLineRepository;
     private final MotherBoardHotLineMapper motherBoardHotLineMapper;
@@ -35,18 +35,18 @@ public class MotherBoardHotlineService implements DataUpdateService {
             motherBoardHotLineRepository.deleteAll();
             log.info("Deleted old motherboard data.");
 
-            List<MotherBoardHotLine> mBlist = motherBoards.stream()
+            List<MotherBoardHotLine> mbList = motherBoards.stream()
                     .map(motherBoardHotLineMapper::toEntity)
                     .toList();
 
             List<MotherBoardHotLine> motherBoardHotLinesFromDb
-                    = motherBoardHotLineRepository.saveAll(mBlist);
+                    = motherBoardHotLineRepository.saveAll(mbList);
 
             log.info("Saved {} new motherboard records.",
                     motherBoardHotLinesFromDb.size());
         } catch (Exception e) {
-            log.error("Error occurred during motherboard data update process: {}"
-                    , e.getMessage(), e);
+            log.error("Error occurred during motherboard data update process: {}",
+                    e.getMessage(), e);
             throw new CustomServiceException("Failed to process motherboard data", e);
         }
     }

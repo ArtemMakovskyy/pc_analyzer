@@ -6,7 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface GpuUserBenchmarkRepository extends JpaRepository<UserBenchmarkGpu,Long> {
-    @Query(value = "SELECT * FROM gpus_user_benchmark ORDER BY CHAR_LENGTH(model) DESC", nativeQuery = true)
+    @Query(value = "SELECT * FROM gpus_user_benchmark ORDER BY CHAR_LENGTH(model) DESC",
+            nativeQuery = true)
     List<UserBenchmarkGpu> findAllOrderByModelLengthDesc();
 
     List<UserBenchmarkGpu> findAllByPowerRequirementIsNull();

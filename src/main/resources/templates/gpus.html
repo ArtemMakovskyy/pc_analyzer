@@ -8,22 +8,29 @@
 <body>
 <div th:replace="fragments/header :: header"></div>
 <h1>GPUs List</h1>
-<form action="/saveGpus" method="post" onsubmit="return validateForm()">
-    <table>
-        <tr>
-            <th>Model</th>
-            <th>Power Requirement</th>
-        </tr>
-        <tr th:each="gpu : ${gpus}">
-            <td th:text="${gpu.model}"></td>
-            <td>
-                <input type="hidden" name="gpuId" th:value="${gpu.id}"/>
-                <input type="number" name="powerRequirement" th:value="${gpu.powerRequirement}" required/>
-            </td>
-        </tr>
-    </table>
-    <button type="submit">Save</button>
-</form>
+
+<div th:if="${gpus.size() > 0}">
+    <form action="/saveGpus" method="post" onsubmit="return validateForm()">
+        <table>
+            <tr>
+                <th>Model</th>
+                <th>Power Requirement</th>
+            </tr>
+            <tr th:each="gpu : ${gpus}">
+                <td th:text="${gpu.model}"></td>
+                <td>
+                    <input type="hidden" name="gpuId" th:value="${gpu.id}"/>
+                    <input type="number" name="powerRequirement" th:value="${gpu.powerRequirement}" required/>
+                </td>
+            </tr>
+        </table>
+        <button type="submit">Save</button>
+    </form>
+</div>
+<div th:if="${gpus.size() == 0}">
+    <p>Нет данных для исправления.</p>
+    <p>Все данные внесены.</p> <!-- Добавленное сообщение -->
+</div>
 
 <script>
     function validateForm() {

@@ -3,17 +3,21 @@
 <head>
     <title>Управление операциями</title>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
+<div th:replace="fragments/header :: header"></div>
 <h2>Запуск операций</h2>
 <form action="/operations/execute" method="post">
     <label><input type="checkbox" name="updateUserBenchmarkCpu"> Обновить CPU Benchmark</label><br>
     <label><input type="checkbox" name="updateUserBenchmarkGpu"> Обновить GPU Benchmark</label><br>
+    <button type="button" onclick="location.href='/gpus'">Обновить данные мощности блоков питания</button><br><br>
     <label><input type="checkbox" name="updateHotline"> Обновить Hotline</label><br>
     <label><input type="checkbox" name="createPcList"> Создать список ПК</label><br>
     <label><input type="checkbox" name="saveReportToExcel"> Сохранить отчет в Excel</label><br>
     <button type="submit">Запустить</button>
 </form>
 <p th:text="${message}"></p>
+<br>
 </body>
 </html>

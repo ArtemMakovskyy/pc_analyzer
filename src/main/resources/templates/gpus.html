@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>GPUs List</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+<h1>GPUs List</h1>
+<form action="/saveGpus" method="post">
+    <table>
+        <tr>
+            <th>Model</th>
+            <th>Power Requirement</th>
+        </tr>
+        <tr th:each="gpu : ${gpus}">
+            <td th:text="${gpu.model}"></td>
+            <td>
+                <input type="hidden" name="gpuId" th:value="${gpu.id}"/>
+                <input type="text" name="powerRequirement" th:value="${gpu.powerRequirement}"/>
+            </td>
+        </tr>
+    </table>
+    <button type="submit">Save</button>
+</form>
+</body>
+</html>

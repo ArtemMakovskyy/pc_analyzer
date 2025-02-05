@@ -26,14 +26,11 @@ import org.springframework.stereotype.Service;
 @Log4j2
 @RequiredArgsConstructor
 public class GpuUserBenchmarkService {
-//    private final static String PATH = "C:\\Users\\Artem\\Documents\\Java\\UltimateJetBrains\\tutorials\\ms1\\parser\\parser\\src\\main\\resources\\static\\gpu_power_requirements.txt";
     private static final int PROCESS_ALL_PAGES_VALUE_DEFAULT = -1;
-//    private static final int DEFAULT_POWER = 300;
     @Value("${parse.pages.quantity.gpu.user.benchmark}")
     private int parsePagesQuantity;
     @Value("${sort.by.age.selenium}")
     private boolean sortByAge;
-//    private static final String REGEX_FIND_POWER = "(\\d+)W";
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;
     private final UserBenchmarkGpuPageParser userBenchmarkGpuPageParser;
     private final GpuUserBenchmarkMapper gpuUserBenchmarkMapper;
@@ -46,11 +43,8 @@ public class GpuUserBenchmarkService {
         return allOrderByModelLengthDesc;
     }
 
-
-
     public List<UserBenchmarkGpu> loadAndSaveNewItems() {
         int parsePages = parsePagesQuantity != 0 ? parsePagesQuantity : PROCESS_ALL_PAGES_VALUE_DEFAULT;
-
         log.info("Starting the loading and saving of new GPU User Benchmark records.");
 
         List<GpuUserBenchmarkParserDto> parsedGpuList = userBenchmarkGpuPageParser
@@ -73,37 +67,6 @@ public class GpuUserBenchmarkService {
         return savedItems;
     }
 
-
-//    public void updateGpuPowerFromFile() {
-//        List<String> gpuPowerInfoFromFile = readFile(PATH);
-//        gpuPowerInfoFromFile.sort((s1, s2) -> Integer.compare(s2.length(), s1.length()));
-//        List<UserBenchmarkGpu> gpus = gpuUserBenchmarkRepository.findAll();
-//        List<UserBenchmarkGpu> gpusToUpdate = new ArrayList<>();
-//
-//        for (UserBenchmarkGpu gpu : gpus) {
-//            for (String gpuPowerInfo : gpuPowerInfoFromFile) {
-//                if (gpu.getPowerRequirement() == null
-//                        && gpuPowerInfo.contains(gpu.getModel())) {
-//                    Integer powerRequirement = extractPowerRequirement(gpuPowerInfo);
-//                    if (powerRequirement != null) {
-//                        gpu.setPowerRequirement(powerRequirement);
-//                        gpusToUpdate.add(gpu);
-//                        log.info("Updated GPU: " + gpu.getModel() + " with power requirement: " + powerRequirement);
-//                    } else if (gpuPowerInfo.contains("Интегрированное решение")) {
-//                        gpu.setPowerRequirement(DEFAULT_POWER);
-//                        gpusToUpdate.add(gpu);
-//                        log.info("Updated GPU: " + gpu.getModel() + " with power requirement: 300 (Интегрированное решение)");
-//                    }
-//                }
-//            }
-//        }
-//
-//        if (!gpusToUpdate.isEmpty()) {
-//            gpuUserBenchmarkRepository.saveAll(gpusToUpdate);
-//        }
-//
-//    }
-
     private static List<UserBenchmarkGpu> filterNewItems(List<UserBenchmarkGpu> existingList, List<UserBenchmarkGpu> parsedList) {
         Set<String> existingModels = existingList.stream()
                 .map(UserBenchmarkGpu::getModel)
@@ -113,26 +76,5 @@ public class GpuUserBenchmarkService {
                 .filter(parsedItem -> !existingModels.contains(parsedItem.getModel()))
                 .collect(Collectors.toList());
     }
-
-
-//    private Integer extractPowerRequirement(String gpuPowerInfo) {
-//        Pattern pattern = Pattern.compile(REGEX_FIND_POWER);
-//        Matcher matcher = pattern.matcher(gpuPowerInfo);
-//
-//        if (matcher.find()) {
-//            String powerStr = matcher.group(1);
-//            return Integer.parseInt(powerStr);
-//        }
-//        return null;
-//    }
-//
-//    private List<String> readFile(String path) {
-//        try {
-//            return Files.readAllLines(Path.of(path));
-//        } catch (IOException e) {
-//            log.error("Error reading file at path: " + path, e);
-//            return Collections.emptyList();
-//        }
-//    }
 
 }

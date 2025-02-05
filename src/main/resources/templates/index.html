@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Главная</title>
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-<h1>Добро пожаловать!</h1>
-<a href="/operations">Перейти к операциям</a>
+<div th:replace="fragments/header :: header"></div>
+<div class="container">
+    <h1>Добро пожаловать!</h1>
+    <h2>Информация</h2>
+    <p>Это пример текста на главной странице. Здесь вы можете добавить любую информацию, которая вам необходима.</p>
+    <button type="button" onclick="location.href='/operations'">Перейти к операциям</button>
+</div>
 </body>
 </html>

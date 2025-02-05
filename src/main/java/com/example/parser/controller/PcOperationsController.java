@@ -26,7 +26,7 @@ public class PcOperationsController {
     }
 
     @PostMapping("/execute")
-    @ResponseBody // Возвращаем JSON, а не редирект
+    @ResponseBody
     public Map<String, Object> executeOperation(@RequestParam(name = "updateUserBenchmarkCpu", required = false) boolean updateUserBenchmarkCpu,
                                                 @RequestParam(name = "updateUserBenchmarkGpu", required = false) boolean updateUserBenchmarkGpu,
                                                 @RequestParam(name = "updateHotline", required = false) boolean updateHotline,
@@ -47,6 +47,6 @@ public class PcOperationsController {
             response.put("message", "Произошла ошибка: " + e.getMessage());
             response.put("success", false);
         }
-        return response; // Отправляем JSON-ответ
+        return response;
     }
 }

@@ -12,7 +12,8 @@ public interface PcHotLineRepository extends JpaRepository<Pc, Long> {
     @Query("SELECT p FROM Pc p WHERE p.marker = :marker ORDER BY p.predictionGpuFpsFHD, p.price")
     List<Pc> findAllByMarkerOrderByPredictionPrice(@Param("marker") PcMarker marker);
 
-    @Query("SELECT p FROM Pc p WHERE p.priceForFps != 0 ORDER BY p.priceForFps, p.predictionGpuFpsFHD, p.price")
+    @Query("SELECT p FROM Pc p WHERE p.priceForFps != 0 "
+            + "ORDER BY p.priceForFps, p.predictionGpuFpsFHD, p.price")
     List<Pc> findPcListWithNonZeroPriceForFpsOrdered();
 
 }

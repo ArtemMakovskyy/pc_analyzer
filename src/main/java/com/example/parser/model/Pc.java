@@ -18,7 +18,6 @@ import java.math.BigDecimal;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Entity
 @Getter
@@ -54,18 +53,19 @@ public class Pc {
 
     @Override
     public String toString() {
-        return "Pc{" +
-                "id=" + id +
-                " | " + cpu.getName() +
-                " | " + motherboard.getManufacturer() + " " + motherboard.getName() +
-                " | " + memory.getManufacturer() + " " + memory.getName() +
-                " | " + gpu.getManufacturer() + " " + gpu.getName() + " " + gpu.getMemorySize() +
-                " | " + ssd.getManufacturer() + " " + ssd.getName() +
-                " | " + powerSupplier.getManufacturer() + " " + powerSupplier.getName() + " " + powerSupplier.getPower() + "W" +
-                " | avgGpuBench: " + avgGpuBench +
-                " | gamingScore: " + gamingScore +
-                " | predictionFpsFHD: " + predictionGpuFpsFHD + ",  priceForFps: " + priceForFps +
-                " | " + price +
-                '}';
+        return "Pc{"
+                + "id=" + id
+                + " | " + cpu.getName()
+                + " | " + motherboard.getManufacturer() + " " + motherboard.getName()
+                + " | " + memory.getManufacturer() + " " + memory.getName()
+                + " | " + gpu.getManufacturer() + " " + gpu.getName() + " " + gpu.getMemorySize()
+                + " | " + ssd.getManufacturer() + " " + ssd.getName()
+                + " | " + powerSupplier.getManufacturer() + " " + powerSupplier.getName() + " "
+                + powerSupplier.getPower() + "W"
+                + " | avgGpuBench: " + avgGpuBench
+                + " | gamingScore: " + gamingScore
+                + " | predictionFpsFHD: " + predictionGpuFpsFHD + ",  priceForFps: " + priceForFps
+                + " | " + price
+                + '}';
     }
 }

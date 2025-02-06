@@ -25,8 +25,10 @@ public class ExcelExporter {
             Sheet sheet = workbook.createSheet("PC List");
 
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"ID", "CPU", "Motherboard", "Memory", "GPU", "SSD", "Power Supplier",
-                    "Avg GPU Bench", "Gaming Score", "Prediction FPS FHD", "Price per FPS", "Price", "Marker"};
+            String[] headers = {
+                    "ID", "CPU", "Motherboard", "Memory", "GPU", "SSD", "Power Supplier",
+                    "Avg GPU Bench", "Gaming Score", "Prediction FPS FHD",
+                    "Price per FPS", "Price", "Marker"};
 
             CellStyle headerStyle = getHeaderStyle(workbook);
             for (int i = 0; i < headers.length; i++) {
@@ -44,11 +46,17 @@ public class ExcelExporter {
                 }
                 row.getCell(0).setCellValue(pc.getId());
                 row.getCell(1).setCellValue(pc.getCpu().getName());
-                row.getCell(2).setCellValue(pc.getMotherboard().getManufacturer() + " " + pc.getMotherboard().getName());
-                row.getCell(3).setCellValue(pc.getMemory().getManufacturer() + " " + pc.getMemory().getName());
-                row.getCell(4).setCellValue(pc.getGpu().getManufacturer() + " " + pc.getGpu().getName() + " " + pc.getGpu().getMemorySize());
-                row.getCell(5).setCellValue(pc.getSsd().getManufacturer() + " " + pc.getSsd().getName());
-                row.getCell(6).setCellValue(pc.getPowerSupplier().getManufacturer() + " " + pc.getPowerSupplier().getName() + " " + pc.getPowerSupplier().getPower() + "W");
+                row.getCell(2).setCellValue(pc.getMotherboard().getManufacturer()
+                        + " " + pc.getMotherboard().getName());
+                row.getCell(3).setCellValue(pc.getMemory().getManufacturer() + " "
+                        + pc.getMemory().getName());
+                row.getCell(4).setCellValue(pc.getGpu().getManufacturer() + " "
+                        + pc.getGpu().getName() + " " + pc.getGpu().getMemorySize());
+                row.getCell(5).setCellValue(pc.getSsd().getManufacturer()
+                        + " " + pc.getSsd().getName());
+                row.getCell(6).setCellValue(pc.getPowerSupplier().getManufacturer()
+                        + " " + pc.getPowerSupplier().getName() + " "
+                        + pc.getPowerSupplier().getPower() + "W");
                 row.getCell(7).setCellValue(pc.getAvgGpuBench());
                 row.getCell(8).setCellValue(pc.getGamingScore());
                 row.getCell(9).setCellValue(pc.getPredictionGpuFpsFHD());

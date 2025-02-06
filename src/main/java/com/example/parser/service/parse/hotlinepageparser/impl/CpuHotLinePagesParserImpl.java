@@ -74,7 +74,6 @@ public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHot
                     parts[0].trim().replace(" ", ""));
             double maxPrice = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
                     parts[1].trim().replace(" ", ""));
-
             cpu.setAvgPrice(calculateBestAvgPrice(minPrice, maxPrice));
         } else if (parts.length == 1) {
             minPrice = ParseUtil.stringToDoubleIfErrorReturnMinusOne(
@@ -107,41 +106,22 @@ public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHot
     }
 
     private void extractData(String text, CpuHotLineParserDto cpu) {
-
         if (text.contains("Роз'єм: Socket ")) {
-            cpu.setSocketType(
-                    splitAndExtractDataByIndex(text, 2)
-            );
+            cpu.setSocketType(splitAndExtractDataByIndex(text, 2));
         } else if (text.contains("Частота: ")) {
-            cpu.setFrequency(
-                    splitAndExtractDataByIndex(text, 1)
-            );
+            cpu.setFrequency(splitAndExtractDataByIndex(text, 1));
         } else if (text.contains("Кеш третього рівня: ")) {
-            cpu.setL3Cache(
-                    splitAndExtractDataByIndex(text, 3)
-            );
+            cpu.setL3Cache(splitAndExtractDataByIndex(text, 3));
         } else if (text.contains("Кількість ядер: ")) {
-            cpu.setCores(
-                    splitAndExtractDataByIndex(text, 2)
-            );
+            cpu.setCores(splitAndExtractDataByIndex(text, 2));
         } else if (text.contains("Число потоків: ")) {
-            cpu.setThreads(
-                    splitAndExtractDataByIndex(text, 2)
-            );
+            cpu.setThreads(splitAndExtractDataByIndex(text, 2));
         } else if (text.contains("Комплектація: Tray")) {
-            cpu.setPackageType(
-                    "Tray"
-            );
+            cpu.setPackageType("Tray");
         } else if (text.contains("Комплектація: MPK")) {
-            cpu.setPackageType(
-                    "Tray"
-            );
+            cpu.setPackageType("Tray");
         } else if (text.contains("Комплектація: Box")) {
-            cpu.setPackageType(
-                    "Box"
-            );
+            cpu.setPackageType("Box");
         }
-
     }
-
 }

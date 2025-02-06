@@ -1,13 +1,13 @@
 package com.example.parser.repository;
 
 import com.example.parser.model.hotline.PowerSupplierHotLine;
-import com.example.parser.model.hotline.SsdHotLine;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface PowerSupplierHotLineRepository extends JpaRepository<PowerSupplierHotLine, Long> {
+public interface PowerSupplierHotLineRepository
+        extends JpaRepository<PowerSupplierHotLine, Long> {
     /**
      * SELECT *
      * FROM (
@@ -35,6 +35,7 @@ public interface PowerSupplierHotLineRepository extends JpaRepository<PowerSuppl
             WHERE row_num = 1
             ORDER BY power
             """, nativeQuery = true)
-    List<PowerSupplierHotLine> findGroupedByPowerWithMinAvgPrice(@Param("minPropositionQuantity") int minPropositionQuantity);
+    List<PowerSupplierHotLine> findGroupedByPowerWithMinAvgPrice(
+            @Param("minPropositionQuantity") int minPropositionQuantity);
 }
 

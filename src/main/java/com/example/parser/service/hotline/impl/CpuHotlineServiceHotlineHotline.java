@@ -23,7 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Log4j2
 public class CpuHotlineServiceHotlineHotline
         implements HotlineDataUpdateService, HotlineDatabaseSynchronizationService {
-    private final MultiThreadPagesParser<CpuHotLineParserDto> сpuPageParserImpl;
+
+    private final MultiThreadPagesParser<CpuHotLineParserDto> cpuPageParserImpl;
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
     private final CpuHotLineMapper cpuHotLineMapper;
@@ -33,7 +34,8 @@ public class CpuHotlineServiceHotlineHotline
     public void refreshDatabaseWithParsedData(ExecutorService executor) {
         try {
             log.info("Starting cpu data update process...");
-            List<CpuHotLineParserDto> cpusHotLine = сpuPageParserImpl.parseAllMultiThread(executor);
+            List<CpuHotLineParserDto> cpusHotLine
+                    = cpuPageParserImpl.parseAllMultiThread(executor);
 
             log.info("Parsed {} cpus.", cpusHotLine.size());
             cpuHotLineRepository.deleteAll();

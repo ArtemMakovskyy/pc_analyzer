@@ -37,10 +37,11 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class CreatorPcService {
-    private final static int MIN_PROPOSITION_QUANTITY_DEFAULT = 5;
-    private final static double CASE_PRICE_MIN = 15.0;
-    private final static double CASE_PRICE_AVG = 25.0;
-    private final static double CASE_PRICE_MAX = 50.0;
+    private static final int MIN_PROPOSITION_QUANTITY_DEFAULT = 5;
+    private static final double CASE_PRICE_MIN = 15.0;
+    private static final double CASE_PRICE_AVG = 25.0;
+    private static final double CASE_PRICE_MAX = 50.0;
+
     private final CpuHotLineRepository cpuHotLineRepository;
     private final MotherBoardHotLineRepository motherBoardHotLineRepository;
     private final MemoryHotLineRepository memoryHotLineRepository;
@@ -146,7 +147,6 @@ public class CreatorPcService {
         log.info("Finished creating and saving optimal PC list");
     }
 
-
     private void insertMarker(List<Pc> pcList, PcMarker marker) {
         pcList.stream()
                 .peek(pc -> pc.setMarker(marker))
@@ -190,7 +190,6 @@ public class CreatorPcService {
         return filterPc(pcs);
     }
 
-
     private List<Pc> removeItemsWithUncompetitivePrice(List<Pc> pcList) {
         boolean process = true;
 
@@ -219,7 +218,6 @@ public class CreatorPcService {
                 )
                 .collect(Collectors.toList());
     }
-
 
     private void validateData(
             List<CpuHotLine> cpus,
@@ -330,14 +328,14 @@ public class CreatorPcService {
             }
         }
         if (cpu.getPackageType() != null && cpu.getPackageType().contains("Box")) {
-            if ((cpu.getName().contains("Ryzen 9") && cpu.getName().contains("X")) ||
-                    (cpu.getName().contains("i9") && cpu.getName().contains("K"))) {
+            if ((cpu.getName().contains("Ryzen 9") && cpu.getName().contains("X"))
+                    || (cpu.getName().contains("i9") && cpu.getName().contains("K"))) {
                 return CASE_PRICE_MAX;
-            } else if ((cpu.getName().contains("Ryzen 7") && cpu.getName().contains("X")) ||
-                    (cpu.getName().contains("i7") && cpu.getName().contains("K"))) {
+            } else if ((cpu.getName().contains("Ryzen 7") && cpu.getName().contains("X"))
+                    || (cpu.getName().contains("i7") && cpu.getName().contains("K"))) {
                 return CASE_PRICE_AVG;
-            } else if ((cpu.getName().contains("Ryzen 5") && cpu.getName().contains("X")) ||
-                    (cpu.getName().contains("i5") && cpu.getName().contains("K"))) {
+            } else if ((cpu.getName().contains("Ryzen 5") && cpu.getName().contains("X"))
+                    || (cpu.getName().contains("i5") && cpu.getName().contains("K"))) {
                 return CASE_PRICE_AVG;
             }
         }
@@ -373,7 +371,8 @@ public class CreatorPcService {
         return memoryHotLineList.stream()
                 .filter(m -> m.getType().contains(memoryType))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No memory found for type: " + memoryType));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No memory found for type: " + memoryType));
     }
 
     private Optional<MotherBoardHotLine> getMotherboardFromCpuBySocket(

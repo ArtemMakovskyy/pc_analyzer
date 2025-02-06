@@ -39,8 +39,8 @@ public class HotlineDataUpdateCoordinatorService {
             try {
                 service.refreshDatabaseWithParsedData(executor);
             } catch (Exception e) {
-                log.error("Ошибка при обновлении данных в сервисе {}: {}"
-                        , service.getClass().getSimpleName(), e.getMessage(), e);
+                log.error("Ошибка при обновлении данных в сервисе {}: {}",
+                        service.getClass().getSimpleName(), e.getMessage(), e);
             }
         }
         log.info("Завершено обновление данных для всех сервисов.");
@@ -54,8 +54,8 @@ public class HotlineDataUpdateCoordinatorService {
             try {
                 service.synchronizeWithBenchmarkData();
             } catch (Exception e) {
-                log.error("Ошибка при обновлении данных в сервисе {}: {}"
-                        , service.getClass().getSimpleName(), e.getMessage(), e);
+                log.error("Ошибка при обновлении данных в сервисе {}: {}",
+                        service.getClass().getSimpleName(), e.getMessage(), e);
             }
         }
         log.info("Завершено обновление данных для всех сервисов.");

@@ -211,7 +211,7 @@ public class CreatorPcService {
         return pcList.stream()
                 .sorted(
                         Comparator
-                                .comparing(Pc::getPredictionGpuFpsFHD,
+                                .comparing(Pc::getPredictionGpuFpsFhd,
                                         Comparator.nullsLast(Comparator.naturalOrder()))
                                 .thenComparing(Pc::getPrice, Comparator.nullsLast(
                                         Comparator.naturalOrder()))
@@ -267,7 +267,7 @@ public class CreatorPcService {
         pc.setDesktopScore(cpu.getUserBenchmarkCpu().getDesktopScore());
         pc.setGamingScore(cpu.getUserBenchmarkCpu().getGamingScore());
         pc.setWorkstationScore(cpu.getUserBenchmarkCpu().getWorkstationScore());
-        pc.setPredictionGpuFpsFHD(
+        pc.setPredictionGpuFpsFhd(
                 calculationPredictionGpuFpsHd(
                         cpu.getUserBenchmarkCpu().getGamingScore(),
                         gpu.getUserBenchmarkGpu().getAvgBench()
@@ -445,7 +445,7 @@ public class CreatorPcService {
 
     public Integer calculatePriceForFpc(Pc pc) {
         BigDecimal someValue = pc.getPrice();
-        BigDecimal denominator = BigDecimal.valueOf(pc.getPredictionGpuFpsFHD());
+        BigDecimal denominator = BigDecimal.valueOf(pc.getPredictionGpuFpsFhd());
         if (denominator.compareTo(BigDecimal.ZERO) != 0) {
             return someValue.divide(denominator, RoundingMode.HALF_UP).intValue();
         } else {

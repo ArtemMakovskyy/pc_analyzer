@@ -59,7 +59,7 @@ public class ExcelExporter {
                         + pc.getPowerSupplier().getPower() + "W");
                 row.getCell(7).setCellValue(pc.getAvgGpuBench());
                 row.getCell(8).setCellValue(pc.getGamingScore());
-                row.getCell(9).setCellValue(pc.getPredictionGpuFpsFHD());
+                row.getCell(9).setCellValue(pc.getPredictionGpuFpsFhd());
                 row.getCell(10).setCellValue(pc.getPriceForFps());
                 row.getCell(11).setCellValue(pc.getPrice().doubleValue());
                 if (pc.getMarker() != null) {

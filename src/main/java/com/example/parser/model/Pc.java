@@ -6,6 +6,7 @@ import com.example.parser.model.hotline.MemoryHotLine;
 import com.example.parser.model.hotline.MotherBoardHotLine;
 import com.example.parser.model.hotline.PowerSupplierHotLine;
 import com.example.parser.model.hotline.SsdHotLine;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -46,7 +47,8 @@ public class Pc {
     private Double gamingScore;
     private Double workstationScore;
     private Double avgGpuBench;
-    private Integer predictionGpuFpsFHD;
+    @Column(name = "prediction_gpu_fpsfhd")
+    private Integer predictionGpuFpsFhd;
     private Integer priceForFps;
     @Enumerated(EnumType.STRING)
     private PcMarker marker;
@@ -64,7 +66,7 @@ public class Pc {
                 + powerSupplier.getPower() + "W"
                 + " | avgGpuBench: " + avgGpuBench
                 + " | gamingScore: " + gamingScore
-                + " | predictionFpsFHD: " + predictionGpuFpsFHD + ",  priceForFps: " + priceForFps
+                + " | predictionFpsFHD: " + predictionGpuFpsFhd + ",  priceForFps: " + priceForFps
                 + " | " + price
                 + '}';
     }

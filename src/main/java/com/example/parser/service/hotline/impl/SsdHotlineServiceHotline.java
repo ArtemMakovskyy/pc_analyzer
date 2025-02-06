@@ -2,7 +2,7 @@ package com.example.parser.service.hotline.impl;
 
 import com.example.parser.dto.hotline.SsdHotLineParserDto;
 import com.example.parser.dto.mapper.SsdHotLineMapper;
-import com.example.parser.exсeption.CustomServiceException;
+import com.example.parser.exception.CustomServiceException;
 import com.example.parser.model.hotline.SsdHotLine;
 import com.example.parser.repository.SsdHotLineRepository;
 import com.example.parser.service.hotline.HotlineDataUpdateService;

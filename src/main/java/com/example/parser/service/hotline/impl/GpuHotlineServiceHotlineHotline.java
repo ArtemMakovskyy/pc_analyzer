@@ -2,7 +2,7 @@ package com.example.parser.service.hotline.impl;
 
 import com.example.parser.dto.hotline.GpuHotLineParserDto;
 import com.example.parser.dto.mapper.GpuHotLineMapper;
-import com.example.parser.exсeption.CustomServiceException;
+import com.example.parser.exception.CustomServiceException;
 import com.example.parser.model.hotline.GpuHotLine;
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.repository.GpuHotLineRepository;

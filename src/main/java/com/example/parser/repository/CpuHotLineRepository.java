@@ -11,6 +11,7 @@ public interface CpuHotLineRepository extends JpaRepository<CpuHotLine, Long> {
     List<CpuHotLine> findByPartialNameIgnoreCase(@Param("name") String name);
 
     @Query("SELECT c FROM CpuHotLine c WHERE c.propositionsQuantity >= :minPropositions")
-    List<CpuHotLine> findCpusWithMinPropositions(@Param("minPropositionQuantity") int minPropositionQuantity);
+    List<CpuHotLine> findCpusWithMinPropositions(
+            @Param("minPropositionQuantity") int minPropositionQuantity);
 
 }

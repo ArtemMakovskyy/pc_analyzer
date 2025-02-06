@@ -2,7 +2,7 @@ package com.example.parser.service.hotline.impl;
 
 import com.example.parser.dto.hotline.PowerSupplierHotLineParserDto;
 import com.example.parser.dto.mapper.PowerSupplierHotLineMapper;
-import com.example.parser.exсeption.CustomServiceException;
+import com.example.parser.exception.CustomServiceException;
 import com.example.parser.model.hotline.PowerSupplierHotLine;
 import com.example.parser.repository.PowerSupplierHotLineRepository;
 import com.example.parser.service.hotline.HotlineDataUpdateService;

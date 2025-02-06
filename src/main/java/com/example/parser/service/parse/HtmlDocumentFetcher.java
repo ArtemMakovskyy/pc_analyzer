@@ -1,6 +1,6 @@
 package com.example.parser.service.parse;
 
-import com.example.parser.exсeption.DocumentFetchException;
+import com.example.parser.exception.DocumentFetchException;
 import com.example.parser.service.parse.utils.ParseUtil;
 import com.example.parser.service.parse.utils.UserAgentProvider;
 import java.io.File;

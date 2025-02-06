@@ -42,12 +42,17 @@ public class UserBenchmarkCpuPageParser {
     private static final ParseUtil.DelayInSeconds SMALL_PAUSE = new ParseUtil.DelayInSeconds(2, 4);
     private static final ParseUtil.DelayInSeconds BIG_PAUSE = new ParseUtil.DelayInSeconds(4, 10);
 
-    private static final String XPATH_NEXT_PAGE_BUTTON = "//*[@id=\"tableDataForm:j_idt225\"]";
-    private static final String XPATH_LOCATOR_PAGE_QUANTITY = "/html/body/div[2]/div/div[6]/form/div[2]/nav/ul/li[1]/a";
+    private static final String XPATH_NEXT_PAGE_BUTTON
+            = "//*[@id=\"tableDataForm:j_idt225\"]";
+    private static final String XPATH_LOCATOR_PAGE_QUANTITY
+            = "/html/body/div[2]/div/div[6]/form/div[2]/nav/ul/li[1]/a";
     private static final String PAGE_QUANTITY_PATTERN = "Page \\d+ of (\\d+)";
     private static final String ONLY_DIGITS_PATTERN = "[^0-9]";
-    private static final String XPATH_BUTTON_PRICE_SORT = "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th[@data-mhth='MC_PRICE'][1]";
-    private static final String XPATH_BUTTON_AGE_MONTH_SORT = "//*[@id='tableDataForm:mhtddyntac']/table/thead/tr//th[@data-mhth='MC_RELEASEDATE'][1]";
+    private static final String XPATH_BUTTON_PRICE_SORT
+            = "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th[@data-mhth='MC_PRICE'][1]";
+    private static final String XPATH_BUTTON_AGE_MONTH_SORT
+            = "//*[@id='tableDataForm:mhtddyntac']"
+            + "/table/thead/tr//th[@data-mhth='MC_RELEASEDATE'][1]";
     private static final String BASE_URL = "https://cpu.userbenchmark.com/";
 
     @Value("${show.web.windows.from.selenium}")
@@ -56,13 +61,12 @@ public class UserBenchmarkCpuPageParser {
     private final UserBenchmarkTestPage userBenchmarkTestPage;
     private final WebDriverFactory webDriverFactory;
 
-        public List<CpuUserBenchmarkParserDto> loadAndParse(boolean sortByAge) {
-       return loadAndParse(sortByAge,PARSE_ALL_PAGES_INDEX);
+    public List<CpuUserBenchmarkParserDto> loadAndParse(boolean sortByAge) {
+        return loadAndParse(sortByAge, PARSE_ALL_PAGES_INDEX);
     }
 
-
     public List<CpuUserBenchmarkParserDto> loadAndParse(boolean sortByAge, int pages) {
-        if (pages == 0 || pages < PARSE_ALL_PAGES_INDEX){
+        if (pages == 0 || pages < PARSE_ALL_PAGES_INDEX) {
             throw new RuntimeException("Enter correct number of pages");
         }
         WebDriver driver = null;
@@ -73,13 +77,13 @@ public class UserBenchmarkCpuPageParser {
                     TIMEOUT_SECONDS);
 
             userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);
-            if (pages == PARSE_ALL_PAGES_INDEX){
+            if (pages == PARSE_ALL_PAGES_INDEX) {
                 pages = findPageQuantity(driver);
             }
 
             if (sortByAge) {
                 sortByAgeMonthButton(driver);
-                ParseUtil.applyRandomDelay(BIG_PAUSE,true);
+                ParseUtil.applyRandomDelay(BIG_PAUSE, true);
                 sortByAgeMonthButton(driver);
             } else {
                 sortByPriceButton(driver);
@@ -100,7 +104,7 @@ public class UserBenchmarkCpuPageParser {
 
             if (currentPage != pages) {
                 log.info("Pause 3 in parsePages() before click on next page");
-                ParseUtil.applyRandomDelay(BIG_PAUSE,true);
+                ParseUtil.applyRandomDelay(BIG_PAUSE, true);
                 clickNextPage(driver);
             }
             currentPage++;
@@ -116,7 +120,7 @@ public class UserBenchmarkCpuPageParser {
                 = pursePageSource(currentHtmlPageSource);
 
         log.info("Pause 2 in parsePage()");
-        ParseUtil.applyRandomDelay(BIG_PAUSE,true);
+        ParseUtil.applyRandomDelay(BIG_PAUSE, true);
 
         return cpuUserBenchmarksOnPage;
     }
@@ -179,7 +183,8 @@ public class UserBenchmarkCpuPageParser {
         By pageInfoLocator = By.xpath(XPATH_LOCATOR_PAGE_QUANTITY);
 
         WebDriverWait wait2 = new WebDriverWait(driver, Duration.ofSeconds(10));
-        WebElement pageInfoElement = wait2.until(ExpectedConditions.visibilityOfElementLocated(pageInfoLocator));
+        WebElement pageInfoElement = wait2.until(
+                ExpectedConditions.visibilityOfElementLocated(pageInfoLocator));
 
         String pageInfoText = pageInfoElement.getText();
 
@@ -189,7 +194,8 @@ public class UserBenchmarkCpuPageParser {
         if (matcher.find()) {
             pages = Integer.parseInt(matcher.group(1));
         } else {
-            throw new RuntimeException("Unable to extract the maximum number of pages from text: " + pageInfoText);
+            throw new RuntimeException("Unable to extract the maximum number of pages from text: "
+                    + pageInfoText);
         }
 
         return pages;
@@ -202,7 +208,7 @@ public class UserBenchmarkCpuPageParser {
             throw new RuntimeException("Price sort button is not visible.");
         }
         log.info("Pause 1, before click on price button");
-        ParseUtil.applyRandomDelay(SMALL_PAUSE,true);
+        ParseUtil.applyRandomDelay(SMALL_PAUSE, true);
         elementPriceButton.click();
     }
 
@@ -213,7 +219,7 @@ public class UserBenchmarkCpuPageParser {
             throw new RuntimeException("AgeMonthButton sort button is not visible.");
         }
         log.info("Pause 1, before click on price button");
-        ParseUtil.applyRandomDelay(SMALL_PAUSE,true);
+        ParseUtil.applyRandomDelay(SMALL_PAUSE, true);
         elementPriceButton.click();
     }
 
@@ -221,7 +227,7 @@ public class UserBenchmarkCpuPageParser {
         By xpathNextButton = By.xpath(XPATH_NEXT_PAGE_BUTTON);
         WebElement elementNextButton = driver.findElement(xpathNextButton);
         log.info("Pause 4 in clickNextPage click before click on next page");
-        ParseUtil.applyRandomDelay(SMALL_PAUSE,true);
+        ParseUtil.applyRandomDelay(SMALL_PAUSE, true);
         elementNextButton.click();
 
         userBenchmarkTestPage.checkAndPassTestIfNecessary(driver);

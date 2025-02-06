@@ -19,16 +19,20 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Log4j2
 public class PowerSupplierHotlineServiceHotline implements HotlineDataUpdateService {
-    private final MultiThreadPagesParser<PowerSupplierHotLineParserDto> powerSupplierMultiThreadPagesParser;
-    private final PowerSupplierHotLineRepository powerSupplierHotLineRepository;
-    private final PowerSupplierHotLineMapper powerSupplierHotLineMapper;
+    private final MultiThreadPagesParser<PowerSupplierHotLineParserDto>
+            powerSupplierMultiThreadPagesParser;
+    private final PowerSupplierHotLineRepository
+            powerSupplierHotLineRepository;
+    private final PowerSupplierHotLineMapper
+            powerSupplierHotLineMapper;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
     public void refreshDatabaseWithParsedData(ExecutorService executor) {
         try {
             log.info("Starting power supplier data update process...");
-            List<PowerSupplierHotLineParserDto> items = powerSupplierMultiThreadPagesParser.parseAllMultiThread(executor);
+            List<PowerSupplierHotLineParserDto> items
+                    = powerSupplierMultiThreadPagesParser.parseAllMultiThread(executor);
 
             log.info("Parsed {} power supplier.", items.size());
             powerSupplierHotLineRepository.deleteAll();
@@ -40,9 +44,11 @@ public class PowerSupplierHotlineServiceHotline implements HotlineDataUpdateServ
 
             List<PowerSupplierHotLine> powerSupplierHotLinesFromDb
                     = powerSupplierHotLineRepository.saveAll(powerSuppliersList);
-            log.info("Saved {} new power supplier records.", powerSupplierHotLinesFromDb.size());
+            log.info("Saved {} new power supplier records.",
+                    powerSupplierHotLinesFromDb.size());
         } catch (Exception e) {
-            log.error("Error occurred during power supplier data update process: {}", e.getMessage(), e);
+            log.error("Error occurred during power supplier data update process: {}",
+                    e.getMessage(), e);
             throw new CustomServiceException("Failed to process power supplier data", e);
         }
     }

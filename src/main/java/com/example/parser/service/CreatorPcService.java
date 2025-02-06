@@ -110,16 +110,19 @@ public class CreatorPcService {
         long executionTime = measureExecutionTime(() -> {
 
             LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm");
+            DateTimeFormatter formatter
+                    = DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm");
             String formattedDate = now.format(formatter);
 
             if (!pcList.isEmpty()) {
-                String documentsPath = System.getProperty("user.home") + File.separator + "Documents";
+                String documentsPath
+                        = System.getProperty("user.home") + File.separator + "Documents";
                 String fulFileName = fileName + " " + formattedDate + ".xlsx";
                 String fullPath = Paths.get(documentsPath, fulFileName).toString();
 
                 excelExporter.exportToExcelPcConfiguration(pcList, fullPath);
-                log.info("Экспорт списка ПК в Excel завершён. Файл сохранён по пути: {}", fullPath);
+                log.info("Экспорт списка ПК в Excel завершён. Файл сохранён по пути: {}",
+                        fullPath);
             } else {
                 log.warn("Список ПК пуст, экспорт не выполнен.");
             }
@@ -152,23 +155,35 @@ public class CreatorPcService {
 
     private List<Pc> createPc() {
         pcHotLineRepository.deleteAll();
-        List<CpuHotLine> cpus = cpuHotLineRepository.findCpusWithMinPropositions(MIN_PROPOSITION_QUANTITY_DEFAULT);
-        List<MotherBoardHotLine> motherBoards = motherBoardHotLineRepository.findMinPriceGroupedByChipsetWithConditions(MIN_PROPOSITION_QUANTITY_DEFAULT);
-        List<MemoryHotLine> memories = memoryHotLineRepository.findMinPriceGroupedByTypeWithConditions(MIN_PROPOSITION_QUANTITY_DEFAULT);
-        List<GpuHotLine> gpus = gpuHotLineRepository.findGroupedGpusByMinAvgPrice(MIN_PROPOSITION_QUANTITY_DEFAULT);
-        SsdHotLine ssdFromDb = ssdHotLineRepository.findTopByAvgPrice(MIN_PROPOSITION_QUANTITY_DEFAULT);
-        List<PowerSupplierHotLine> powerSupplierHotLines = powerSupplierHotLineRepository.findGroupedByPowerWithMinAvgPrice(MIN_PROPOSITION_QUANTITY_DEFAULT);
+        List<CpuHotLine> cpus = cpuHotLineRepository
+                .findCpusWithMinPropositions(
+                        MIN_PROPOSITION_QUANTITY_DEFAULT);
+        List<MotherBoardHotLine> motherBoards
+                = motherBoardHotLineRepository
+                .findMinPriceGroupedByChipsetWithConditions(MIN_PROPOSITION_QUANTITY_DEFAULT);
+        List<MemoryHotLine> memories = memoryHotLineRepository
+                .findMinPriceGroupedByTypeWithConditions(MIN_PROPOSITION_QUANTITY_DEFAULT);
+        List<GpuHotLine> gpus = gpuHotLineRepository
+                .findGroupedGpusByMinAvgPrice(MIN_PROPOSITION_QUANTITY_DEFAULT);
+        SsdHotLine ssdFromDb = ssdHotLineRepository
+                .findTopByAvgPrice(MIN_PROPOSITION_QUANTITY_DEFAULT);
+        List<PowerSupplierHotLine> powerSupplierHotLines
+                = powerSupplierHotLineRepository.findGroupedByPowerWithMinAvgPrice(
+                MIN_PROPOSITION_QUANTITY_DEFAULT);
 
         validateData(cpus, motherBoards, memories, gpus, ssdFromDb, powerSupplierHotLines);
 
         List<Pc> pcs = new ArrayList<>();
 
         cpus.forEach(cpu -> {
-            Optional<MotherBoardHotLine> motherboardOpt = getMotherboardFromCpuBySocket(motherBoards, cpu);
+            Optional<MotherBoardHotLine> motherboardOpt
+                    = getMotherboardFromCpuBySocket(motherBoards, cpu);
             if (motherboardOpt.isPresent()) {
                 MotherBoardHotLine motherboard = motherboardOpt.get();
-                MemoryHotLine memory = getMemoryFromMotherBoardBySocketType(memories, motherboard);
-                pcs.addAll(video(gpus, cpu, motherboard, memory, ssdFromDb, powerSupplierHotLines));
+                MemoryHotLine memory = getMemoryFromMotherBoardBySocketType(
+                        memories, motherboard);
+                pcs.addAll(video(
+                        gpus, cpu, motherboard, memory, ssdFromDb, powerSupplierHotLines));
             }
         });
         log.info("Computer configurations were successfully assembled");
@@ -197,20 +212,35 @@ public class CreatorPcService {
         return pcList.stream()
                 .sorted(
                         Comparator
-                                .comparing(Pc::getPredictionGpuFpsFHD, Comparator.nullsLast(Comparator.naturalOrder()))
-                                .thenComparing(Pc::getPrice, Comparator.nullsLast(Comparator.naturalOrder()))
+                                .comparing(Pc::getPredictionGpuFpsFHD,
+                                        Comparator.nullsLast(Comparator.naturalOrder()))
+                                .thenComparing(Pc::getPrice, Comparator.nullsLast(
+                                        Comparator.naturalOrder()))
                 )
                 .collect(Collectors.toList());
     }
 
 
-    private void validateData(List<CpuHotLine> cpus, List<MotherBoardHotLine> motherBoards, List<MemoryHotLine> memories, List<GpuHotLine> gpus, SsdHotLine ssdFromDb, List<PowerSupplierHotLine> powerSupplierHotLines) {
-        if (cpus.isEmpty() || motherBoards.isEmpty() || memories.isEmpty() || gpus.isEmpty() || ssdFromDb == null || powerSupplierHotLines.isEmpty()) {
+    private void validateData(
+            List<CpuHotLine> cpus,
+            List<MotherBoardHotLine> motherBoards,
+            List<MemoryHotLine> memories,
+            List<GpuHotLine> gpus,
+            SsdHotLine ssdFromDb,
+            List<PowerSupplierHotLine> powerSupplierHotLines) {
+        if (cpus.isEmpty() || motherBoards.isEmpty()
+                || memories.isEmpty() || gpus.isEmpty()
+                || ssdFromDb == null || powerSupplierHotLines.isEmpty()) {
             throw new IllegalArgumentException("One or more required data lists are empty.");
         }
     }
 
-    private List<Pc> video(List<GpuHotLine> gpus, CpuHotLine cpu, MotherBoardHotLine mb, MemoryHotLine memory, SsdHotLine ssd, List<PowerSupplierHotLine> powerSupplierHotLines) {
+    private List<Pc> video(List<GpuHotLine> gpus,
+                           CpuHotLine cpu,
+                           MotherBoardHotLine mb,
+                           MemoryHotLine memory,
+                           SsdHotLine ssd,
+                           List<PowerSupplierHotLine> powerSupplierHotLines) {
         List<Pc> pcs = new ArrayList<>();
 
         gpus.forEach(gpu -> {
@@ -222,7 +252,12 @@ public class CreatorPcService {
         return pcs;
     }
 
-    private void initializePc(Pc pc, GpuHotLine gpu, CpuHotLine cpu, MotherBoardHotLine mb, MemoryHotLine memory, SsdHotLine ssd, List<PowerSupplierHotLine> powerSupplierHotLines) {
+    private void initializePc(Pc pc, GpuHotLine gpu,
+                              CpuHotLine cpu,
+                              MotherBoardHotLine mb,
+                              MemoryHotLine memory,
+                              SsdHotLine ssd,
+                              List<PowerSupplierHotLine> powerSupplierHotLines) {
         pc.setGpu(gpu);
         pc.setCpu(cpu);
         pc.setMotherboard(mb);
@@ -254,7 +289,8 @@ public class CreatorPcService {
         Double avgPriceSsd = getSafeAvgPrice(pc.getSsd().getAvgPrice());
         Double avgPricePs = getSafeAvgPrice(pc.getPowerSupplier().getAvgPrice());
 
-        return avgPriceCpu + coolingPrice + avgPriceMb + avgPriceMemory + avgPriceGpu + avgPriceSsd + avgPricePs;
+        return avgPriceCpu + coolingPrice + avgPriceMb
+                + avgPriceMemory + avgPriceGpu + avgPriceSsd + avgPricePs;
     }
 
     private double calculateCoolingPrice(CpuHotLine cpu) {
@@ -316,15 +352,18 @@ public class CreatorPcService {
         return (int) (cpuGamingScore * avgGpuBench / 100);
     }
 
-    private PowerSupplierHotLine getPowerSupply(GpuHotLine gpu, List<PowerSupplierHotLine> powerSupplierHotLines) {
+    private PowerSupplierHotLine getPowerSupply(
+            GpuHotLine gpu, List<PowerSupplierHotLine> powerSupplierHotLines) {
         return powerSupplierHotLines.stream()
                 .sorted(Comparator.comparingInt(PowerSupplierHotLine::getPower))
                 .filter(p -> p.getPower() >= gpu.getUserBenchmarkGpu().getPowerRequirement())
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("No suitable power supply found for GPU: " + gpu.getName()));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "No suitable power supply found for GPU: " + gpu.getName()));
     }
 
-    private MemoryHotLine getMemoryFromMotherBoardBySocketType(List<MemoryHotLine> memoryHotLineList, MotherBoardHotLine motherBoardHotLine) {
+    private MemoryHotLine getMemoryFromMotherBoardBySocketType(
+            List<MemoryHotLine> memoryHotLineList, MotherBoardHotLine motherBoardHotLine) {
         final String memoryType = motherBoardHotLine.getMemoryType();
 
         if (memoryType == null) {
@@ -337,7 +376,8 @@ public class CreatorPcService {
                 .orElseThrow(() -> new IllegalArgumentException("No memory found for type: " + memoryType));
     }
 
-    private Optional<MotherBoardHotLine> getMotherboardFromCpuBySocket(List<MotherBoardHotLine> motherBoards, CpuHotLine cpu) {
+    private Optional<MotherBoardHotLine> getMotherboardFromCpuBySocket(
+            List<MotherBoardHotLine> motherBoards, CpuHotLine cpu) {
         int propositionQuantityThreshold = MIN_PROPOSITION_QUANTITY_DEFAULT;
 
         while (propositionQuantityThreshold >= 2) {
@@ -345,7 +385,9 @@ public class CreatorPcService {
 
             if (!mbList.isEmpty()) {
                 return mbList.stream()
-                        .sorted(Comparator.comparing(MotherBoardHotLine::getAvgPrice, Comparator.nullsLast(Comparator.naturalOrder())))
+                        .sorted(Comparator.comparing(
+                                MotherBoardHotLine::getAvgPrice, Comparator.nullsLast(
+                                        Comparator.naturalOrder())))
                         .findFirst();
             }
 
@@ -356,13 +398,16 @@ public class CreatorPcService {
         return Optional.empty();
     }
 
-    private List<MotherBoardHotLine> filterMotherboardsByCpu(List<MotherBoardHotLine> motherBoards, CpuHotLine cpu) {
+    private List<MotherBoardHotLine> filterMotherboardsByCpu(
+            List<MotherBoardHotLine> motherBoards, CpuHotLine cpu) {
         return motherBoards.stream()
                 .filter(mb -> mb.getSocketType().contains(cpu.getSocketType()))
                 .filter(mb -> {
-                    if (isIntelCpu(cpu) && cpuContaini5ori7ori9(cpu) && cpu.getName().contains("K")) {
+                    if (isIntelCpu(cpu) && cpuContaini5ori7ori9(cpu)
+                            && cpu.getName().contains("K")) {
                         return mb.getChipset().charAt(0) == 'Z';
-                    } else if (isAmdCpu(cpu) && cpuContainRyzen5or7or9(cpu) && cpu.getName().contains("X")) {
+                    } else if (isAmdCpu(cpu) && cpuContainRyzen5or7or9(cpu)
+                            && cpu.getName().contains("X")) {
                         return mb.getChipset().charAt(0) == 'X';
                     } else if (cpuContainRyzen5or7or9(cpu) || cpuContaini5ori7ori9(cpu)) {
                         return mb.getChipset().charAt(0) == 'B';
@@ -382,15 +427,21 @@ public class CreatorPcService {
     }
 
     private boolean cpuContainRyzen5or7or9(CpuHotLine cpu) {
-        return cpu.getName().contains("Ryzen 5") || cpu.getName().contains("Ryzen 7") || cpu.getName().contains("Ryzen 9");
+        return cpu.getName().contains("Ryzen 5")
+                || cpu.getName().contains("Ryzen 7")
+                || cpu.getName().contains("Ryzen 9");
     }
 
     private boolean cpuContaini5ori7ori9(CpuHotLine cpu) {
-        return cpu.getName().contains("Core i5") || cpu.getName().contains("Core i7") || cpu.getName().contains("Core i9");
+        return cpu.getName().contains("Core i5")
+                || cpu.getName().contains("Core i7")
+                || cpu.getName().contains("Core i9");
     }
 
-    private List<MotherBoardHotLine> updateMotherBoardsList(int propositionQuantityThreshold) {
-        return motherBoardHotLineRepository.findMinPriceGroupedByChipsetWithConditions(propositionQuantityThreshold);
+    private List<MotherBoardHotLine> updateMotherBoardsList(
+            int propositionQuantityThreshold) {
+        return motherBoardHotLineRepository
+                .findMinPriceGroupedByChipsetWithConditions(propositionQuantityThreshold);
     }
 
     public Integer calculatePriceForFpc(Pc pc) {

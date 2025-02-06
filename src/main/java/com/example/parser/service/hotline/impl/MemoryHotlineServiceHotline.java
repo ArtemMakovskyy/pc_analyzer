@@ -19,16 +19,16 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Log4j2
 public class MemoryHotlineServiceHotline implements HotlineDataUpdateService {
-    private final static String MEMORY_PAGE_LINK_DDR4
-            = "https://hotline.ua/ua/computer/moduli-pamyati-dlya-pk-i-noutbukov"
-            + "/3102-19139-98765/?sort=priceUp";
-    private final static String MEMORY_PAGE_LINK_DDR5 =
+    private static final String MEMORY_PAGE_LINK_DDR4 =
+            "https://hotline.ua/ua/computer/moduli-pamyati-dlya-pk-i-noutbukov"
+                    + "/3102-19139-98765/?sort=priceUp";
+    private static final String MEMORY_PAGE_LINK_DDR5 =
             "https://hotline.ua/ua/computer/moduli-pamyati-dlya-pk-i-noutbukov"
                     + "/3102-19139-672508/?sort=priceUp";
+
     private final MultiThreadPagesParser<MemoryHotLineParserDto> memoryPageParserImpl;
     private final MemoryHotLineRepository memoryHotLineRepository;
     private final MemoryHotLineMapper memoryHotLineMapper;
-
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
@@ -44,16 +44,16 @@ public class MemoryHotlineServiceHotline implements HotlineDataUpdateService {
             memoryHotLineRepository.deleteAll();
             log.info("Deleted old memory data.");
 
-            List<MemoryHotLine> MemoryHotLineList = memories.stream()
+            List<MemoryHotLine> memoryHotLineList = memories.stream()
                     .map(memoryHotLineMapper::toEntity)
                     .toList();
 
-            List<MemoryHotLine> memoryHotLinesFromDb
-                    = memoryHotLineRepository.saveAll(MemoryHotLineList);
+            List<MemoryHotLine> memoryHotLinesFromDb =
+                    memoryHotLineRepository.saveAll(memoryHotLineList);
             log.info("Saved {} new memory records.", memoryHotLinesFromDb.size());
         } catch (Exception e) {
-            log.error("Error occurred during memory data update process: {}"
-                    , e.getMessage(), e);
+            log.error("Error occurred during memory data update process: {}",
+                    e.getMessage(), e);
             throw new CustomServiceException("Failed to process memory data", e);
         }
     }

@@ -19,19 +19,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Log4j2
 public class SsdHotlineServiceHotline implements HotlineDataUpdateService {
-    private final static String SSD_PAGE_LINK
+    private static final String SSD_PAGE_LINK
             = "https://hotline.ua/ua/computer/diski-ssd/66705-301666-301678-301686-608078-667303/";
 
     private final MultiThreadPagesParser<SsdHotLineParserDto> ssdHotlinePageParserImpl;
     private final SsdHotLineRepository ssdHotLineRepository;
     private final SsdHotLineMapper ssdHotLineMapper;
-
-//    @PostConstruct
-//    public void init(){
-//        int availableProcessors = Runtime.getRuntime().availableProcessors();
-//        ExecutorService executor = Executors.newFixedThreadPool(availableProcessors);
-//        refreshDatabaseWithParsedData(executor);
-//    }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override

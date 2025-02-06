@@ -35,18 +35,18 @@ public class MotherBoardHotlineServiceHotline implements HotlineDataUpdateServic
             motherBoardHotLineRepository.deleteAll();
             log.info("Deleted old motherboard data.");
 
-            List<MotherBoardHotLine> mBlist = motherBoards.stream()
+            List<MotherBoardHotLine> mbList = motherBoards.stream()
                     .map(motherBoardHotLineMapper::toEntity)
                     .toList();
 
             List<MotherBoardHotLine> motherBoardHotLinesFromDb
-                    = motherBoardHotLineRepository.saveAll(mBlist);
+                    = motherBoardHotLineRepository.saveAll(mbList);
 
             log.info("Saved {} new motherboard records.",
                     motherBoardHotLinesFromDb.size());
         } catch (Exception e) {
-            log.error("Error occurred during motherboard data update process: {}"
-                    , e.getMessage(), e);
+            log.error("Error occurred during motherboard data update process: {}",
+                    e.getMessage(), e);
             throw new CustomServiceException("Failed to process motherboard data", e);
         }
     }

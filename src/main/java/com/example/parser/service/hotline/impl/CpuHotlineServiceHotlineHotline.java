@@ -7,8 +7,8 @@ import com.example.parser.model.hotline.CpuHotLine;
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
 import com.example.parser.repository.CpuHotLineRepository;
 import com.example.parser.repository.CpuUserBenchmarkRepository;
-import com.example.parser.service.hotline.DataUpdateService;
-import com.example.parser.service.hotline.DatabaseSynchronizationService;
+import com.example.parser.service.hotline.HotlineDataUpdateService;
+import com.example.parser.service.hotline.HotlineDatabaseSynchronizationService;
 import com.example.parser.service.parse.MultiThreadPagesParser;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class CpuHotlineService implements DataUpdateService, DatabaseSynchronizationService {
+public class CpuHotlineServiceHotlineHotline implements HotlineDataUpdateService, HotlineDatabaseSynchronizationService {
     private final MultiThreadPagesParser<CpuHotLineParserDto> сpuPageParserImpl;
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;

@@ -5,7 +5,7 @@ import com.example.parser.dto.mapper.MemoryHotLineMapper;
 import com.example.parser.exсeption.CustomServiceException;
 import com.example.parser.model.hotline.MemoryHotLine;
 import com.example.parser.repository.MemoryHotLineRepository;
-import com.example.parser.service.hotline.DataUpdateService;
+import com.example.parser.service.hotline.HotlineDataUpdateService;
 import com.example.parser.service.parse.MultiThreadPagesParser;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class MemoryHotlineService implements DataUpdateService {
+public class MemoryHotlineServiceHotline implements HotlineDataUpdateService {
     private final static String MEMORY_PAGE_LINK_DDR4
             = "https://hotline.ua/ua/computer/moduli-pamyati-dlya-pk-i-noutbukov"
             + "/3102-19139-98765/?sort=priceUp";

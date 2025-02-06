@@ -1,5 +1,5 @@
 package com.example.parser.service.hotline;
 
-public interface DatabaseSynchronizationService {
+public interface HotlineDatabaseSynchronizationService {
     void synchronizeWithBenchmarkData();
 }

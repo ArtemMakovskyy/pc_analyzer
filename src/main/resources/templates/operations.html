@@ -10,7 +10,7 @@
 <div th:replace="fragments/header :: header"></div>
 
 <h2>Запуск операцій</h2>
-<p id="statusMessage" style="color: red;"></p>
+<h3 id="statusMessage" style="color: red;"></h3>
 
 <form id="operationsForm">
     <label><input type="checkbox" name="updateUserBenchmarkCpu"> Оновити CPU Benchmark</label><br>
@@ -21,7 +21,6 @@
     <label><input type="checkbox" name="saveReportToExcel"> Зберегти звіт в Excel</label><br>
     <button type="button" onclick="executeOperation()">Запустити</button>
 </form>
-
 
 <script>
     function executeOperation() {

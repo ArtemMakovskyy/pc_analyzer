@@ -6,15 +6,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Log4j2
 public class HotlineDataUpdateCoordinatorService {
-    private final List<DataUpdateService> dataUpdateServices;
-    private final List<DatabaseSynchronizationService> databaseSynchronizationServices;
+    private final List<HotlineDataUpdateService> hotlineDataUpdateServices;
+    private final List<HotlineDatabaseSynchronizationService> hotlineDatabaseSynchronizationServices;
     private final PcHotLineRepository pcHotLineRepository;
 
     public void updateAllData() {
@@ -32,7 +33,7 @@ public class HotlineDataUpdateCoordinatorService {
     private void runAllDataUpdateServices(ExecutorService executor) {
         log.info("Начало процесса обновления данных для всех сервисов...");
 
-        for (DataUpdateService service : dataUpdateServices) {
+        for (HotlineDataUpdateService service : hotlineDataUpdateServices) {
             try {
                 service.refreshDatabaseWithParsedData(executor);
             } catch (Exception e) {
@@ -45,7 +46,7 @@ public class HotlineDataUpdateCoordinatorService {
     private void runAllDatabaseSynchronizationServices() {
         log.info("Начало процесса обновления данных для всех сервисов...");
 
-        for (DatabaseSynchronizationService service : databaseSynchronizationServices) {
+        for (HotlineDatabaseSynchronizationService service : hotlineDatabaseSynchronizationServices) {
             try {
                 service.synchronizeWithBenchmarkData();
             } catch (Exception e) {

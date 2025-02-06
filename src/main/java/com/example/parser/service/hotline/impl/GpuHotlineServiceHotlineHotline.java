@@ -2,14 +2,13 @@ package com.example.parser.service.hotline.impl;
 
 import com.example.parser.dto.hotline.GpuHotLineParserDto;
 import com.example.parser.dto.mapper.GpuHotLineMapper;
-import com.example.parser.dto.mapper.GpuUserBenchmarkMapper;
 import com.example.parser.exсeption.CustomServiceException;
 import com.example.parser.model.hotline.GpuHotLine;
 import com.example.parser.model.user.benchmark.UserBenchmarkGpu;
 import com.example.parser.repository.GpuHotLineRepository;
 import com.example.parser.repository.GpuUserBenchmarkRepository;
-import com.example.parser.service.hotline.DataUpdateService;
-import com.example.parser.service.hotline.DatabaseSynchronizationService;
+import com.example.parser.service.hotline.HotlineDataUpdateService;
+import com.example.parser.service.hotline.HotlineDatabaseSynchronizationService;
 import com.example.parser.service.parse.MultiThreadPagesParser;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -22,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class GpuHotlineService implements DataUpdateService, DatabaseSynchronizationService {
+public class GpuHotlineServiceHotlineHotline implements HotlineDataUpdateService, HotlineDatabaseSynchronizationService {
     private final MultiThreadPagesParser<GpuHotLineParserDto> gpuPageParserImpl;
     private final GpuHotLineRepository gpuHotLineRepository;
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;

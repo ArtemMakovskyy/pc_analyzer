@@ -5,7 +5,7 @@ import com.example.parser.dto.mapper.MotherBoardHotLineMapper;
 import com.example.parser.exсeption.CustomServiceException;
 import com.example.parser.model.hotline.MotherBoardHotLine;
 import com.example.parser.repository.MotherBoardHotLineRepository;
-import com.example.parser.service.hotline.DataUpdateService;
+import com.example.parser.service.hotline.HotlineDataUpdateService;
 import com.example.parser.service.parse.MultiThreadPagesParser;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class MotherBoardHotlineService implements DataUpdateService {
+public class MotherBoardHotlineServiceHotline implements HotlineDataUpdateService {
     private final MultiThreadPagesParser<MotherBoardHotLineParserDto> motherBoardPageParserImpl;
     private final MotherBoardHotLineRepository motherBoardHotLineRepository;
     private final MotherBoardHotLineMapper motherBoardHotLineMapper;

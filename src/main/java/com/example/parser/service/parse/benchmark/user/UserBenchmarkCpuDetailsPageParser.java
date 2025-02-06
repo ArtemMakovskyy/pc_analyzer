@@ -16,8 +16,6 @@ import org.springframework.stereotype.Component;
 @Log4j2
 @RequiredArgsConstructor
 public class UserBenchmarkCpuDetailsPageParser {
-    private final static String HTML_PATH_GENERAL = "C:\\Users\\Artem\\Documents\\Java\\UltimateJetBrains\\tutorials\\ms1\\parser\\parser\\src\\main\\java\\com\\example\\parser\\service\\parse\\benchmark\\user\\other\\";
-    private final static String HTML_PATH_PENTIUM_DUAL_T_3200 = HTML_PATH_GENERAL + "InnerrPagePentiumDualT3200.html";
     private final static int FAILURE_VALUE = -1;
     private static final int GAMING_SCORE_INDEX1 = 1;
     private static final int DESKTOP_SCORE_INDEX3 = 3;
@@ -56,11 +54,11 @@ public class UserBenchmarkCpuDetailsPageParser {
 
     }
 
-    public void parseFromFile() {
+    public void parseFromFile(String pathToFile) {
         UserBenchmarkCpu cpu = new UserBenchmarkCpu();
         Document document = null;
         try {
-            document = Jsoup.parse(new File(HTML_PATH_PENTIUM_DUAL_T_3200));
+            document = Jsoup.parse(new File(pathToFile));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

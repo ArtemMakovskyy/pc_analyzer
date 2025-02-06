@@ -22,6 +22,8 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
     private int delayFrom;
     @Value("${hotline.delay.to}")
     private int delayTo;
+    @Value("${hotline.delay.use.gelay}")
+    private boolean useDelay;
     protected static final String NO_ELEMENT_CSS_SELECTOR
             = "div.list-item__value > div.list-item__value--overlay."
             + "list-item__value--full > div > div > div.m_b-10";
@@ -101,7 +103,7 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
     public List<T> parsePage(
             String url
     ) {
-        Document htmlDocument = fetchHtmlDocumentWithRetries(url, true, true, 2, 4, false);
+        Document htmlDocument = fetchHtmlDocumentWithRetries(url, true, useDelay, delayFrom, delayTo, false);
         return parseData(htmlDocument);
     }
 

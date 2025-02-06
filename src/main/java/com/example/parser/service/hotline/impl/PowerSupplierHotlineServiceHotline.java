@@ -5,7 +5,7 @@ import com.example.parser.dto.mapper.PowerSupplierHotLineMapper;
 import com.example.parser.exсeption.CustomServiceException;
 import com.example.parser.model.hotline.PowerSupplierHotLine;
 import com.example.parser.repository.PowerSupplierHotLineRepository;
-import com.example.parser.service.hotline.DataUpdateService;
+import com.example.parser.service.hotline.HotlineDataUpdateService;
 import com.example.parser.service.parse.MultiThreadPagesParser;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class PowerSupplierHotlineService implements DataUpdateService {
+public class PowerSupplierHotlineServiceHotline implements HotlineDataUpdateService {
     private final MultiThreadPagesParser<PowerSupplierHotLineParserDto> powerSupplierMultiThreadPagesParser;
     private final PowerSupplierHotLineRepository powerSupplierHotLineRepository;
     private final PowerSupplierHotLineMapper powerSupplierHotLineMapper;

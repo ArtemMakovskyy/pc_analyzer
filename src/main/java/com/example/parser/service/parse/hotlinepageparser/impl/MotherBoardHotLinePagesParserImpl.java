@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component;
 
 @Log4j2
 @Component
-public class MotherBoardHotLinePagesParserImpl extends HotLinePagesParserAbstract<MotherBoardHotLineParserDto> {
+public class MotherBoardHotLinePagesParserImpl
+        extends HotLinePagesParserAbstract<MotherBoardHotLineParserDto> {
     private static final String BASE_URL = "https://hotline.ua/ua/computer/materinskie-platy/?p=";
     private static final String CHARACTERISTICS_BLOCK_CSS_SELECTOR = "div.specs__text";
     private static final String PRICE_CSS_SELECTOR = "div.list-item__value-price";

@@ -20,9 +20,9 @@ import org.springframework.stereotype.Service;
 @Log4j2
 @RequiredArgsConstructor
 public class CpuUserBenchmarkService {
-    private final static int FAILURE_VALUE = -1;
-    private final static int PROCESS_ALL_PAGES_VALUE_DEFAULT = -1;
-    private final static int TIMEOUT_SECONDS = 10;
+    private static final int FAILURE_VALUE = -1;
+    private static final int PROCESS_ALL_PAGES_VALUE_DEFAULT = -1;
+    private static final int TIMEOUT_SECONDS = 10;
     @Value("${parse.pages.quantity.cpu.user.benchmark}")
     private int parsePagesQuantity;
     @Value("${show.web.windows.from.selenium}")
@@ -36,7 +36,9 @@ public class CpuUserBenchmarkService {
     private final WebDriverFactory webDriverFactory;
 
     public List<UserBenchmarkCpu> loadAndSaveNewItems() {
-        int parsePages = parsePagesQuantity != 0 ? parsePagesQuantity : PROCESS_ALL_PAGES_VALUE_DEFAULT;
+        int parsePages = parsePagesQuantity != 0
+                ? parsePagesQuantity
+                : PROCESS_ALL_PAGES_VALUE_DEFAULT;
 
         final List<CpuUserBenchmarkParserDto> cpuUserBenchmarkParserDtos =
                 userBenchmarkCpuPageParser.loadAndParse(sortByAge, parsePages);
@@ -47,23 +49,21 @@ public class CpuUserBenchmarkService {
                         .map(d -> cpuUserBenchmarkMapper.toEntity(d))
                         .toList());
 
-        final List<UserBenchmarkCpu> userBenchmarkCpus
-                = saveAllToDb(
-
+        final List<UserBenchmarkCpu> userBenchmarkCpus = saveAllToDb(
                 newItems.stream()
                         .map(cpuUserBenchmarkMapper::toDto)
-                        .toList()
+                        .toList());
 
-        );
         log.info("Successfully Was added " + userBenchmarkCpus.size() + " new positions");
         return userBenchmarkCpus;
     }
 
     public void updateMissingSpecifications() {
-        final List<UserBenchmarkCpu> byCpuSpecificationIsNull
-                = cpuUserBenchmarkRepository.findByCpuSpecificationIsNull();
+        final List<UserBenchmarkCpu> byCpuSpecificationIsNull =
+                cpuUserBenchmarkRepository.findByCpuSpecificationIsNull();
 
-        WebDriver driver = webDriverFactory.setUpWebDriver(showWebGraphicInterfaceFromSelenium, TIMEOUT_SECONDS);
+        WebDriver driver = webDriverFactory.setUpWebDriver(
+                showWebGraphicInterfaceFromSelenium, TIMEOUT_SECONDS);
         int updated = 0;
         int notUpdated = 0;
         int progress = 0;
@@ -92,8 +92,8 @@ public class CpuUserBenchmarkService {
     private List<UserBenchmarkCpu> saveAllToDb(List<CpuUserBenchmarkParserDto> createDto) {
         return cpuUserBenchmarkRepository.saveAll(
                 createDto.stream()
-                        .map(cpuUserBenchmarkMapper::toEntity).toList()
-        );
+                        .map(cpuUserBenchmarkMapper::toEntity)
+                        .toList());
     }
 
     private static List<UserBenchmarkCpu> filterNewItems(

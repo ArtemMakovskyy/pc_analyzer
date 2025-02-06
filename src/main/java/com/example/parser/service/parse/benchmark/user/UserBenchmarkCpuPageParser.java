@@ -26,10 +26,9 @@ import org.springframework.stereotype.Component;
 @Log4j2
 @RequiredArgsConstructor
 public class UserBenchmarkCpuPageParser {
-    private final static int TIMEOUT_SECONDS = 10;
-    @Value("${show.web.windows.from.selenium}")
-    private boolean showWebGraphicInterfaceFromSelenium;
+    private static final int TIMEOUT_SECONDS = 10;
     private static final int PARSE_ALL_PAGES_INDEX = -1;
+
     private static final String CSS_SELECTOR_TABLE_ROW = "tr.hovertarget";
     private static final String CSS_SELECTOR_MANUFACTURER = "td:nth-child(2) span.semi-strongs";
     private static final String CSS_SELECTOR_MODEL = "td:nth-child(2) span.semi-strongs a.nodec";
@@ -39,25 +38,25 @@ public class UserBenchmarkCpuPageParser {
     private static final String CSS_SELECTOR_MEMORY = "td:nth-child(6) div.mh-tc";
     private static final String CSS_SELECTOR_PRICE = "td:nth-child(10) div.mh-tc";
     private static final String CSS_SELECTOR_URL = "td a.nodec";
-    private static final ParseUtil.DelayInSeconds SMALL_PAUSE
-            = new ParseUtil.DelayInSeconds(2, 4);
-    private static final ParseUtil.DelayInSeconds BIG_PAUSE
-            = new ParseUtil.DelayInSeconds(4, 10);
-    private static final String XPATH_NEXT_PAGE_BUTTON
-            =  "//*[@id=\"tableDataForm:j_idt225\"]";
-    private static final String XPATH_LOCATOR_PAGE_QUANTITY
-            = "/html/body/div[2]/div/div[6]/form/div[2]/nav/ul/li[1]/a";
+
+    private static final ParseUtil.DelayInSeconds SMALL_PAUSE = new ParseUtil.DelayInSeconds(2, 4);
+    private static final ParseUtil.DelayInSeconds BIG_PAUSE = new ParseUtil.DelayInSeconds(4, 10);
+
+    private static final String XPATH_NEXT_PAGE_BUTTON = "//*[@id=\"tableDataForm:j_idt225\"]";
+    private static final String XPATH_LOCATOR_PAGE_QUANTITY = "/html/body/div[2]/div/div[6]/form/div[2]/nav/ul/li[1]/a";
     private static final String PAGE_QUANTITY_PATTERN = "Page \\d+ of (\\d+)";
     private static final String ONLY_DIGITS_PATTERN = "[^0-9]";
-    private static final String XPATH_BUTTON_PRICE_SORT
-            = "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th[@data-mhth='MC_PRICE'][1]";
-    private static final String XPATH_BUTTON_AGE_MONTH_SORT
-            = "//*[@id='tableDataForm:mhtddyntac']/table/thead/tr//th[@data-mhth='MC_RELEASEDATE'][1]";
+    private static final String XPATH_BUTTON_PRICE_SORT = "//*[@id=\"tableDataForm:mhtddyntac\"]/table/thead/tr//th[@data-mhth='MC_PRICE'][1]";
+    private static final String XPATH_BUTTON_AGE_MONTH_SORT = "//*[@id='tableDataForm:mhtddyntac']/table/thead/tr//th[@data-mhth='MC_RELEASEDATE'][1]";
     private static final String BASE_URL = "https://cpu.userbenchmark.com/";
+
+    @Value("${show.web.windows.from.selenium}")
+    private boolean showWebGraphicInterfaceFromSelenium;
+
     private final UserBenchmarkTestPage userBenchmarkTestPage;
     private final WebDriverFactory webDriverFactory;
 
-    public List<CpuUserBenchmarkParserDto> loadAndParse(boolean sortByAge) {
+        public List<CpuUserBenchmarkParserDto> loadAndParse(boolean sortByAge) {
        return loadAndParse(sortByAge,PARSE_ALL_PAGES_INDEX);
     }
 

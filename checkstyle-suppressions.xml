@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD Suppressions 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <!-- Исключаем папку из проверки -->
+<!--    <suppress files=".*\/com\/example\/parser\/service\/diferent\/.*\.java"/>-->
+    <!-- Пример исключения для конкретной проверки -->
+<!--    <suppress checks="LocalVariableName" files=".*\/com\/example\/parser\/service\/parse\/lessons\/.*\.java"/>-->
+</suppressions>

@@ -19,6 +19,7 @@ public class UserBenchmarkTestPage {
             = "div > a > i.fa.fa-4x.fa-male";
     private static final int PAUSE_FROM_SEC = 2;
     private static final int PAUSE_TO_SEC = 4;
+
     public void checkAndPassTestIfNecessary(WebDriver driver) {
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
@@ -27,7 +28,8 @@ public class UserBenchmarkTestPage {
             log.info("Page contain robot test.");
             By iconLocator = By.cssSelector(CSS_LOCATOR_TEST_IF_NOT_ROBOT);
 
-            WebElement testButtonElement = wait.until(ExpectedConditions.elementToBeClickable(iconLocator));
+            WebElement testButtonElement
+                    = wait.until(ExpectedConditions.elementToBeClickable(iconLocator));
 
             if (!testButtonElement.isDisplayed()) {
                 throw new RuntimeException("testButtonElement is not visible.");

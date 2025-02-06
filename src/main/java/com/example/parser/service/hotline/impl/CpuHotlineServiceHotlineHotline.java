@@ -21,7 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class CpuHotlineServiceHotlineHotline implements HotlineDataUpdateService, HotlineDatabaseSynchronizationService {
+public class CpuHotlineServiceHotlineHotline
+        implements HotlineDataUpdateService, HotlineDatabaseSynchronizationService {
     private final MultiThreadPagesParser<CpuHotLineParserDto> сpuPageParserImpl;
     private final CpuHotLineRepository cpuHotLineRepository;
     private final CpuUserBenchmarkRepository cpuUserBenchmarkRepository;
@@ -50,7 +51,6 @@ public class CpuHotlineServiceHotlineHotline implements HotlineDataUpdateService
             throw new CustomServiceException("Failed to process cpu data", e);
         }
     }
-
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override

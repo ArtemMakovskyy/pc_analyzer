@@ -21,7 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Log4j2
-public class GpuHotlineServiceHotlineHotline implements HotlineDataUpdateService, HotlineDatabaseSynchronizationService {
+public class GpuHotlineServiceHotlineHotline implements
+        HotlineDataUpdateService, HotlineDatabaseSynchronizationService {
     private final MultiThreadPagesParser<GpuHotLineParserDto> gpuPageParserImpl;
     private final GpuHotLineRepository gpuHotLineRepository;
     private final GpuUserBenchmarkRepository gpuUserBenchmarkRepository;

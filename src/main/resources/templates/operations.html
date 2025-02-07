@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Управління опараціями</title>
+    <title>Управління операціями</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
 
-<div th:replace="fragments/header :: header"></div>
+<div th:replace="~{fragments/header :: header}"></div>
 
 <h2>Запуск операцій</h2>
 <h3 id="statusMessage" style="color: red;"></h3>
@@ -15,12 +15,22 @@
 <form id="operationsForm">
     <label><input type="checkbox" name="updateUserBenchmarkCpu"> Оновити CPU Benchmark</label><br>
     <label><input type="checkbox" name="updateUserBenchmarkGpu"> Оновити GPU Benchmark</label><br>
-    <button type="button" onclick="location.href='/gpus'">Оновити дані потужності блоків живлення</button><br><br>
+    <button type="button" onclick="location.href='/gpus'">Додати дані потужностей блоків живлення</button><br><br>
     <label><input type="checkbox" name="updateHotline"> Оновити Hotline</label><br>
     <label><input type="checkbox" name="createPcList"> Створити список ПК</label><br>
     <label><input type="checkbox" name="saveReportToExcel"> Зберегти звіт в Excel</label><br>
     <button type="button" onclick="executeOperation()">Запустити</button>
 </form>
+<br>
+<div class="container">
+    <h4>Швидкий старт:</h4>
+    <ul >
+        <li style="text-align: left;">Для повсякденного використання рекомендовано використовувати останні три пункти.</li>
+        <li style="text-align: left;">Якщо ви поставите галочку на всі пункти, всі операції по оновленню пройдуть успішно. Але якщо будуть знайдені нові відеокарти, вони потраплять в базу даних, але не будуть використані, оскільки не буде даних про потужність блоку живлення.</li>
+        <li style="text-align: left;">Після додавання нових відеокарт необхідно натискати кнопку «Додати дані потужностей блоків живлення», щоб нові відеокарти пішли в розрахунок. Це слід зробити до запуску пункту "Створити список ПК"</li>
+        <li style="text-align: left;">Файли зберігаються в папці «Мої документи» з назвою <strong>pc_configuration_2025-02-05_13-52.xlsx</strong></li>
+    </ul>
+</div>
 
 <script>
     function executeOperation() {

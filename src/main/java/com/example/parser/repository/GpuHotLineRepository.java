@@ -11,7 +11,11 @@ public interface GpuHotLineRepository extends JpaRepository<GpuHotLine, Long> {
     List<GpuHotLine> findByPartialNameIgnoreCase(@Param("name") String name);
 
     @Query("SELECT g FROM GpuHotLine g WHERE LOWER(g.name) "
+<<<<<<< HEAD
             + "LIKE LOWER(CONCAT('%', :name, '%')) AND g.userBenchmarkGpu IS NULL")
+=======
+            + " LIKE LOWER(CONCAT('%', :name, '%')) AND g.userBenchmarkGpu IS NULL")
+>>>>>>> develop
     List<GpuHotLine> findByPartialNameIgnoreCaseAndUserBenchmarkGpuIsNull(
             @Param("name") String name);
 
@@ -29,10 +33,17 @@ public interface GpuHotLineRepository extends JpaRepository<GpuHotLine, Long> {
      */
     @Query(value = "SELECT * "
             + "FROM ( "
+<<<<<<< HEAD
             + " SELECT *, "
             + " ROW_NUMBER() OVER (PARTITION BY name, memory_size "
             + "ORDER BY avg_price ASC) AS row_num "
             + " FROM parser.gpus_hotline "
+=======
+            + "    SELECT *, "
+            + "           ROW_NUMBER() OVER (PARTITION BY name, memory_size "
+            + "  ORDER BY avg_price ASC) AS row_num "
+            + "    FROM parser.gpus_hotline "
+>>>>>>> develop
             + "    WHERE propositions_quantity > :minPropositionQuantity "
             + "    AND user_benchmark_gpu_id IS NOT NULL "
             + ") AS grouped_data "

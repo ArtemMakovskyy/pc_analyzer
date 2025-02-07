@@ -41,7 +41,10 @@ public class CreatorPcService {
     private static final double CASE_PRICE_MIN = 15.0;
     private static final double CASE_PRICE_AVG = 25.0;
     private static final double CASE_PRICE_MAX = 50.0;
+<<<<<<< HEAD
 
+=======
+>>>>>>> develop
     private final CpuHotLineRepository cpuHotLineRepository;
     private final MotherBoardHotLineRepository motherBoardHotLineRepository;
     private final MemoryHotLineRepository memoryHotLineRepository;

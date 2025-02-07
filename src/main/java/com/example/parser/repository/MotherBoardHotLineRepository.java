@@ -20,8 +20,13 @@ public interface MotherBoardHotLineRepository extends JpaRepository<MotherBoardH
      * FROM
      * parser.mother_boards_hotline
      * WHERE
+<<<<<<< HEAD
      * prices != 0 AND chipset IS NOT NULL and propositions_quantity > 5
      * and socket_type is not null and case_type is not null
+=======
+     * prices != 0 AND chipset IS NOT NULL and propositions_quantity >
+     * 5 and socket_type is not null and case_type is not null
+>>>>>>> develop
      * GROUP BY
      * chipset
      * ) grouped ON m.chipset = grouped.chipset AND m.avg_price = grouped.min_price

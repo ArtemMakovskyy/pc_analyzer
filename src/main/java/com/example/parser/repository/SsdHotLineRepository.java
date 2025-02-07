@@ -7,20 +7,11 @@ import org.springframework.data.repository.query.Param;
 
 public interface SsdHotLineRepository extends JpaRepository<SsdHotLine, Long> {
     @Query(value = """
-<<<<<<< HEAD
-            SELECT * 
-            FROM parser.ssd_hotline
-            WHERE avg_price IS NOT NULL AND propositions_quantity > :minPropositionQuantity 
-            ORDER BY avg_price
-            LIMIT 1
-               """, nativeQuery = true)
-=======
                 SELECT * 
                 FROM parser.ssd_hotline
                 WHERE avg_price IS NOT NULL AND propositions_quantity > :minPropositionQuantity 
                 ORDER BY avg_price
                 LIMIT 1
             """, nativeQuery = true)
->>>>>>> develop
     SsdHotLine findTopByAvgPrice(@Param("minPropositionQuantity") int minPropositionQuantity);
 }

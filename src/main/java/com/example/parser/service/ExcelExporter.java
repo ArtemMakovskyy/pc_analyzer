@@ -25,13 +25,8 @@ public class ExcelExporter {
             Sheet sheet = workbook.createSheet("PC List");
 
             Row headerRow = sheet.createRow(0);
-<<<<<<< HEAD
-            String[] headers = {
-                    "ID", "CPU", "Motherboard", "Memory", "GPU", "SSD", "Power Supplier",
-=======
             String[] headers = {"ID", "CPU", "Motherboard", "Memory",
                     "GPU", "SSD", "Power Supplier",
->>>>>>> develop
                     "Avg GPU Bench", "Gaming Score", "Prediction FPS FHD",
                     "Price per FPS", "Price", "Marker"};
 
@@ -51,28 +46,16 @@ public class ExcelExporter {
                 }
                 row.getCell(0).setCellValue(pc.getId());
                 row.getCell(1).setCellValue(pc.getCpu().getName());
-<<<<<<< HEAD
-                row.getCell(2).setCellValue(pc.getMotherboard().getManufacturer()
-                        + " " + pc.getMotherboard().getName());
-=======
                 row.getCell(2).setCellValue(pc.getMotherboard().getManufacturer() + " "
                         + pc.getMotherboard().getName());
->>>>>>> develop
                 row.getCell(3).setCellValue(pc.getMemory().getManufacturer() + " "
                         + pc.getMemory().getName());
                 row.getCell(4).setCellValue(pc.getGpu().getManufacturer() + " "
                         + pc.getGpu().getName() + " " + pc.getGpu().getMemorySize());
-<<<<<<< HEAD
-                row.getCell(5).setCellValue(pc.getSsd().getManufacturer()
-                        + " " + pc.getSsd().getName());
-                row.getCell(6).setCellValue(pc.getPowerSupplier().getManufacturer()
-                        + " " + pc.getPowerSupplier().getName() + " "
-=======
                 row.getCell(5).setCellValue(pc.getSsd().getManufacturer() + " "
                         + pc.getSsd().getName());
                 row.getCell(6).setCellValue(pc.getPowerSupplier().getManufacturer() + " "
                         + pc.getPowerSupplier().getName() + " "
->>>>>>> develop
                         + pc.getPowerSupplier().getPower() + "W");
                 row.getCell(7).setCellValue(pc.getAvgGpuBench());
                 row.getCell(8).setCellValue(pc.getGamingScore());

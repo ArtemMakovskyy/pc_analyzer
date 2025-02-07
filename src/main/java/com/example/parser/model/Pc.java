@@ -62,13 +62,8 @@ public class Pc {
                 + " | " + memory.getManufacturer() + " " + memory.getName()
                 + " | " + gpu.getManufacturer() + " " + gpu.getName() + " " + gpu.getMemorySize()
                 + " | " + ssd.getManufacturer() + " " + ssd.getName()
-<<<<<<< HEAD
-                + " | " + powerSupplier.getManufacturer() + " " + powerSupplier.getName() + " "
-                + powerSupplier.getPower() + "W"
-=======
                 + " | " + powerSupplier.getManufacturer() + " " + powerSupplier.getName()
                 + " " + powerSupplier.getPower() + "W"
->>>>>>> develop
                 + " | avgGpuBench: " + avgGpuBench
                 + " | gamingScore: " + gamingScore
                 + " | predictionFpsFHD: " + predictionGpuFpsFhd + ",  priceForFps: " + priceForFps

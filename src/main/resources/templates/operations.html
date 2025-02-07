@@ -1,21 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<<<<<<< HEAD
-    <title>Управління опараціями</title>
-=======
     <title>Управління операціями</title>
->>>>>>> develop
     <meta charset="UTF-8">
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
 
-<<<<<<< HEAD
-<div th:replace="fragments/header :: header"></div>
-=======
 <div th:replace="~{fragments/header :: header}"></div>
->>>>>>> develop
 
 <h2>Запуск операцій</h2>
 <h3 id="statusMessage" style="color: red;"></h3>
@@ -23,18 +15,12 @@
 <form id="operationsForm">
     <label><input type="checkbox" name="updateUserBenchmarkCpu"> Оновити CPU Benchmark</label><br>
     <label><input type="checkbox" name="updateUserBenchmarkGpu"> Оновити GPU Benchmark</label><br>
-<<<<<<< HEAD
-    <button type="button" onclick="location.href='/gpus'">Оновити дані потужності блоків живлення</button><br><br>
-=======
     <button type="button" onclick="location.href='/gpus'">Додати дані потужностей блоків живлення</button><br><br>
->>>>>>> develop
     <label><input type="checkbox" name="updateHotline"> Оновити Hotline</label><br>
     <label><input type="checkbox" name="createPcList"> Створити список ПК</label><br>
     <label><input type="checkbox" name="saveReportToExcel"> Зберегти звіт в Excel</label><br>
     <button type="button" onclick="executeOperation()">Запустити</button>
 </form>
-<<<<<<< HEAD
-=======
 <br>
 <div class="container">
     <h4>Швидкий старт:</h4>
@@ -45,7 +31,6 @@
         <li style="text-align: left;">Файли зберігаються в папці «Мої документи» з назвою <strong>pc_configuration_2025-02-05_13-52.xlsx</strong></li>
     </ul>
 </div>
->>>>>>> develop
 
 <script>
     function executeOperation() {

@@ -2,7 +2,7 @@
 
 ## Description
 
-Parser is a web application designed for collecting, processing, and analyzing data about computer components. The main functionality includes:
+Parser is a local Java application with a web interface designed to collect, process and analyze data about computer components. The main functionality includes:
 
 - Parsing data about processors and graphics cards.
 - Updating data from external sources.

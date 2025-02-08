@@ -4,6 +4,7 @@ import com.example.parser.service.CreatorPcService;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/operations")
 @RequiredArgsConstructor
+@Log4j2
 public class PcOperationsController {
 
     private final CreatorPcService creatorPcService;
@@ -41,6 +43,7 @@ public class PcOperationsController {
             boolean createPcList,
             @RequestParam(name = "saveReportToExcel", required = false)
             boolean saveReportToExcel) {
+
         Map<String, Object> response = new HashMap<>();
         try {
             boolean result = creatorPcService.updateDataAndCreatePcList(
@@ -54,6 +57,7 @@ public class PcOperationsController {
                     : "Помилка виконання операції!");
             response.put("success", result);
         } catch (Exception e) {
+            log.error("Error occurred while executing operation", e);
             response.put("message", "Виникла помилка: " + e.getMessage());
             response.put("success", false);
         }

@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Log4j2
@@ -41,6 +42,10 @@ public class CreatorPcService {
     private static final double CASE_PRICE_MIN = 15.0;
     private static final double CASE_PRICE_AVG = 25.0;
     private static final double CASE_PRICE_MAX = 50.0;
+    @Value("${xlsx.directory.path}")
+    private String directoryPath;
+    @Value("${xlsx.file.name.prefix}")
+    private String filePrefix;
     private final CpuHotLineRepository cpuHotLineRepository;
     private final MotherBoardHotLineRepository motherBoardHotLineRepository;
     private final MemoryHotLineRepository memoryHotLineRepository;
@@ -90,7 +95,7 @@ public class CreatorPcService {
             }
 
             if (saveReportToExel) {
-                exportToExcelPcList("pc_configuration",
+                exportToExcelPcList(filePrefix,
                         pcHotLineRepository.findPcListWithNonZeroPriceForFpsOrdered());
             }
 
@@ -106,30 +111,48 @@ public class CreatorPcService {
 
     public void exportToExcelPcList(String fileName, List<Pc> pcList) {
         log.info("Start save file to Excel");
-
         long executionTime = measureExecutionTime(() -> {
-
-            LocalDateTime now = LocalDateTime.now();
-            DateTimeFormatter formatter
-                    = DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm");
-            String formattedDate = now.format(formatter);
-
             if (!pcList.isEmpty()) {
-                String documentsPath
-                        = System.getProperty("user.home") + File.separator + "Documents";
-                String fulFileName = fileName + " " + formattedDate + ".xlsx";
-                String fullPath = Paths.get(documentsPath, fulFileName).toString();
-
+                String customPath = directoryPath;
+                File directory = new File(customPath);
+                if (!directory.exists()) {
+                    directory.mkdirs();
+                }
+                LocalDateTime now = LocalDateTime.now();
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH-mm");
+                String formattedDate = now.format(formatter);
+                String fullFileName = fileName + " " + formattedDate + ".xlsx";
+                String fullPath = Paths.get(customPath, fullFileName).toString();
+                clearFilesDirectory();
                 excelExporter.exportToExcelPcConfiguration(pcList, fullPath);
-                log.info("Экспорт списка ПК в Excel завершён. Файл сохранён по пути: {}",
-                        fullPath);
+                log.info("Export of PC list to Excel completed. File saved at: {}", fullPath);
             } else {
-                log.warn("Список ПК пуст, экспорт не выполнен.");
+                log.warn("PC list is empty, export was not performed.");
             }
-
         });
+        log.info("Excel export execution time: {} ms", executionTime);
+    }
 
-        log.info("Время выполнения экспорта в Excel: {} мс", executionTime);
+    private void clearFilesDirectory() {
+        File directory = new File(directoryPath);
+
+        if (directory.exists() && directory.isDirectory()) {
+            File[] files = directory.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        if (file.delete()) {
+                            log.info("Deleted file: {}", file.getName());
+                        } else {
+                            log.warn("Failed to delete file: {}", file.getName());
+                        }
+                    }
+                }
+            }
+        } else {
+            log.warn("Directory does not exist or is not a directory: {}",
+                    directoryPath);
+        }
     }
 
     private void createFilterAndSaveOptimalPcList() {

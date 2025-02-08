@@ -43,7 +43,7 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
     @Value("${hotline.delay.to}")
     private int delayTo;
 
-    @Value("${hotline.delay.use.gelay}")
+    @Value("${hotline.delay.use.delay}")
     private boolean useDelay;
 
     public HotLinePagesParserAbstract(HtmlDocumentFetcher htmlDocumentFetcher, String baseUrl) {

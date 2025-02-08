@@ -33,32 +33,34 @@ public class HotlineDataUpdateCoordinatorService {
     }
 
     private void runAllDataUpdateServices(ExecutorService executor) {
-        log.info("Начало процесса обновления данных для всех сервисов...");
+        log.info("Start of updating new hotline components ");
 
         for (HotlineDataUpdateService service : hotlineDataUpdateServices) {
             try {
                 service.refreshDatabaseWithParsedData(executor);
             } catch (Exception e) {
-                log.error("Ошибка при обновлении данных в сервисе {}: {}",
+                log.error("Error updating data in the service {}: {}",
                         service.getClass().getSimpleName(), e.getMessage(), e);
             }
         }
-        log.info("Завершено обновление данных для всех сервисов.");
+        log.info("Updates to new hotline components completed ");
     }
 
     private void runAllDatabaseSynchronizationServices() {
-        log.info("Начало процесса обновления данных для всех сервисов...");
+        log.info("Start of the process of synchronization of data of hotline and "
+                + "tests of UserBenchmark for all services ");
 
         for (HotlineDatabaseSynchronizationService service
                 : hotlineDatabaseSynchronizationServices) {
             try {
                 service.synchronizeWithBenchmarkData();
             } catch (Exception e) {
-                log.error("Ошибка при обновлении данных в сервисе {}: {}",
+                log.error("Error synchronizing hotline and UserBenchmark data {}: {}",
                         service.getClass().getSimpleName(), e.getMessage(), e);
             }
         }
-        log.info("Завершено обновление данных для всех сервисов.");
+        log.info("The process of synchronization of hotline data and "
+                + "UserBenchmark tests has been completed ");
 
     }
 

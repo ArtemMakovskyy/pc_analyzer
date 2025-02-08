@@ -30,18 +30,10 @@ header a {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-<<<<<<< HEAD
-/* Заголовки залишаються центрованими */
-=======
->>>>>>> develop
 h1, h2, h3, h4, h5, h6 {
     text-align: center;
 }
 
-<<<<<<< HEAD
-/* Вирівнюємо текстові блоки по лівому краю */
-=======
->>>>>>> develop
 p {
     text-align: left;
 }

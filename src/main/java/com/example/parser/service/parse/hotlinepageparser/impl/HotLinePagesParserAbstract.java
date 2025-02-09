@@ -1,5 +1,6 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
+import com.example.parser.service.LogService;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.service.parse.MultiThreadPagesParser;
 import com.example.parser.service.parse.utils.ParseUtil;
@@ -35,6 +36,7 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
     private static final int MAX_RETRIES = 5;
 
     protected final HtmlDocumentFetcher htmlDocumentFetcher;
+    protected final LogService logService;
     protected final String baseUrl;
 
     @Value("${hotline.delay.from}")
@@ -46,9 +48,13 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
     @Value("${hotline.delay.use.delay}")
     private boolean useDelay;
 
-    public HotLinePagesParserAbstract(HtmlDocumentFetcher htmlDocumentFetcher, String baseUrl) {
+    public HotLinePagesParserAbstract(
+            HtmlDocumentFetcher htmlDocumentFetcher,
+            String baseUrl,
+            LogService logService) {
         this.htmlDocumentFetcher = htmlDocumentFetcher;
         this.baseUrl = baseUrl;
+        this.logService = logService;
     }
 
     @Override
@@ -140,6 +146,8 @@ public abstract class HotLinePagesParserAbstract<T> implements MultiThreadPagesP
             attempt++;
             try {
                 log.info("Attempting to fetch page: " + url + " (Attempt " + attempt + ")");
+                logService.addLog("Attempting to fetch page: " + url
+                        + " (Attempt " + attempt + ")");
                 htmlDocument = htmlDocumentFetcher.fetchDocument(
                         url,
                         useUserAgent,

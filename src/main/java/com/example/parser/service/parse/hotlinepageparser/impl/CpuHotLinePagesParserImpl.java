@@ -1,6 +1,7 @@
 package com.example.parser.service.parse.hotlinepageparser.impl;
 
 import com.example.parser.dto.hotline.CpuHotLineParserDto;
+import com.example.parser.service.LogService;
 import com.example.parser.service.parse.HtmlDocumentFetcher;
 import com.example.parser.service.parse.utils.ParseUtil;
 import java.util.ArrayList;
@@ -20,8 +21,9 @@ public class CpuHotLinePagesParserImpl extends HotLinePagesParserAbstract<CpuHot
     private static final String NAME_CSS_SELECTOR = "div.list-item__title-container a";
     private static final String LINK_CSS_SELECTOR = "a.item-title.link--black";
 
-    public CpuHotLinePagesParserImpl(HtmlDocumentFetcher htmlDocumentFetcher) {
-        super(htmlDocumentFetcher, BASE_URL);
+    public CpuHotLinePagesParserImpl(
+            HtmlDocumentFetcher htmlDocumentFetcher, LogService logService) {
+        super(htmlDocumentFetcher, BASE_URL, logService);
     }
 
     @Override

@@ -61,6 +61,8 @@ To improve performance during parsing, multithreading is used. The `parseAllMult
 ## Accessing the Application
 To use the application, open your browser and navigate to http://localhost:8080/
 
+When deploying the project to the internet, you need to change the link `localhost:8080` to the internet address in the file `src/main/resources/templates/operations.html`.
+
 ## Authors
 
 Developed by **Artem Makovskyi**.

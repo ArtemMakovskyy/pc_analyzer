@@ -1,6 +1,7 @@
 package com.example.parser.service.parse.benchmark.user;
 
 import com.example.parser.dto.userbenchmark.CpuUserBenchmarkParserDto;
+import com.example.parser.service.LogService;
 import com.example.parser.service.parse.WebDriverFactory;
 import com.example.parser.service.parse.utils.ParseUtil;
 import java.time.Duration;
@@ -60,6 +61,7 @@ public class UserBenchmarkCpuPageParser {
 
     private final UserBenchmarkTestPage userBenchmarkTestPage;
     private final WebDriverFactory webDriverFactory;
+    private final LogService logService;
 
     public List<CpuUserBenchmarkParserDto> loadAndParse(boolean sortByAge) {
         return loadAndParse(sortByAge, PARSE_ALL_PAGES_INDEX);
@@ -99,6 +101,7 @@ public class UserBenchmarkCpuPageParser {
         int currentPage = 1;
         do {
             log.info("Current page is " + currentPage + " from " + pages + ".");
+            logService.addLog("Current page is " + currentPage + " from " + pages + ".");
             final List<CpuUserBenchmarkParserDto> cpusUserBenchmarksOnPage = parsePage(driver);
             cpuUserBenchmarks.addAll(cpusUserBenchmarksOnPage);
 

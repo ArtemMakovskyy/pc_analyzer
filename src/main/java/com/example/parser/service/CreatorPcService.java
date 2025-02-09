@@ -57,6 +57,7 @@ public class CreatorPcService {
     private final CpuUserBenchmarkService cpuUserBenchmarkService;
     private final GpuUserBenchmarkService gpuUserBenchmarkService;
     private final HotlineDataUpdateCoordinatorService hotlineDataUpdateCoordinatorService;
+    private final LogService logService;
 
     public List<Pc> getAll() {
         return pcHotLineRepository.findPcListWithNonZeroPriceForFpsOrdered();
@@ -76,30 +77,42 @@ public class CreatorPcService {
             boolean saveReportToExel) {
         try {
             log.info("Starting data update process ");
+            logService.addLog("Starting data update process ");
 
             if (updateUserBenchmarkCpu) {
+                logService.addLog("update UserBenchmarkCpu started");
                 cpuUserBenchmarkService.loadAndSaveNewItems();
                 cpuUserBenchmarkService.updateMissingSpecifications();
+                logService.addLog("update UserBenchmarkCpu done");
             }
 
             if (updateUserBenchmarkGpu) {
+                logService.addLog("update UserBenchmarkGpu started ");
                 gpuUserBenchmarkService.loadAndSaveNewItems();
+                logService.addLog("update UserBenchmarkGpu done");
             }
 
             if (updateHotline) {
+                logService.addLog("update Hotline started ");
                 hotlineDataUpdateCoordinatorService.updateAllData();
+                logService.addLog("update Hotline done ");
             }
 
             if (createPcList) {
+                logService.addLog("create Pc List started ");
                 createFilterAndSaveOptimalPcList();
+                logService.addLog("create Pc List done ");
             }
 
             if (saveReportToExel) {
+                logService.addLog("save report started ");
                 exportToExcelPcList(filePrefix,
                         pcHotLineRepository.findPcListWithNonZeroPriceForFpsOrdered());
+                logService.addLog("save report done ");
             }
 
             log.info("Data update process completed successfully");
+            logService.addLog("Data update process completed successfully");
 
         } catch (Exception e) {
             log.error("An error occurred during the update process: ", e);
@@ -111,6 +124,7 @@ public class CreatorPcService {
 
     public void exportToExcelPcList(String fileName, List<Pc> pcList) {
         log.info("Start save file to Excel");
+        logService.addLog("Start save file to Excel");
         long executionTime = measureExecutionTime(() -> {
             if (!pcList.isEmpty()) {
                 String customPath = directoryPath;
@@ -157,6 +171,7 @@ public class CreatorPcService {
 
     private void createFilterAndSaveOptimalPcList() {
         log.info("Start creating and filtering PC list");
+        logService.addLog("Start creating and filtering PC list");
         try {
             pcHotLineRepository.deleteAll();
             List<Pc> allPcList = pcHotLineRepository.saveAll(createPc());
@@ -167,6 +182,7 @@ public class CreatorPcService {
             log.error("Error occurred during the process: ", e);
         }
         log.info("Finished creating and saving optimal PC list");
+        logService.addLog("Finished creating and saving optimal PC list");
     }
 
     private void insertMarker(List<Pc> pcList, PcMarker marker) {
@@ -209,6 +225,7 @@ public class CreatorPcService {
             }
         });
         log.info("Computer configurations were successfully assembled");
+        logService.addLog("Computer configurations were successfully assembled");
         return filterPc(pcs);
     }
 

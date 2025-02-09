@@ -1,6 +1,7 @@
 package com.example.parser.service.parse.benchmark.user;
 
 import com.example.parser.model.user.benchmark.UserBenchmarkCpu;
+import com.example.parser.service.LogService;
 import com.example.parser.service.parse.utils.ParseUtil;
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +41,7 @@ public class UserBenchmarkCpuDetailsPageParser {
     private static final ParseUtil.DelayInSeconds DELAY_IN_SECONDS
             = new ParseUtil.DelayInSeconds(3, 6);
     private final UserBenchmarkTestPage userBenchmarkTestPage;
+    private final LogService logService;
 
     public void purseAndAddDetails(
             UserBenchmarkCpu cpu,
@@ -49,6 +51,7 @@ public class UserBenchmarkCpuDetailsPageParser {
 
         if (parseCpuScore(document, cpu) && parseCpuSpecification(document, cpu)) {
             log.info(cpu);
+            logService.addLog(cpu.getModel() + " parsed");
         } else {
             log.error("Can't parse data from cpu ID: " + cpu.getId());
         }

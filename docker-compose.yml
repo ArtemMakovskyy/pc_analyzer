@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  mysql-parser-db:
+    image: mysql:latest
+    container_name: mysql-parser-db-container
+    environment:
+      MYSQL_ROOT_PASSWORD: rootPassword
+      MYSQL_DATABASE: parser
+      MYSQL_USER: bestuser
+      MYSQL_PASSWORD: bestuser
+    ports:
+      - "3308:3306"
+    restart: unless-stopped

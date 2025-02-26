@@ -59,7 +59,7 @@ Parser is a local Java application with a web interface designed to collect, pro
 To improve performance during parsing, multithreading is used. The `parseAllMultiThread` method processes pages in separate threads using `ExecutorService`, speeding up data collection.
 
 ## Accessing the Application
-To use the application, open your browser and navigate to http://localhost:8080/
+To use the application, open your browser and navigate to http://localhost:8079/
 
 When deploying the project to the internet, you need to change the link `localhost:8080` to the internet address in the file `src/main/resources/templates/operations.html`.
 

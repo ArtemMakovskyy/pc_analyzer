@@ -1,4 +1,4 @@
-create table pc
+create table pc_config
 (
     id                    bigint auto_increment
         primary key,
@@ -29,4 +29,3 @@ create table pc
     constraint FKskotnel68nh34fw2mlhba7jrd
         foreign key (cpu_id) references parser.cpus_hotline (id)
 );
-

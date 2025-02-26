@@ -1,6 +1,8 @@
 package com.example.parser.service;
 
-import com.example.parser.model.Pc;
+import com.example.parser.dto.PcConfigDto;
+import com.example.parser.dto.mapper.PcConfigMapper;
+import com.example.parser.model.PcConfig;
 import com.example.parser.model.PcMarker;
 import com.example.parser.model.hotline.CpuHotLine;
 import com.example.parser.model.hotline.GpuHotLine;
@@ -12,7 +14,7 @@ import com.example.parser.repository.CpuHotLineRepository;
 import com.example.parser.repository.GpuHotLineRepository;
 import com.example.parser.repository.MemoryHotLineRepository;
 import com.example.parser.repository.MotherBoardHotLineRepository;
-import com.example.parser.repository.PcHotLineRepository;
+import com.example.parser.repository.PcConfigRepository;
 import com.example.parser.repository.PowerSupplierHotLineRepository;
 import com.example.parser.repository.SsdHotLineRepository;
 import com.example.parser.service.hotline.HotlineDataUpdateCoordinatorService;
@@ -28,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -37,7 +40,7 @@ import org.springframework.stereotype.Service;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-public class CreatorPcService {
+public class PcConfigService {
     private static final int MIN_PROPOSITION_QUANTITY_DEFAULT = 5;
     private static final double CASE_PRICE_MIN = 15.0;
     private static final double CASE_PRICE_AVG = 25.0;
@@ -52,21 +55,27 @@ public class CreatorPcService {
     private final GpuHotLineRepository gpuHotLineRepository;
     private final SsdHotLineRepository ssdHotLineRepository;
     private final PowerSupplierHotLineRepository powerSupplierHotLineRepository;
-    private final PcHotLineRepository pcHotLineRepository;
+    private final PcConfigRepository pcConfigRepository;
     private final ExcelExporter excelExporter;
     private final CpuUserBenchmarkService cpuUserBenchmarkService;
     private final GpuUserBenchmarkService gpuUserBenchmarkService;
     private final HotlineDataUpdateCoordinatorService hotlineDataUpdateCoordinatorService;
     private final LogService logService;
+    private final PcConfigMapper pcConfigMapper;
 
-    public List<Pc> getAll() {
-        return pcHotLineRepository.findPcListWithNonZeroPriceForFpsOrdered();
+    public List<PcConfigDto> getAllPcConfigDto() {
+        return pcConfigRepository.findAll()
+                .stream()
+                .map(pcConfigMapper::toDto)
+                .toList();
     }
 
-    public List<Pc> getAllByBestPrice() {
-        final List<Pc> allByMarkerOrderByPredictionPrice = pcHotLineRepository
-                .findAllByMarkerOrderByPredictionPrice(PcMarker.BEST_PRICE);
-        return allByMarkerOrderByPredictionPrice;
+    public List<PcConfigDto> getAllPcConfigDtoByBestPrice() {
+        return pcConfigRepository
+                .findAllByMarkerOrderByPredictionPrice(PcMarker.BEST_PRICE)
+                .stream()
+                .map(pcConfigMapper::toDto)
+                .toList();
     }
 
     public boolean updateDataAndCreatePcList(
@@ -76,40 +85,57 @@ public class CreatorPcService {
             boolean createPcList,
             boolean saveReportToExel) {
         try {
-            log.info("Starting data update process ");
-            logService.addLog("Starting data update process ");
+            log.info("Starting data update process");
+            logService.addLog("Starting data update process");
 
-            if (updateUserBenchmarkCpu) {
-                logService.addLog("update UserBenchmarkCpu started");
-                cpuUserBenchmarkService.loadAndSaveNewItems();
-                cpuUserBenchmarkService.updateMissingSpecifications();
-                logService.addLog("update UserBenchmarkCpu done");
-            }
+            CompletableFuture<Void> benchmarkFuture = CompletableFuture.runAsync(() -> {
+                if (updateUserBenchmarkCpu) {
+                    logService.addLog("update UserBenchmarkCpu started");
+                    cpuUserBenchmarkService.loadAndSaveNewItems();
+                    cpuUserBenchmarkService.updateMissingSpecifications();
+                    logService.addLog("update UserBenchmarkCpu done");
+                }
 
-            if (updateUserBenchmarkGpu) {
-                logService.addLog("update UserBenchmarkGpu started ");
-                gpuUserBenchmarkService.loadAndSaveNewItems();
-                logService.addLog("update UserBenchmarkGpu done");
-            }
+                if (updateUserBenchmarkGpu) {
+                    logService.addLog("update UserBenchmarkGpu started");
+                    gpuUserBenchmarkService.loadAndSaveNewItems();
+                    logService.addLog("update UserBenchmarkGpu done");
+                }
+            });
 
-            if (updateHotline) {
-                logService.addLog("update Hotline started ");
-                hotlineDataUpdateCoordinatorService.updateAllData();
-                logService.addLog("update Hotline done ");
-            }
+            CompletableFuture<Void> hotlineFuture = CompletableFuture.runAsync(() -> {
+                if (updateHotline) {
+                    logService.addLog("update Hotline started");
+                    hotlineDataUpdateCoordinatorService.updateAllData();
+                    logService.addLog("update Hotline done");
+                }
+            });
 
-            if (createPcList) {
-                logService.addLog("create Pc List started ");
-                createFilterAndSaveOptimalPcList();
-                logService.addLog("create Pc List done ");
-            }
+            CompletableFuture<Void> pcListFuture
+                    = CompletableFuture.allOf(benchmarkFuture, hotlineFuture)
 
-            if (saveReportToExel) {
-                logService.addLog("save report started ");
-                exportToExcelPcList(filePrefix,
-                        pcHotLineRepository.findPcListWithNonZeroPriceForFpsOrdered());
-                logService.addLog("save report done ");
-            }
+                    .thenRunAsync(() -> {
+                        if (createPcList) {
+                            logService.addLog("create Pc List started");
+                            createFilterAndSaveOptimalPcList();
+                            logService.addLog("create Pc List done");
+                        }
+                    })
+
+                    .thenRunAsync(() -> {
+                        if (saveReportToExel) {
+                            logService.addLog("save report started");
+                            exportToExcelPcList(
+                                    filePrefix, pcConfigRepository
+                                            .findPcListWithNonZeroPriceForFpsOrdered()
+                                            .stream()
+                                            .map(pcConfigMapper::toDto)
+                                            .toList());
+                            logService.addLog("save report done");
+                        }
+                    });
+
+            pcListFuture.join();
 
             log.info("Data update process completed successfully");
             logService.addLog("Data update process completed successfully");
@@ -122,11 +148,11 @@ public class CreatorPcService {
         return true;
     }
 
-    public void exportToExcelPcList(String fileName, List<Pc> pcList) {
+    public void exportToExcelPcList(String fileName, List<PcConfigDto> pcConfigList) {
         log.info("Start save file to Excel");
         logService.addLog("Start save file to Excel");
         long executionTime = measureExecutionTime(() -> {
-            if (!pcList.isEmpty()) {
+            if (!pcConfigList.isEmpty()) {
                 String customPath = directoryPath;
                 File directory = new File(customPath);
                 if (!directory.exists()) {
@@ -138,7 +164,7 @@ public class CreatorPcService {
                 String fullFileName = fileName + " " + formattedDate + ".xlsx";
                 String fullPath = Paths.get(customPath, fullFileName).toString();
                 clearFilesDirectory();
-                excelExporter.exportToExcelPcConfiguration(pcList, fullPath);
+                excelExporter.exportToExcelPcConfiguration(pcConfigList, fullPath);
                 log.info("Export of PC list to Excel completed. File saved at: {}", fullPath);
             } else {
                 log.warn("PC list is empty, export was not performed.");
@@ -173,11 +199,11 @@ public class CreatorPcService {
         log.info("Start creating and filtering PC list");
         logService.addLog("Start creating and filtering PC list");
         try {
-            pcHotLineRepository.deleteAll();
-            List<Pc> allPcList = pcHotLineRepository.saveAll(createPc());
-            List<Pc> optimalPcList = removeItemsWithUncompetitivePrice(allPcList);
-            insertMarker(optimalPcList, PcMarker.BEST_PRICE);
-            pcHotLineRepository.saveAll(optimalPcList);
+            pcConfigRepository.deleteAll();
+            List<PcConfig> allPcListConfig = pcConfigRepository.saveAll(createPc());
+            List<PcConfig> optimalPcListConfig = removeItemsWithUncompetitivePrice(allPcListConfig);
+            insertMarker(optimalPcListConfig, PcMarker.BEST_PRICE);
+            pcConfigRepository.saveAll(optimalPcListConfig);
         } catch (Exception e) {
             log.error("Error occurred during the process: ", e);
         }
@@ -185,14 +211,14 @@ public class CreatorPcService {
         logService.addLog("Finished creating and saving optimal PC list");
     }
 
-    private void insertMarker(List<Pc> pcList, PcMarker marker) {
-        pcList.stream()
-                .peek(pc -> pc.setMarker(marker))
+    private void insertMarker(List<PcConfig> pcConfigList, PcMarker marker) {
+        pcConfigList.stream()
+                .peek(pcConfig -> pcConfig.setMarker(marker))
                 .collect(Collectors.toList());
     }
 
-    private List<Pc> createPc() {
-        pcHotLineRepository.deleteAll();
+    private List<PcConfig> createPc() {
+        pcConfigRepository.deleteAll();
         List<CpuHotLine> cpus = cpuHotLineRepository
                 .findCpusWithMinPropositions(
                         MIN_PROPOSITION_QUANTITY_DEFAULT);
@@ -211,7 +237,7 @@ public class CreatorPcService {
 
         validateData(cpus, motherBoards, memories, gpus, ssdFromDb, powerSupplierHotLines);
 
-        List<Pc> pcs = new ArrayList<>();
+        List<PcConfig> pcConfigs = new ArrayList<>();
 
         cpus.forEach(cpu -> {
             Optional<MotherBoardHotLine> motherboardOpt
@@ -220,39 +246,40 @@ public class CreatorPcService {
                 MotherBoardHotLine motherboard = motherboardOpt.get();
                 MemoryHotLine memory = getMemoryFromMotherBoardBySocketType(
                         memories, motherboard);
-                pcs.addAll(video(
+                pcConfigs.addAll(video(
                         gpus, cpu, motherboard, memory, ssdFromDb, powerSupplierHotLines));
             }
         });
         log.info("Computer configurations were successfully assembled");
         logService.addLog("Computer configurations were successfully assembled");
-        return filterPc(pcs);
+        return filterPc(pcConfigs);
     }
 
-    private List<Pc> removeItemsWithUncompetitivePrice(List<Pc> pcList) {
+    private List<PcConfig> removeItemsWithUncompetitivePrice(List<PcConfig> pcConfigList) {
         boolean process = true;
 
         while (process) {
             process = false;
 
-            for (int i = 0; i < pcList.size() - 1; i++) {
-                if (pcList.get(i).getPrice().compareTo(pcList.get(i + 1).getPrice()) > 0) {
-                    pcList.get(i).setPrice(BigDecimal.ZERO);
+            for (int i = 0; i < pcConfigList.size() - 1; i++) {
+                if (pcConfigList.get(i).getPrice()
+                        .compareTo(pcConfigList.get(i + 1).getPrice()) > 0) {
+                    pcConfigList.get(i).setPrice(BigDecimal.ZERO);
                     process = true;
                 }
             }
-            pcList.removeIf(pc -> pc.getPrice().compareTo(BigDecimal.ZERO) == 0);
+            pcConfigList.removeIf(pcConfig -> pcConfig.getPrice().compareTo(BigDecimal.ZERO) == 0);
         }
-        return pcList;
+        return pcConfigList;
     }
 
-    private List<Pc> filterPc(List<Pc> pcList) {
-        return pcList.stream()
+    private List<PcConfig> filterPc(List<PcConfig> pcConfigList) {
+        return pcConfigList.stream()
                 .sorted(
                         Comparator
-                                .comparing(Pc::getPredictionGpuFpsFhd,
+                                .comparing(PcConfig::getPredictionGpuFpsFhd,
                                         Comparator.nullsLast(Comparator.naturalOrder()))
-                                .thenComparing(Pc::getPrice, Comparator.nullsLast(
+                                .thenComparing(PcConfig::getPrice, Comparator.nullsLast(
                                         Comparator.naturalOrder()))
                 )
                 .collect(Collectors.toList());
@@ -272,59 +299,59 @@ public class CreatorPcService {
         }
     }
 
-    private List<Pc> video(List<GpuHotLine> gpus,
-                           CpuHotLine cpu,
-                           MotherBoardHotLine mb,
-                           MemoryHotLine memory,
-                           SsdHotLine ssd,
-                           List<PowerSupplierHotLine> powerSupplierHotLines) {
-        List<Pc> pcs = new ArrayList<>();
+    private List<PcConfig> video(List<GpuHotLine> gpus,
+                                 CpuHotLine cpu,
+                                 MotherBoardHotLine mb,
+                                 MemoryHotLine memory,
+                                 SsdHotLine ssd,
+                                 List<PowerSupplierHotLine> powerSupplierHotLines) {
+        List<PcConfig> pcConfigs = new ArrayList<>();
 
         gpus.forEach(gpu -> {
-            Pc pc = new Pc();
-            initializePc(pc, gpu, cpu, mb, memory, ssd, powerSupplierHotLines);
-            pcs.add(pc);
+            PcConfig pcConfig = new PcConfig();
+            initializePc(pcConfig, gpu, cpu, mb, memory, ssd, powerSupplierHotLines);
+            pcConfigs.add(pcConfig);
         });
 
-        return pcs;
+        return pcConfigs;
     }
 
-    private void initializePc(Pc pc, GpuHotLine gpu,
+    private void initializePc(PcConfig pcConfig, GpuHotLine gpu,
                               CpuHotLine cpu,
                               MotherBoardHotLine mb,
                               MemoryHotLine memory,
                               SsdHotLine ssd,
                               List<PowerSupplierHotLine> powerSupplierHotLines) {
-        pc.setGpu(gpu);
-        pc.setCpu(cpu);
-        pc.setMotherboard(mb);
-        pc.setMemory(memory);
-        pc.setSsd(ssd);
-        pc.setPowerSupplier(getPowerSupply(gpu, powerSupplierHotLines));
-        pc.setPrice(BigDecimal.valueOf(calculatePrice(pc)));
-        pc.setAvgGpuBench(gpu.getUserBenchmarkGpu().getAvgBench());
-        pc.setDesktopScore(cpu.getUserBenchmarkCpu().getDesktopScore());
-        pc.setGamingScore(cpu.getUserBenchmarkCpu().getGamingScore());
-        pc.setWorkstationScore(cpu.getUserBenchmarkCpu().getWorkstationScore());
-        pc.setPredictionGpuFpsFhd(
+        pcConfig.setGpu(gpu);
+        pcConfig.setCpu(cpu);
+        pcConfig.setMotherboard(mb);
+        pcConfig.setMemory(memory);
+        pcConfig.setSsd(ssd);
+        pcConfig.setPowerSupplier(getPowerSupply(gpu, powerSupplierHotLines));
+        pcConfig.setPrice(BigDecimal.valueOf(calculatePrice(pcConfig)));
+        pcConfig.setAvgGpuBench(gpu.getUserBenchmarkGpu().getAvgBench());
+        pcConfig.setDesktopScore(cpu.getUserBenchmarkCpu().getDesktopScore());
+        pcConfig.setGamingScore(cpu.getUserBenchmarkCpu().getGamingScore());
+        pcConfig.setWorkstationScore(cpu.getUserBenchmarkCpu().getWorkstationScore());
+        pcConfig.setPredictionGpuFpsFhd(
                 calculationPredictionGpuFpsHd(
                         cpu.getUserBenchmarkCpu().getGamingScore(),
                         gpu.getUserBenchmarkGpu().getAvgBench()
                 )
         );
-        pc.setPriceForFps(calculatePriceForFpc(pc));
+        pcConfig.setPriceForFps(calculatePriceForFpc(pcConfig));
     }
 
-    private double calculatePrice(Pc pc) {
-        Double avgPriceCpu = pc.getCpu().getAvgPrice();
-        double coolingPrice = calculateCoolingPrice(pc.getCpu());
-        avgPriceCpu += calculateCasePrice(pc.getCpu());
+    private double calculatePrice(PcConfig pcConfig) {
+        Double avgPriceCpu = pcConfig.getCpu().getAvgPrice();
+        double coolingPrice = calculateCoolingPrice(pcConfig.getCpu());
+        avgPriceCpu += calculateCasePrice(pcConfig.getCpu());
 
-        Double avgPriceMb = getSafeAvgPrice(pc.getMotherboard().getAvgPrice());
-        Double avgPriceMemory = getSafeAvgPrice(pc.getMemory().getAvgPrice());
-        Double avgPriceGpu = getSafeAvgPrice(pc.getGpu().getAvgPrice());
-        Double avgPriceSsd = getSafeAvgPrice(pc.getSsd().getAvgPrice());
-        Double avgPricePs = getSafeAvgPrice(pc.getPowerSupplier().getAvgPrice());
+        Double avgPriceMb = getSafeAvgPrice(pcConfig.getMotherboard().getAvgPrice());
+        Double avgPriceMemory = getSafeAvgPrice(pcConfig.getMemory().getAvgPrice());
+        Double avgPriceGpu = getSafeAvgPrice(pcConfig.getGpu().getAvgPrice());
+        Double avgPriceSsd = getSafeAvgPrice(pcConfig.getSsd().getAvgPrice());
+        Double avgPricePs = getSafeAvgPrice(pcConfig.getPowerSupplier().getAvgPrice());
 
         return avgPriceCpu + coolingPrice + avgPriceMb
                 + avgPriceMemory + avgPriceGpu + avgPriceSsd + avgPricePs;
@@ -482,9 +509,9 @@ public class CreatorPcService {
                 .findMinPriceGroupedByChipsetWithConditions(propositionQuantityThreshold);
     }
 
-    public Integer calculatePriceForFpc(Pc pc) {
-        BigDecimal someValue = pc.getPrice();
-        BigDecimal denominator = BigDecimal.valueOf(pc.getPredictionGpuFpsFhd());
+    public Integer calculatePriceForFpc(PcConfig pcConfig) {
+        BigDecimal someValue = pcConfig.getPrice();
+        BigDecimal denominator = BigDecimal.valueOf(pcConfig.getPredictionGpuFpsFhd());
         if (denominator.compareTo(BigDecimal.ZERO) != 0) {
             return someValue.divide(denominator, RoundingMode.HALF_UP).intValue();
         } else {

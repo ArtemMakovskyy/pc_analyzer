@@ -15,12 +15,12 @@ public class PcConfigController {
     private final PcConfigService pcConfigService;
 
     @GetMapping
-    public List<PcConfigDto> getAll(){
+    public List<PcConfigDto> getAll() {
         return pcConfigService.getAllPcConfigDto();
     }
 
     @GetMapping("/price/best")
-    public List<PcConfigDto> getAllByBestPrice(){
+    public List<PcConfigDto> getAllByBestPrice() {
         return pcConfigService.getAllPcConfigDtoByBestPrice();
     }
 

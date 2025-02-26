@@ -11,3 +11,24 @@ services:
     ports:
       - "3308:3306"
     restart: unless-stopped
+    networks:
+      - app-network
+
+  parser-app:
+    build: .
+    container_name: parser-app-container
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-parser-db:3306/parser
+      SPRING_DATASOURCE_USERNAME: bestuser
+      SPRING_DATASOURCE_PASSWORD: bestuser
+    depends_on:
+      - mysql-parser-db
+    ports:
+      - "8079:8080"
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

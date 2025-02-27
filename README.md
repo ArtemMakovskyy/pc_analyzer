@@ -21,6 +21,7 @@ Parser is a local Java application with a web interface designed to collect, pro
 - **Apache POI** – generating reports in Excel format.
 - **JSoup** – parsing HTML pages.
 - **Selenium** – browser automation.
+- **Docker** – browser automation.
 
 ### Database:
 - **MySQL** – relational database.
@@ -34,17 +35,32 @@ Parser is a local Java application with a web interface designed to collect, pro
 - **JUnit** – testing framework.
 
 ## Project Setup
+### First option Using maven, JDK and a database MySQL
 
 1. Ensure **JDK 17** and **Maven** are installed.
 2. Clone the repository:
    ```sh
-   git clone https://github.com/your-repository/parser.git
+   git clone https://github.com/ArtemMakovskyy/pc_analyzer.git
    cd parser
    ```
 3. Configure the MySQL database and update `application.properties`.
 4. Start the project using Maven:
    ```sh
    mvn spring-boot:run
+   ```
+### Second option Using maven and Docker
+- **Instalation**
+   - Clone the repository from github:
+  ```shell
+  git clone https://github.com/ArtemMakovskyy/pc_analyzer.git
+   ```
+   - Start the Docker
+   - Open a terminal and navigate to the root directory of your project
+   - Into the terminal use command to build the container and start project.
+  ```shell
+    mvn clean package
+    docker-compose build
+    docker-compose up
    ```
 
 ## API Endpoints

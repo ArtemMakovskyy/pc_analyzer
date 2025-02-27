@@ -59,7 +59,6 @@ Parser is a local Java application with a web interface designed to collect, pro
    - Into the terminal use command to build the container and start project.
   ```shell
     mvn clean package
-    docker-compose build
     docker-compose up
    ```
   to stop use docker

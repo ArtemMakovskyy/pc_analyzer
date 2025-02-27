@@ -1,4 +1,4 @@
-version: '3.8'
+
 services:
   mysql-parser-db:
     image: mysql:latest
@@ -30,7 +30,7 @@ services:
       SPRING_DATASOURCE_USERNAME: bestuser
       SPRING_DATASOURCE_PASSWORD: bestuser
     ports:
-      - "8079:8080"
+      - "8079:8079"
     networks:
       - app-network
 

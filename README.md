@@ -62,7 +62,10 @@ Parser is a local Java application with a web interface designed to collect, pro
     docker-compose build
     docker-compose up
    ```
-
+  to stop use docker
+  ```shell
+    docker-compose stop
+   ```
 ## API Endpoints
 
 - `GET /gpus` – Retrieve a list of graphics cards.

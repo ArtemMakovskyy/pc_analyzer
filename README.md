@@ -45,6 +45,9 @@
 
 ## What You Can Analyse
 
+- [Link to download pc_configuration 2025-02-09 11-53.zip](https://drive.google.com/file/d/1Qc3C0PZnqo7e8zi6-J41b7_4LBnkwig-/view?usp=sharing)
+
+
 The generated dataset enables a range of analytical tasks out of the box:
 
 - **Price-to-performance ranking** — sort all builds by ₴/FPS to instantly identify the most efficient configurations at any budget level.
